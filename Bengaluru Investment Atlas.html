@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280">
+  <title>Bengaluru | Investment Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root{--paper:#f4f6f3;--white:#fff;--ink:#1f2930;--muted:#65727a;--line:#dce2df;--green:#246b56;--green-light:#e7f2ec;--orange:#b25b31;--orange-light:#fff0e5;--blue:#335c82;--blue-light:#eaf1f7;--gold:#cc9c61;--deep:#193a38}
+    *{box-sizing:border-box}[hidden]{display:none!important}
+    html,body{height:100%}
+    body{margin:0;min-width:1200px;overflow:hidden;background:var(--paper);color:var(--ink);font:14px/1.4 'DM Sans',system-ui,sans-serif}
+    button,input,select{font:inherit;color:inherit}button{cursor:pointer}a{color:var(--green)}
+    button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid #edae65;outline-offset:2px}
+    h1,h2,h3,p{margin:0}h1,h2,h3{font-family:'Space Grotesk',sans-serif;letter-spacing:0}
+    .app{display:grid;grid-template-rows:auto minmax(0,1fr);height:100vh}
+
+    /* Header */
+    .top{display:flex;align-items:center;gap:28px;padding:12px 24px;background:var(--deep);color:#f3f7f4;border-bottom:3px solid var(--gold)}
+    .eyebrow{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#b7d1c6;font-weight:700;margin-bottom:3px}
+    .top h1{font-size:23px;line-height:1.1}
+    .kpis{display:flex;margin-left:auto}
+    .kpi{padding:2px 20px;border-left:1px solid rgba(255,255,255,.18);min-width:112px}
+    .kpi strong{font:600 21px 'Space Grotesk',sans-serif;display:block}
+    .kpi span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b7d1c6}
+
+    /* Shell */
+    .body{display:grid;grid-template-columns:284px minmax(0,1fr);min-height:0}
+    .filters{overflow:auto;background:var(--white);border-right:1px solid var(--line);padding:16px 18px 28px}
+    .filters-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .filters-head h2{font-size:16px}.filters-head small{color:var(--muted);font-size:11px;margin-left:6px}
+    .quiet-btn{border:0;background:none;color:var(--green);padding:4px 6px;font-size:12px;font-weight:700;border-radius:3px}.quiet-btn:hover{background:var(--green-light)}
+    .group{margin-bottom:16px}
+    .group-label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:7px}
+    .group-label output{text-transform:none;letter-spacing:0;color:var(--ink);font-weight:700}
+    .search{width:100%;height:38px;border:1px solid #cbd6d2;border-radius:4px;padding:0 10px;background:#fff}
+    .search-wrap{position:relative}.search-wrap kbd{position:absolute;right:8px;top:9px;font-size:10px;border:1px solid var(--line);border-radius:3px;padding:1px 5px;color:var(--muted);background:#f6f7f6}
+    .facet{display:flex;align-items:center;gap:9px;width:100%;border:1px solid transparent;background:none;padding:6px 8px;border-radius:4px;text-align:left;font-size:13px}
+    .facet:hover{background:#f2f5f3}.facet[aria-pressed=true]{background:var(--green-light);border-color:#b9d6c8;font-weight:700}
+    .facet i{width:10px;height:10px;border-radius:50%;flex:none}.facet span{flex:1}.facet b{font-size:11px;color:var(--muted);font-weight:700}
+    .chip-row{display:flex;flex-wrap:wrap;gap:5px}
+    .chip-btn{border:1px solid #cdd8d4;background:#fff;border-radius:14px;padding:4px 10px;font-size:12px;font-weight:600}
+    .chip-btn:hover{border-color:#8eaaa0}.chip-btn[aria-pressed=true]{background:var(--green);border-color:var(--green);color:#fff}
+    .segmented{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #cdd8d4;border-radius:5px;overflow:hidden}
+    .segmented button{border:0;background:#fff;padding:7px 4px;font-size:12px;font-weight:600;border-right:1px solid #cdd8d4}.segmented button:last-child{border-right:0}
+    .segmented button[aria-pressed=true]{background:var(--green);color:#fff}
+    input[type=range]{width:100%;accent-color:var(--green)}
+    .select{width:100%;height:36px;border:1px solid #cbd6d2;border-radius:4px;background:#fff;padding:0 8px}
+    .check{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin:8px 0}.check input{accent-color:var(--green);margin-top:2px}
+    .rule{border:0;border-top:1px solid var(--line);margin:16px 0}
+    details.about{font-size:11.5px;color:var(--muted);line-height:1.6}details.about summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:12px}details.about p{margin-top:8px}
+
+    /* Workspace */
+    .workspace{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;min-width:0}
+    .tabs{display:flex;align-items:flex-end;gap:2px;padding:8px 20px 0;border-bottom:1px solid var(--line);background:var(--paper)}
+    .tab{border:0;background:none;padding:10px 14px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+    .tab:hover{color:var(--ink)}.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--green)}
+    .badge{display:inline-block;min-width:18px;padding:1px 5px;border-radius:9px;background:var(--green);color:#fff;font-size:10.5px;margin-left:4px;text-align:center}
+    .tabs-right{margin-left:auto;display:flex;gap:8px;padding-bottom:8px}
+    .action{background:var(--white);border:1px solid #bfcfca;border-radius:4px;padding:7px 11px;font-size:12px;font-weight:700;color:var(--green)}
+    .action:hover{background:var(--green-light)}.action:disabled{opacity:.45;cursor:not-allowed}
+    .action.primary{background:var(--green);color:#fff;border-color:var(--green)}.action.primary:hover{background:#1c5746}
+    .view{min-height:0;overflow:auto;padding:18px 22px 28px}
+
+    /* Explore */
+    #view-explore{display:grid;grid-template-columns:minmax(400px,.9fr) minmax(480px,1.1fr);padding:0;overflow:hidden}
+    .list-pane{overflow:auto;padding:12px 16px 30px;border-right:1px solid var(--line)}
+    .list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;position:sticky;top:-12px;background:var(--paper);padding:10px 0 8px;z-index:2}
+    .list-head strong{font:600 16px 'Space Grotesk',sans-serif}
+    .inline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.inline select{height:32px;border:1px solid #cbd6d2;border-radius:4px;background:#fff;padding:0 6px;color:var(--ink)}
+    .district{display:flex;align-items:center;gap:8px;margin:16px 0 8px;font:600 14px 'Space Grotesk',sans-serif}.district i{width:10px;height:10px;border-radius:50%}.district span{font:500 11px 'DM Sans';color:var(--muted)}
+    .row{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:4px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,border-color .15s,transform .15s}
+    .row:hover,.row.hot{box-shadow:0 4px 14px rgba(25,58,56,.12);border-color:#9fb8ae;border-left-color:var(--c);transform:translateX(2px)}
+    .row.flash{animation:flash 1.2s ease}@keyframes flash{0%,40%{background:#fff4dc}100%{background:#fff}}
+    .row.comparing{box-shadow:inset 0 0 0 1px var(--green)}
+    .row-top{display:flex;align-items:center;gap:8px}.row-top h3{font-size:15px;flex:1;line-height:1.25}
+    .star{border:0;background:none;font-size:18px;line-height:1;color:#c3ccc8;padding:2px 4px;border-radius:3px}.star:hover{color:var(--gold)}.star.on{color:#d59b3a}
+    .row-sub{color:var(--muted);font-size:12px;margin:2px 0 9px}
+    .row-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+    .row-metrics span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.row-metrics b{font-size:13px}
+    .row-foot{display:flex;align-items:center;gap:10px;margin-top:9px}.row-foot .chips{flex:1}
+    .cmp{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}.cmp input{accent-color:var(--green)}
+    .link-btn{border:0;background:none;color:var(--green);font-weight:700;font-size:12px;padding:3px 4px;white-space:nowrap}.link-btn:hover{text-decoration:underline}
+    .chips{display:flex;gap:4px;flex-wrap:wrap}
+    .chip{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;padding:4px 6px;border-radius:2px;background:#eff2f1;color:#5c676a}
+    .chip.ready{background:var(--green-light);color:var(--green)}.chip.late{background:var(--orange-light);color:var(--orange)}.chip.unknown{background:var(--blue-light);color:var(--blue)}
+    .empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed #c9d3cf;border-radius:6px;background:#fff}
+    .map-pane{position:relative;min-height:0;background:#e9ecea}#map{position:absolute;inset:0}
+    .map-tools{position:absolute;top:12px;right:12px;z-index:500;background:#fff;border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:flex;gap:12px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:12px}
+    .map-tools label{display:flex;gap:5px;align-items:center}.map-tools input{accent-color:var(--green)}
+    .legend{position:absolute;left:12px;bottom:26px;z-index:500;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:6px;padding:8px;box-shadow:0 2px 10px rgba(0,0,0,.08);width:210px}
+    .legend .facet{padding:4px 6px;font-size:12px}.legend-note{font-size:10.5px;color:var(--muted);padding:4px 6px 0;line-height:1.4}
+    .map-fallback{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:6px;color:var(--muted)}.map-fallback strong{color:var(--ink);font-size:15px}
+    .lm{background:var(--deep);border:2px solid #fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+    .leaflet-tooltip.lm-label{background:rgba(25,58,56,.9);color:#fff;border:0;font-size:11px;font-weight:700;padding:2px 6px;box-shadow:none}.leaflet-tooltip.lm-label:before{display:none}
+    .pop b{display:block;font-size:13px}.pop span{display:block;color:var(--muted);font-size:11.5px;margin:2px 0 6px}.pop div{font-size:12px;margin-bottom:8px}
+    .pop button{border:1px solid var(--green);background:var(--green);color:#fff;border-radius:4px;padding:5px 9px;font-size:12px;font-weight:700}
+
+    /* Table */
+    .view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:14px}.view-head h2{font-size:18px}.view-head p{color:var(--muted);font-size:12.5px;margin-top:3px;max-width:760px}
+    table.data{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:12.5px}
+    table.data th{position:sticky;top:-18px;background:#f0f3f1;border-bottom:1px solid var(--line);text-align:left;padding:0;z-index:1}
+    table.data th button{border:0;background:none;width:100%;text-align:left;padding:9px 10px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+    table.data th button.on{color:var(--ink)}table.data th button:hover{background:#e5ebe8}
+    table.data td{padding:9px 10px;border-bottom:1px solid #edf1ef;vertical-align:top}
+    table.data tbody tr{cursor:pointer}table.data tbody tr:hover{background:#f6faf8}
+    table.data td.num{text-align:right;font-variant-numeric:tabular-nums}.name-cell{display:flex;gap:7px;align-items:center;font-weight:700}.name-cell i{width:9px;height:9px;border-radius:50%;flex:none}
+
+    /* Timeline */
+    .tl-legend{display:flex;gap:18px;font-size:12px;color:var(--muted)}.tl-legend span{display:flex;align-items:center;gap:6px}
+    .tl-legend i{display:inline-block}.sw-dot{width:11px;height:11px;border-radius:50%;background:var(--blue)}.sw-bar{width:26px;height:8px;border-radius:4px;background:#b9dcc9}.sw-line{width:2px;height:14px;background:var(--orange)}
+    #timeline{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+    #timeline svg{display:block;font-family:'DM Sans',sans-serif}
+    .tl-row{cursor:pointer}.tl-row .tl-hit{fill:transparent}.tl-row:hover .tl-hit{fill:#f3f8f5}
+    .tl-label{font-size:12.5px;font-weight:600;fill:var(--ink)}.tl-date{font-size:11px;fill:var(--muted);font-weight:600}.tl-unknown{font-size:11px;fill:var(--blue);font-style:italic}
+    .tl-year{font-size:11px;fill:var(--muted);font-weight:700}.tl-grid{stroke:#e8ecea}.tl-rent{fill:#b9dcc9}
+
+    /* Compare & model */
+    .model-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(400px,.75fr);gap:16px;align-items:start}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:18px}.panel h2{font-size:17px}.panel>p{color:var(--muted);font-size:12.5px;margin:4px 0 14px;line-height:1.5}
+    .cmp-table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+    .cmp-table th,.cmp-table td{border-bottom:1px solid #edf1ef;padding:8px 10px;text-align:left;vertical-align:top}
+    .cmp-table th:first-child,.cmp-table td:first-child{width:150px;color:var(--muted);font-weight:600;font-size:11.5px}
+    .cmp-table thead th{border-bottom:2px solid var(--line);font:600 14px 'Space Grotesk',sans-serif;color:var(--ink)}
+    .cmp-table thead th button{border:0;background:none;color:var(--muted);font-size:11px;padding:2px 0;display:block;margin-top:3px}.cmp-table thead th button:hover{color:var(--orange)}
+    .cmp-table td.best{background:var(--green-light);font-weight:700;color:var(--green)}
+    .calc-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+    .calc-fields label{display:block}.calc-fields label>span{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:5px}
+    .calc-fields label>span output{text-transform:none;color:var(--ink);letter-spacing:0}
+    .calc-fields input[type=number],.calc-fields select{width:100%;height:36px;border:1px solid #cbd6d2;border-radius:4px;padding:0 8px;background:#fff}
+    .span2{grid-column:1/-1}
+    .calc-out{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 12px}
+    .calc-out div{background:#f5f8f6;border-radius:5px;padding:9px 10px}.calc-out span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.calc-out b{font:600 16px 'Space Grotesk',sans-serif}
+    .calc-out .neg b{color:var(--orange)}.calc-out .pos b{color:var(--green)}
+    .sens{width:100%;border-collapse:collapse;font-size:12px}.sens th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;padding:5px 6px;border-bottom:1px solid var(--line)}
+    .sens td{padding:5px 6px;border-bottom:1px solid #f0f3f1}.sens tr[data-growth]{cursor:pointer}.sens tr[data-growth]:hover{background:#f6faf8}.sens tr.on{background:#fff7e8}
+    .bar{height:9px;border-radius:5px;background:var(--green);min-width:2px}.bar.neg{background:var(--orange)}
+    .calc-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:10px}
+    .calc-hint{font-size:11.5px;color:var(--blue);background:var(--blue-light);border-radius:4px;padding:7px 9px;line-height:1.45}
+
+    /* Projections & outlook */
+    .scen-wrap{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--muted);flex:none}
+    .scen-seg{width:200px}
+    table.data th.proj-h button{color:var(--green)}table.data td.proj{color:var(--green);font-weight:600}table.data td.proj.mult{color:var(--blue)}
+    .ol-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+    .ol-stat{background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 14px}.ol-stat b{display:block;font:600 19px 'Space Grotesk',sans-serif}.ol-stat span{display:block;font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:3px}
+    .ol-chart-panel{margin-bottom:14px}.ol-chart-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.ol-chart-head span{font-size:12px;color:var(--muted)}
+    #olChart svg{display:block;font-family:'DM Sans',sans-serif}.ol-line{cursor:pointer}.ol-line:hover polyline{stroke-width:4}
+    .ol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-bottom:14px}
+    .ol-card{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:6px;padding:14px 16px;scroll-margin-top:10px}
+    .ol-card.flash{animation:flash 1.2s ease}
+    .ol-card h3{font-size:15px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}.ol-card h3 small{font:600 11px 'DM Sans',sans-serif;color:var(--muted)}
+    .ol-now{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 8px}.ol-now div{background:#f5f8f6;border-radius:5px;padding:7px 9px}.ol-now span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}.ol-now b{font-size:13.5px}
+    .ol-sub{font-size:11.5px;color:var(--muted);margin-bottom:6px;line-height:1.45}
+    .ol-proj,.d-proj{width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 10px}
+    .ol-proj th,.d-proj th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:4px 6px;border-bottom:1px solid var(--line);font-weight:700}
+    .ol-proj th:first-child,.ol-proj td:first-child,.d-proj th:first-child,.d-proj td:first-child{text-align:left}
+    .ol-proj td,.d-proj td{text-align:right;padding:5px 6px;border-bottom:1px solid #f0f3f1;font-variant-numeric:tabular-nums}
+    .ol-proj tr.on td,.d-proj tr.on td{background:#fff7e8;font-weight:700}
+    .ol-card h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin:8px 0 2px}.ol-card h4.risk{color:var(--orange)}
+    .ol-card ul{margin:2px 0 8px;padding-left:16px;font-size:12px;line-height:1.45}
+    .ol-method{font-size:12.5px;line-height:1.55}.ol-method h2{margin-bottom:6px}.ol-method h3{font-size:13px;margin:12px 0 4px}.ol-method ul{padding-left:18px;margin:4px 0}.ol-method .src{columns:2;column-gap:28px;font-size:11.5px}
+    .d-fan{display:block;margin:4px 0 0}
+
+    /* Drawer */
+    .scrim{position:fixed;inset:0;background:rgba(20,32,32,.3);z-index:2000}
+    .drawer{position:fixed;top:0;right:0;bottom:0;width:490px;background:#fff;z-index:2001;box-shadow:-10px 0 30px rgba(0,0,0,.15);transform:translateX(105%);transition:transform .25s ease;overflow:auto;padding:22px 26px 30px}
+    .drawer.open{transform:none}
+    .drawer-close{position:absolute;top:14px;right:16px;border:0;background:#f0f3f1;width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1}
+    .d-area{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.d-area:before{content:'';width:10px;height:10px;border-radius:50%;background:var(--c)}
+    .drawer h2{font-size:23px;margin:6px 40px 2px 0;line-height:1.2}.d-sub{color:var(--muted);margin-bottom:10px}
+    .d-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+    .d-metrics div{background:#f5f8f6;border-radius:5px;padding:10px 12px}.d-metrics span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .d-metrics b{display:block;font:600 16px 'Space Grotesk',sans-serif;margin:2px 0}.d-metrics small{font-size:11px;color:var(--muted);line-height:1.35;display:block}
+    .d-risk{border-left:3px solid var(--orange);background:#fff8ef;padding:10px 12px;font-size:12.5px;line-height:1.5}.d-risk strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--orange);margin-bottom:3px}
+    .drawer h3{font-size:13px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-family:'DM Sans'}
+    .d-dist{list-style:none;margin:0;padding:0;font-size:12.5px}.d-dist li{display:grid;grid-template-columns:1fr 60px 120px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f3f1}.d-dist b{text-align:right}
+    .d-dist .track{height:6px;background:#eef2f0;border-radius:3px;overflow:hidden}.d-dist .track i{display:block;height:100%;background:var(--blue)}
+    .d-note{font-size:11px;color:var(--muted);margin-top:6px}
+    .d-rera{display:flex;gap:8px;align-items:center}.d-rera code{flex:1;background:#f5f8f6;padding:7px 9px;border-radius:4px;font-size:11.5px;overflow-wrap:anywhere}
+    .d-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
+    .d-links{display:flex;gap:16px;margin-top:16px;font-size:12.5px;font-weight:700}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--deep);color:#fff;padding:9px 16px;border-radius:5px;font-size:13px;z-index:3000;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div><div class="eyebrow">Research desk · Bengaluru residential · snapshot 27 Sep 2026</div><h1>Investment Atlas</h1></div>
+    <div class="kpis" aria-live="polite">
+      <div class="kpi"><strong id="kShown">0</strong><span>Matching</span></div>
+      <div class="kpi"><strong id="kAreas">0</strong><span>Corridors</span></div>
+      <div class="kpi"><strong id="kMedian">—</strong><span>Median known entry</span></div>
+      <div class="kpi"><strong id="kRent">0</strong><span>Can rent before exit</span></div>
+      <div class="kpi"><strong id="kShort">0</strong><span>Shortlisted</span></div>
+    </div>
+  </header>
+  <div class="body">
+    <aside class="filters" aria-label="Filters">
+      <div class="filters-head"><h2>Refine<small id="activeCount"></small></h2><button class="quiet-btn" id="reset" type="button">Reset all</button></div>
+      <div class="group"><div class="search-wrap"><input class="search" id="search" type="search" placeholder="Project, village, risk…" aria-label="Search"><kbd>/</kbd></div></div>
+      <div class="group"><div class="group-label">Corridor</div><div id="areaFacets"></div></div>
+      <div class="group"><div class="group-label">Developer</div><div class="chip-row" id="builderChips"></div></div>
+      <div class="group"><div class="group-label">Asset</div><div class="segmented" id="typeSeg"><button type="button" data-type="">All</button><button type="button" data-type="Apartment">Apartments</button><button type="button" data-type="Plot">Plots</button></div></div>
+      <div class="group"><div class="group-label">Stage</div><div class="chip-row" id="stageChips"><button type="button" class="chip-btn" data-stage="Ready">Ready</button><button type="button" class="chip-btn" data-stage="Near possession">Near possession</button><button type="button" class="chip-btn" data-stage="Under construction">Under construction</button><button type="button" class="chip-btn" data-stage="Pre-launch / launch">Pre-launch / launch</button></div></div>
+      <div class="group"><div class="group-label">Data source</div><div class="chip-row" id="tierChips"><button type="button" class="chip-btn" data-tier="Developer">Developer</button><button type="button" class="chip-btn" data-tier="Portal / guide">Portal / guide</button><button type="button" class="chip-btn" data-tier="Broker site">Broker site</button></div></div>
+      <div class="group"><div class="group-label">Configuration</div><div class="chip-row" id="bhkChips"><button type="button" class="chip-btn" data-bhk="1">1 BHK</button><button type="button" class="chip-btn" data-bhk="2">2 BHK</button><button type="button" class="chip-btn" data-bhk="3">3 BHK</button><button type="button" class="chip-btn" data-bhk="4">4 BHK+</button></div></div>
+      <div class="group"><div class="group-label">Max entry price <output id="budgetOut">Any</output></div><input id="budget" type="range" min="0.4" max="4.5" step="0.05" value="4.5" aria-label="Maximum entry price in crore"><label class="check"><input id="includeQuote" type="checkbox" checked><span>Include “quote needed” entries</span></label></div>
+      <div class="group"><div class="group-label">Possession by</div><select class="select" id="deadline"><option value="">Any date</option><option value="2026-12">Ready / 2026</option><option value="2028-12">2028</option><option value="2030-12">2030</option><option value="2031-09">Sep 2031 exit</option></select></div>
+      <div class="group"><div class="group-label">Distance from <output id="radiusOut">Any distance</output></div><select class="select" id="anchor"></select><input id="radius" type="range" min="5" max="60" step="1" value="60" aria-label="Maximum straight-line distance in km" style="margin-top:8px"></div>
+      <hr class="rule">
+      <label class="check"><input id="rental" type="checkbox"><span>Rental-ready at purchase</span></label>
+      <label class="check"><input id="shortOnly" type="checkbox"><span>Shortlisted only ★</span></label>
+      <hr class="rule">
+      <details class="about"><summary>About this data</summary>
+        <p><strong>Curated shortlist, not a live inventory feed.</strong> Prices are indicative advertised starting points for different unit sizes, not completed transactions. RERA references and possession dates come from linked listings unless noted as developer-published.</p>
+        <p>Pins were checked against OpenStreetMap on 28 Sep 2026: solid pins match a mapped project footprint, dashed pins are village or landmark centroids, faded pins mean the exact site is unpublished. Distances are straight-line; road distance and peak-hour travel time will be longer.</p>
+        <p>Established developers only (Prestige, Brigade, Godrej, Sobha, Sattva, Birla, Puravankara/Provident, Assetz, Century, Tata, Embassy; Bhartiya, TVS Emerald and Nambiar added on request). Entries tagged “Broker data” come from authorised-marketing-partner sites, not the developer, and are unverified; no official A-grade certification is implied. “KIADB” refers to the surrounding residential catchment, not a title designation. Price projections are scenario ranges from 99acres history, registration data and Anarock / PropTiger / Knight Frank reports (see Price outlook), not forecasts. Check land use on the <a href="https://www.kiadb.karnataka.gov.in/en/industrial-land-bank" target="_blank" rel="noopener noreferrer">KIADB portal</a> and filings at <a href="https://rera.karnataka.gov.in/" target="_blank" rel="noopener noreferrer">Karnataka RERA</a>.</p>
+      </details>
+    </aside>
+
+    <section class="workspace">
+      <nav class="tabs" role="tablist">
+        <button class="tab" role="tab" type="button" data-view="explore" aria-selected="true">Map &amp; list</button>
+        <button class="tab" role="tab" type="button" data-view="table" aria-selected="false">Table</button>
+        <button class="tab" role="tab" type="button" data-view="outlook" aria-selected="false">Price outlook</button>
+        <button class="tab" role="tab" type="button" data-view="timeline" aria-selected="false">Handover timeline</button>
+        <button class="tab" role="tab" type="button" data-view="model" aria-selected="false">Compare &amp; model<span class="badge" id="cmpBadge">0</span></button>
+        <div class="tabs-right"><button class="action" id="clearCompare" type="button">Clear compare</button><button class="action" id="export" type="button">Export CSV ↓</button></div>
+      </nav>
+
+      <div class="view" id="view-explore">
+        <div class="list-pane">
+          <div class="list-head"><strong id="results">0 projects</strong><label class="inline">Sort<select id="sort"><option value="area">Corridor</option><option value="price">Lowest entry</option><option value="delivery">Earliest handover</option><option value="rent">Longest rent window</option><option value="near">Nearest to anchor</option><option value="growth">Best 10-yr outlook</option><option value="name">Name</option></select></label></div>
+          <div id="list"></div>
+        </div>
+        <div class="map-pane">
+          <div id="map" aria-label="Project map"></div>
+          <div class="map-tools"><label><input id="autoFit" type="checkbox" checked>Auto-fit</label><label><input id="showLandmarks" type="checkbox" checked>Landmarks</label><button class="quiet-btn" id="resetView" type="button">Reset view</button></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+
+      <div class="view" id="view-table" hidden>
+        <div class="view-head"><div><h2>All matching projects</h2><p>Click a column to sort, click a row for full details. Green columns grow the indicative entry price (₹ Cr) at the corridor outlook for 3, 5, 7 and 10 years; blue “×” values are multiples where no price is published. Distances are straight-line from the locality pin.</p></div>
+          <div class="scen-wrap">Scenario<div class="segmented scen-seg"><button type="button" data-scen="bear">Bear</button><button type="button" data-scen="base">Base</button><button type="button" data-scen="bull">Bull</button></div></div></div>
+        <table class="data" id="dataTable"></table>
+      </div>
+
+      <div class="view" id="view-outlook" hidden>
+        <div class="view-head"><div><h2>Price outlook · 3, 5, 7 and 10 years</h2><p>Scenario ranges per corridor, built from 99acres five-year price history, Karnataka registration data, Anarock, PropTiger and Knight Frank city reports, and the funded infrastructure pipeline. Use them for planning, not as promises.</p></div>
+          <div class="scen-wrap">Scenario<div class="segmented scen-seg"><button type="button" data-scen="bear">Bear</button><button type="button" data-scen="base">Base</button><button type="button" data-scen="bull">Bull</button></div></div></div>
+        <div class="ol-stats">
+          <div class="ol-stat"><b>₹9,450/sq ft</b><span>Bengaluru average, Q2 2026 (Anarock): +90% from ₹4,975 in 2019, about 8.9% a year. Rental yield rose from 3.6% to 4.6%.</span></div>
+          <div class="ol-stat"><b>+63% in 2022–25</b><span>Anarock: most of the post-2019 gain came in those four years; 2019 to early 2022 added only about 10%. Booms here come in bursts.</span></div>
+          <div class="ol-stat"><b>+9% in H1 2026</b><span>Knight Frank: sales +5%, ~35,000 launched vs ~28,000 sold, unsold stock +22%. PropTiger’s +24% (Q1) is skewed by pricier launches.</span></div>
+          <div class="ol-stat"><b>5–6% a year next</b><span>Developer view for the next 4–6 quarters (Shriram Properties, BW Businessworld, Sep 2026): cooling shows up as payment offers, not list-price cuts.</span></div>
+        </div>
+        <div class="panel ol-chart-panel"><div class="ol-chart-head"><h2>Projected average rate by corridor (₹/sq ft)</h2><span id="olChartNote"></span></div><div id="olChart"></div></div>
+        <div class="ol-grid" id="olCards"></div>
+        <div class="panel ol-method">
+          <h2>How the projections are built</h2>
+          <ul>
+            <li><strong>Corridor paths.</strong> Each corridor has an annual growth rate for years 1–3, 4–5, 6–7 and 8–10. The base case cools from the 2021–26 boom (13–19% a year on 99acres) towards Bengaluru’s long-run 7–9% nominal, then lifts where a funded metro or ring road opens (Blue Line ~2028, Red Line ~2033).</li>
+            <li><strong>Bear</strong> repeats the 2019–21 lull (0–3% a year) for longer. <strong>Bull</strong> is roughly half the 2021–26 pace. The truth has usually sat nearer the base than either end over ten years.</li>
+            <li><strong>Project adjustments</strong> (percentage points a year): plots +0.5 base (−1 bear, +1.5 bull) because land does not depreciate but is illiquid; resale over 10 years old −1.5; resale 5–10 years old −0.5; broker-only pre-launches without a RERA number −0.5 base and −1.5 bear for launch-price and delivery risk.</li>
+            <li><strong>Values are nominal ₹</strong> on the indicative entry price, before stamp duty, brokerage, GST, maintenance, capital-gains tax and ~4–5% inflation. Rent is not included here; use Compare &amp; model for that.</li>
+            <li><strong>Asking vs. registered.</strong> Rates are portal asking prices. Registered deal values are 20–45% lower in Bagalur, Sarjapur Road and Hoskote, so real resale exits may land below these lines.</li>
+            <li><strong>Under-construction exits</strong> before OC usually need a developer assignment (transfer fee, lock-in). Plot and township phases can stall for years if a launch wave arrives nearby.</li>
+          </ul>
+          <h3>Sources (checked 28 Sep 2026)</h3>
+          <ul class="src">
+            <li><a href="https://www.99acres.com/property-rates-and-price-trends-in-devanahalli-bangalore-north-prffid" target="_blank" rel="noopener noreferrer">99acres · Devanahalli rates</a></li>
+            <li><a href="https://www.99acres.com/property-rates-and-price-trends-in-bagalur-bangalore-north-prffid" target="_blank" rel="noopener noreferrer">99acres · Bagalur rates</a></li>
+            <li><a href="https://www.99acres.com/property-rates-and-price-trends-in-sarjapur-road-bangalore-east-prffid" target="_blank" rel="noopener noreferrer">99acres · Sarjapur Road rates</a></li>
+            <li><a href="https://www.99acres.com/property-rates-and-price-trends-in-hoskote-bangalore-east-prffid" target="_blank" rel="noopener noreferrer">99acres · Hoskote rates</a></li>
+            <li><a href="https://www.99acres.com/property-rates-and-price-trends-in-whitefield-bangalore-east-prffid" target="_blank" rel="noopener noreferrer">99acres · Whitefield rates</a> (also Varthur, Panathur, Budigere Cross, Gunjur)</li>
+            <li><a href="https://www.business-standard.com/finance/personal-finance/125-price-gains-higher-rental-yields-india-s-housing-hotspots-outperform-126080400867_1.html" target="_blank" rel="noopener noreferrer">Business Standard · Anarock 2019–Q2 2026 prices and yields</a></li>
+            <li><a href="https://www.hindustantimes.com/real-estate/bengaluru-housing-prices-rise-63-since-2022-sarjapur-attibele-corridor-up-71-101773074110781.html" target="_blank" rel="noopener noreferrer">Hindustan Times · Anarock Sarjapur–Attibele outlook</a></li>
+            <li><a href="https://www.aninews.in/news/business/bengaluru-housing-prices-jump-24-in-q1-2026-amid-strong-demand-report20260527171654/" target="_blank" rel="noopener noreferrer">ANI · PropTiger Q1 2026</a></li>
+            <li><a href="https://www.businessworld.in/article/bengaluru-housing-market-enters-a-new-phase-of-growth-and-adjustment-625287" target="_blank" rel="noopener noreferrer">BW Businessworld · H1 2026 supply and outlook</a></li>
+            <li><a href="https://www.businesstoday.in/india/story/tired-of-bengaluru-traffic-airport-metro-crosses-72-mark-heres-what-it-means-for-you-547584-2026-08-06" target="_blank" rel="noopener noreferrer">Business Today · Blue Line 72% complete</a></li>
+            <li><a href="https://www.deccanherald.com/india/karnataka/bengaluru/bengaluru-metro-phase-3a-station-alignment-and-cost-tweaks-push-deadline-back-by-two-years-4074038" target="_blank" rel="noopener noreferrer">Deccan Herald · Red Line slips to ~2033</a></li>
+            <li><a href="https://www.thehindu.com/news/national/karnataka/bengaluru-strr-nears-completion-as-four-of-six-packages-finished-remaining-stretches-due-this-year/article71254009.ece" target="_blank" rel="noopener noreferrer">The Hindu · STRR nearly complete</a></li>
+            <li><a href="https://www.moneycontrol.com/news/business/foxconn-hires-30-000-workers-at-women-led-iphone-plant-near-bengaluru-report-13736167.html" target="_blank" rel="noopener noreferrer">Moneycontrol · Foxconn Devanahalli hiring</a></li>
+            <li><a href="https://timesofindia.indiatimes.com/city/bengaluru/second-airport-harohalli-joins-race-as-govt-awaits-feasibility-report/articleshow/132269388.cms" target="_blank" rel="noopener noreferrer">Times of India · second-airport site undecided</a></li>
+            <li><a href="https://www.thehindu.com/news/cities/bangalore/bda-issues-final-notification-to-acquire-1427-acres-for-peripheral-ring-road-2/article71442185.ece" target="_blank" rel="noopener noreferrer">The Hindu · PRR-2 land notification</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="view" id="view-timeline" hidden>
+        <div class="view-head"><div><h2>Handover vs. five-year exit</h2><p>Each dot is the published target handover. The green bar is the maximum window to earn rent before a Sep 2031 exit. Anything right of the orange line completes after the exit.</p></div>
+          <div class="tl-legend"><span><i class="sw-dot"></i>Handover</span><span><i class="sw-bar"></i>Possible rent window</span><span><i class="sw-line"></i>Sep 2031 exit</span></div></div>
+        <div id="timeline"></div>
+      </div>
+
+      <div class="view" id="view-model" hidden>
+        <div class="model-grid">
+          <div class="panel"><h2>Side by side</h2><p>Up to three projects. Starting prices refer to different unit sizes, so compare per sq ft on a real cost sheet.</p><div id="comparison"></div></div>
+          <div class="panel"><h2>Five-year return model</h2><p>Illustrative. Assumes full purchase today, not construction-linked payments.</p>
+            <div class="calc-fields">
+              <label class="span2"><span>Load project</span><select id="calcProject"></select></label>
+              <label><span>Purchase ₹ Cr</span><input id="calcPrice" type="number" min="0.01" step="0.01" value="1.90"></label>
+              <label><span>Buy + sell costs %</span><input id="calcCosts" type="number" min="0" max="50" step="0.5" value="10"></label>
+              <label class="span2"><span>Annual price growth <output id="growthOut">6.0%</output></span><input id="calcGrowth" type="range" min="-3" max="14" step="0.5" value="6"></label>
+              <p class="calc-hint span2" id="calcHint">Load a project to set growth to its research-based five-year outlook.</p>
+              <label><span>Gross rent yield %</span><input id="calcYield" type="number" min="0" max="15" step="0.1" value="3"></label>
+              <label><span>Months rented</span><input id="calcMonths" type="number" min="0" max="60" step="1" value="0"></label>
+            </div>
+            <div class="calc-out" id="calcOut"></div>
+            <table class="sens" id="sens"></table>
+            <p class="calc-note">Click a growth row to apply it. Financing, maintenance, vacancy, capital-gains tax and inflation are excluded. Plots earn no rent unless a home is built.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Project details"><button class="drawer-close" id="drawerClose" type="button" aria-label="Close details">×</button><div id="drawerBody"></div></aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const EXIT='2031-09',NOW='2026-09',BUDGET_MAX=4.5,RADIUS_MAX=60,STORE='bia-shortlist';
+  const projects=[
+    {name:'Sattva City',area:'Airport / Devanahalli',place:'Doddajala · NH-44',builder:'Sattva',type:'Apartment',price:1.91,priceNote:'1,316 sq ft at your ₹14,500/sq ft quote; portals list 2 BHK from ₹1.82 Cr (~₹13,800/sq ft)',delivery:'2032-02',status:'Under construction',rera:'PRM/KA/RERA/1251/472/PR/270226/008494',source:'https://sattvagroup.com/residential/sattva-city/',evidence:'Developer + buyer quote',risk:'Phase 1 is reported for Feb 2032, beyond a Sep 2031 exit. No rent during the five-year hold.'},
+    {name:'Godrej Royale Woods',area:'Airport / Devanahalli',place:'Chikkasanni · Devanahalli',builder:'Godrej',type:'Apartment',price:0.37,priceNote:'Studio from ₹37.3 L; 1–3 BHK 432–1,248 sq ft (Housing.com)',delivery:'2026-01',status:'Ready / verify OC',rera:'PRM/KA/RERA/1250/303/PR/200515/003411',source:'https://www.godrejproperties.com/bengaluru/residential/godrej-royale-woods',evidence:'Developer; resale quote needed',risk:'Rental option today; verify exact tower OC and a real lease. Smaller layouts and airport-side commute limit appeal.'},
+    {name:'Godrej MSR City · Barca I',area:'Airport / Devanahalli',place:'Yartiganahalli · Shettigere',builder:'Godrej',type:'Apartment',price:1.60,priceNote:'2 BHK from ₹1.60 Cr (Housing.com); developer site shows 3 BHK from ₹1.79 Cr',delivery:'2030-03',status:'Under construction',rera:'PRM/KA/RERA/1250/303/PR/010425/007644',source:'https://housing.com/in/buy/projects/page/344838-barca-at-godrej-msr-city-by-godrej-properties-ltd-in-shettigere',evidence:'Portal asking price',risk:'Phase-specific completion and newer inventory compete with resale; confirm phase and all-in quote.'},
+    {name:'Birla Trimaya · Phase 4',area:'Airport / Devanahalli',place:'Shettigere Road',builder:'Birla',type:'Apartment',price:0.69,priceNote:'From ₹68.8 L; 1–3.5 BHK + 4.5 BHK duplex, 485–2,551 sq ft (Housing.com)',delivery:'2031-12',status:'Under construction',rera:'PRM/KA/RERA/1250/303/PR/290126/008436',source:'https://realtypromoo.com/projects/birla-trimaya-phase-4',evidence:'Portal listing (Housing.com)',risk:'Housing.com and CommonFloor give Dec 2031 possession, after a Sep 2031 exit (one broker says 2029). Earlier-phase resale fits a five-year hold better.'},
+    {name:'Century Greens · resale',area:'IVC Road',place:'IVC Road · Nagamangala',builder:'Century',type:'Plot',price:0.99,priceNote:'1,200 sq ft resale ~₹1.0 Cr (Magicbricks); broker quotes from ₹84 L; 239 plots, 18 acres',delivery:'2026-01',status:'Ready / verify title',rera:'PRM/KA/RERA/1250/303/PR/180905/001983',source:'https://www.99acres.com/plots-for-resale-in-century-greens-ivc-road-bangalore-north-797906-npffid',evidence:'Resale asking price',risk:'Zero rent as vacant plot. Listing areas and approval descriptions conflict; survey number, deed and boundaries need legal check.'},
+    {name:'Prestige Crystal Lawns',area:'IVC Road',place:'Singarahalli · IVC Road',builder:'Prestige',type:'Plot',price:1.35,priceNote:'Plots 1,499–4,003 sq ft, ₹1.35–3.60 Cr (Housing.com / Square Yards)',delivery:'2027-03',status:'Under development',rera:'PRM/KA/RERA/1250/303/PR/300925/008132',source:'https://www.prestigeconstructions.com/residential-projects/bangalore/prestige-crystal-lawns',evidence:'Developer + secondary price',risk:'Portals agree on Mar 2027 possession; one broker quoted Oct 2031 and ₹2.38 Cr (that figure is for 2,400 sq ft+ plots). No rent as a plot.'},
+    {name:'Brigade Oasis · Phase 3',area:'Airport / Devanahalli',place:'Soluru area · north of Devanahalli (listed as Lakshmipura)',builder:'Brigade',type:'Plot',price:1.09,priceNote:'Launched from ~₹90 L–1.09 Cr; plots 987–2,691 sq ft; resale quote needed',delivery:'2025-06',status:'Ready (completed Jun 2025)',rera:'PRM/KA/RERA/1250/303/PR/220124/006562',source:'https://www.brigadegroup.com/residential/projects/bengaluru/brigade-oasis',evidence:'Developer price',risk:'Not on IVC Road. No rent as a plot; inspect utilities and compare earlier-phase resale deeds.'},
+    {name:'Prestige Marigold · Phase 2',area:'Airport / Devanahalli',place:'Bettenahalli / Maragondanahalli · ~8 km west of NH-44',builder:'Prestige',type:'Plot',price:0.68,priceNote:'From ₹68 L (Housing.com); ~717 plots 860–4,000 sq ft, up to ~₹3.2 Cr',delivery:null,status:'New launch',rera:'PRM/KA/RERA/1250/303/PR/171225/008346',source:'https://www.prestigeconstructions.com/residential-projects/bangalore/prestige-marigold-phase-2',evidence:'Developer; quote needed',risk:'715 plots; no rental income. Bettenahalli is not a verified KIADB Phase 2 industrial allotment.'},
+    {name:'Prestige Finsbury Park · Hyde',area:'KIADB / Bagalur',place:'Gummanahalli · aerospace catchment',builder:'Prestige',type:'Apartment',price:null,priceNote:'Resale only; 14+ Hyde listings on Housing.com. Completion reported May 2023, occupancy from Mar 2024',delivery:'2024-03',status:'Ready / verify OC',rera:'Check exact tower',source:'https://housing.com/in/buy/projects/page/229145-prestige-finsbury-park-hyde-by-prestige-projects-pvt-ltd-in-gummanahalli',evidence:'Portal project listing',risk:'Income can begin sooner than new launches; inspect actual tenancy and large competing inventory.'},
+    {name:'Assetz Sora & Saki · Phase 1',area:'KIADB / Bagalur',place:'Gummanahalli · aerospace catchment',builder:'Assetz',type:'Apartment',price:2.20,priceNote:'3/4 BHK 1,670–2,168 sq ft; a listed 3 BHK asks ~₹2.20 Cr (Magicbricks)',delivery:'2028-09',status:'Under construction',rera:'Verify phase registration',source:'https://housing.com/in/buy/projects/page/317633-assetz-sora-and-saki-phase-1-by-assetz-property-group-in-gummanahalli',evidence:'Portal project listing',risk:'Larger 3–4 BHK ticket; 2028 handover is a listing target, not a guarantee.'},
+    {name:'Purva Northern Lights · Phase 1',area:'KIADB / Bagalur',place:'Gummanahalli · aerospace catchment',builder:'Puravankara',type:'Apartment',price:0.80,priceNote:'1 BHK ~₹80 L; 2 BHK ~₹1.11 Cr; up to ₹2.64 Cr at ~₹11,000/sq ft (broker sites)',delivery:'2029-12',status:'Under construction',rera:'PRM/KA/RERA/1251/309/PR/120326/008523',source:'https://realtypromoo.com/projects/puravankara-purva-northern-lights-kiadb-aerospace-park-bengaluru',evidence:'Secondary guide; confirm',risk:'Large simultaneous supply may pressure first-year rentals and resales. Verify phase and completion with RERA.'},
+    {name:'Godrej Park Retreat · Phase 2',area:'Sarjapur Road',place:'Chikkakannalli · near RGA Tech Park',builder:'Godrej',type:'Apartment',price:1.32,priceNote:'2/3 BHK 1,103–1,498 sq ft from ₹1.32 Cr; launched Jul 2023 (Housing.com)',delivery:'2028-06',status:'Under construction',rera:'PRM/KA/RERA/1251/446/PR/130723/006056',source:'https://housing.com/in/buy/projects/page/302990-godrej-park-retreat-phase-2-by-godrej-properties-ltd-in-chikkakannalli',evidence:'Portal listing (Housing.com)',risk:'IT catchment supports leasing after completion, but verify phase and congestion at peak hour.'},
+    {name:'Birla Evara · Phase 1',area:'Sarjapur Road',place:'Kodathi',builder:'Birla',type:'Apartment',price:1.30,priceNote:'2 BHK ~₹1.30 Cr (Magicbricks listing); 3/4 BHK from ₹1.87 Cr (Housing.com)',delivery:'2031-12',status:'Under construction',rera:'PRM/KA/RERA/1251/446/PR/060225/007487',source:'https://realtypromoo.com/projects/birla-evara-sarjapur-road',evidence:'Portal listings; confirm phase',risk:'Housing.com shows Dec 2031 possession, after a Sep 2031 exit, so no rent in the hold. Narrow feeder roads.'},
+    {name:'Prestige City · earlier phases',area:'Sarjapur Road',place:'Yamare · Sarjapur (The Prestige City)',builder:'Prestige',type:'Apartment',price:null,priceNote:'Phase-specific; e.g. Meridian Park ready units ~₹12,650/sq ft (a 3 BHK asks ₹2.36 Cr)',delivery:null,status:'Mixed phases',rera:'Check building / phase',source:'https://www.prestigeconstructions.com/residential-projects/bangalore',evidence:'Developer portfolio',risk:'Several differently dated phases; buy only against a specific tower, registered deed and OC.'},
+    {name:'Godrej Parkshire',area:'Hoskote',place:'Sarakariguttahalli · Whitefield-Hoskote',builder:'Godrej',type:'Apartment',price:1.17,priceNote:'2 BHK from ₹1.17 Cr (Housing.com); developer site now shows 3 BHK from ₹1.85 Cr',delivery:'2030-12',status:'Under construction',rera:'PRM/KA/RERA/1250/304/PR/090126/008393',source:'https://www.godrejproperties.com/bengaluru/residential/godrej-parkshire',evidence:'Developer price + date',risk:'Premium for Hoskote with limited post-delivery rental window by 2031; no operational Hoskote metro.'},
+    {name:'Sobha One World · Wing 1–2',area:'Hoskote',place:'NH-75 · Hoskote',builder:'Sobha',type:'Apartment',price:1.09,priceNote:'1–4 BHK ₹1.09–3.09 Cr; RERA approved May 2026',delivery:'2032-07',status:'Under construction',rera:'PRM/KA/RERA/1250/304/PR/080526/008634',source:'https://realtypromoo.com/guides/sobha-one-world-hoskote-best-planned-future-ready-township',evidence:'Secondary guide; check RERA',risk:'Possession quoted as Dec 2031, Jul 2032, Aug 2032 and Jan 2033 by different sources; all fall at or after the exit. Very large supply.'},
+    {name:'Godrej Woodscapes',area:'Whitefield / ORR',place:'Budigere Cross · Whitefield approach',builder:'Godrej',type:'Apartment',price:0.81,priceNote:'Studio–4 BHK; from ~₹81 L (broker), 4 BHK ~₹4.1 Cr (developer). Phase 2 possession Jun 2030',delivery:'2029-01',status:'Under construction',rera:'Check exact phase',source:'https://www.godrejproperties.com/bengaluru/residential/godrej-woodscapes',evidence:'Developer + portal',risk:'Phase 1 Jan 2029, Phase 2 Jun 2030; confirm which phase a quote belongs to. Budigere Cross is outside core Whitefield.'},
+    {name:'Sobha Neopolis · Phase 1',area:'Whitefield / ORR',place:'Panathur · ORR catchment',builder:'Sobha',type:'Apartment',price:1.04,priceNote:'1/3/4 BHK 660–2,481 sq ft from ₹1.04 Cr (Housing.com); launched Oct 2023 at ~₹13,300/sq ft',delivery:'2029-12',status:'Under construction',rera:'PRM/KA/RERA/1251/446/PR/200923/006269',source:'https://realtypromoo.com/projects/sobha-neopolis',evidence:'Secondary phase guide',risk:'Housing.com now lists Dec 2029 possession (earlier guides said 2027–28), leaving ~21 months of rent. Panathur peak-hour bottlenecks.'},
+    {name:'Prestige Raintree Park',area:'Whitefield / ORR',place:'Varthur · Whitefield',builder:'Prestige',type:'Apartment',price:2.93,priceNote:'3–5 BHK 2,004–3,698 sq ft from ₹2.93 Cr (~₹17,000/sq ft)',delivery:'2028-12',status:'Under construction',rera:'Check exact phase',source:'https://www.prestigeconstructions.com/residential-projects/bangalore/prestige-raintree-park',evidence:'Developer project page',risk:'Large integrated development; different phases and considerable ongoing supply. Validate lake-facing premium.'},
+    {name:'Prestige Somerville',area:'Whitefield / ORR',place:'Ramagondanahalli · Varthur Road',builder:'Prestige',type:'Apartment',price:1.80,priceNote:'2–4 BHK 1,203–3,543 sq ft from ₹1.80 Cr (Housing.com); brokers quote ₹1.97 Cr',delivery:'2027-12',status:'Under construction',rera:'Check exact phase',source:'https://www.prestigeconstructions.com/residential-projects/bangalore/prestige-somerville',evidence:'Developer project page',risk:'Compare access and actual travel times with other Whitefield developments; verify completion date.'},
+    // Added 28 Sep 2026 research pass; most figures come from channel-partner (broker) sites.
+    {name:'Prestige Sarjapur Road',area:'Sarjapur Road',place:'Ittangur · Sarjapura',builder:'Prestige',type:'Apartment',price:0.68,priceNote:'Listed 1 BHK from ₹68.25 L; 10 acres, ~830 homes',delivery:'2030-12',status:'Pre-launch',rera:'Application in process (per listing)',source:'https://www.prestigesarjapurroad.com/sarjapur-road/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Pre-launch with no RERA number yet; Ittangur is at the far end of Sarjapur Road. Only ~9 months of rent possible before Sep 2031.'},
+    {name:'Sobha Celsia',area:'Sarjapur Road',place:'Harlur · off Sarjapur Road',builder:'Sobha',type:'Apartment',price:null,priceNote:'Resale only; 2–4 BHK 890–3,760 sq ft',delivery:null,status:'Ready (completed 2011)',rera:'Pre-RERA project',source:'https://www.99acres.com/',evidence:'Portal listing (Housing.com)',risk:'A broker site listed this as a 2026 launch; Housing.com shows it completed in 2011. Treat as 15-year-old resale stock.'},
+    {name:'Prestige Aston Park',area:'Sarjapur Road',place:'Inside The Prestige City · Yamare',builder:'Prestige',type:'Apartment',price:1.47,priceNote:'2/3 BHK + 3 BHK duplex, 1,135–2,416 sq ft, from ₹1.47 Cr (Housing.com)',delivery:'2026-09',status:'Ready (possession Sep 2026)',rera:'Verify on K-RERA',source:'https://www.prestigesarjapurroad.com/sarjapur-road/ready-to-move-apartments-2026.html',evidence:'Portal listing (Housing.com)',risk:'Ready now, so up to five years of rent. The broker’s ₹89 L entry was wrong; units on Magicbricks ask ~₹15,000/sq ft.'},
+    {name:'Godrej Verano',area:'Sarjapur Road',place:'Sarjapur Road (working name)',builder:'Godrej',type:'Apartment',price:0.85,priceNote:'~₹85 L from at ~₹12,500/sq ft (EOI)',delivery:'2031-03',status:'Pre-launch',rera:'Expected at launch (end 2026)',source:'https://www.godrejsverano.com/sarjapur-road/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Broker working name only: the developer’s own “Godrej Verano” is a Gurugram project. No RERA; handover lands at the exit, leaving no rent window.'},
+    {name:'Assetz 63 Degree East',area:'Sarjapur Road',place:'Chikkakannalli · Kodathi',builder:'Assetz',type:'Apartment',price:null,priceNote:'Resale only; studio–4 BHK 474–2,410 sq ft, 18+ listings',delivery:'2021-12',status:'Ready (completed Dec 2021)',rera:'Completed project',source:'https://www.99acres.com/',evidence:'Portal listing (Housing.com)',risk:'A broker site listed this as a new launch; it has been ready since Dec 2021. Rent is possible now; get resale quotes.'},
+    {name:'Sobha Royal Pavilion',area:'Sarjapur Road',place:'Hadosiddapura · off Sarjapur Road, near Kodathi',builder:'Sobha',type:'Apartment',price:2.08,priceNote:'2–4 BHK resale ₹2.08–3.68 Cr (99acres); 24 acres, ~1,284 homes',delivery:null,status:'Ready (resale)',rera:'Completed project; check OC',source:'https://www.prestigesarjapurroad.com/sarjapur-road/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; resale quote',risk:'Rental possible now; resale price depends on tower, floor and age. Check maintenance dues and actual lease levels.'},
+    {name:'Sobha Dream Acres',area:'Whitefield / ORR',place:'Balagere · Panathur',builder:'Sobha',type:'Apartment',price:0.85,priceNote:'Resale ~₹13,150/sq ft (Q1 2026); compact 1 BHK ~₹85 L',delivery:null,status:'Ready (resale, phased)',rera:'Check exact wing',source:'https://www.godrejswhitefield.com/whitefield/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; resale quote',risk:'Strong rental demand from ORR tech parks, but thousands of similar units compete for tenants and resale buyers.'},
+    {name:'Prestige Lakeside Habitat',area:'Whitefield / ORR',place:'Gunjur · Varthur',builder:'Prestige',type:'Apartment',price:1.38,priceNote:'Resale ~₹14,500/sq ft (Q2 2026), from ~₹1.38 Cr; 905–2,830 sq ft',delivery:null,status:'Ready (resale)',rera:'Completed project; check OC',source:'https://www.squareyards.com/bangalore-residential-property/prestige-lakeside-habitat/14915/project',evidence:'Portal asking price',risk:'Large, settled township with rental history; Varthur road congestion and older-stock maintenance are the main drags.'},
+    {name:'Brigade Cornerstone Utopia',area:'Whitefield / ORR',place:'Gunjur · Varthur',builder:'Brigade',type:'Apartment',price:0.70,priceNote:'Resale ~₹12,500–13,000/sq ft, 547–1,897 sq ft (Square Yards); ~3.5% yield reported',delivery:'2024-12',status:'Ready (completed 2024)',rera:'Completed project; check OC',source:'https://www.onecityproperty.com/projects/brigade-cornerstone-utopia-whitefield-bangalore',evidence:'Broker resale guide',risk:'Low entry includes studios/1 BHK; confirm carpet area and actual rent. Varthur access is congested.'},
+    {name:'Prestige Shantiniketan',area:'Whitefield / ORR',place:'ITPL Road · Whitefield',builder:'Prestige',type:'Apartment',price:2.40,priceNote:'Resale ~₹19,400/sq ft (Q2 2026, Square Yards); a 1,418 sq ft unit asks ₹2.90 Cr',delivery:null,status:'Ready (resale)',rera:'Completed project',source:'https://www.godrejswhitefield.com/whitefield/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; resale quote',risk:'Mature township next to ITPL; older buildings mean lower price growth and higher upkeep.'},
+    {name:'Sobha Windsor',area:'Whitefield / ORR',place:'East Whitefield (Kadugodi side)',builder:'Sobha',type:'Apartment',price:2.03,priceNote:'2–4 BHK 1,350–2,292 sq ft from ₹2.03 Cr (Housing.com)',delivery:'2025-11',status:'Ready (completed Nov 2025)',rera:'Check tower OC',source:'https://www.godrejswhitefield.com/whitefield/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; unverified',risk:'Ready stock allows rent now; verify developer inventory vs resale pricing.'},
+    {name:'Brigade Cosmopolis',area:'Whitefield / ORR',place:'Whitefield (~3 km south of ITPL)',builder:'Brigade',type:'Apartment',price:2.10,priceNote:'Resale ~₹15,400–16,500/sq ft; 2 BHK listed at ₹2.1 Cr (99acres, Sep 2026)',delivery:null,status:'Ready (resale)',rera:'Completed project',source:'https://www.godrejswhitefield.com/whitefield/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; resale quote',risk:'Established tenant base; compare net rent after maintenance with newer Whitefield stock.'},
+    {name:'Prestige Elm Park',area:'Whitefield / ORR',place:'Channasandra · Whitefield',builder:'Prestige',type:'Apartment',price:2.18,priceNote:'3/4 BHK 1,790–2,575 sq ft from ₹2.18 Cr; 192 homes on 3.98 acres',delivery:'2026-08',status:'Near possession',rera:'…/PR/250123/005667 (verify full number)',source:'https://www.godrejswhitefield.com/whitefield/ready-to-move-apartments-2026.html',evidence:'Channel-partner site; unverified',risk:'Large-ticket 3/4 BHK narrows the tenant pool; confirm OC before counting rent.'},
+    {name:'Brigade Avalon',area:'Whitefield / ORR',place:'Whitefield Main Road',builder:'Brigade',type:'Apartment',price:4.62,priceNote:'Ultra-luxury 3.5/4 BHK 2,765–3,862 sq ft from ₹4.62 Cr (Housing.com)',delivery:'2030-03',status:'Under construction',rera:'RERA approved (verify number)',source:'https://www.godrejswhitefield.com/whitefield/new-launch-projects-2026.html',evidence:'Portal listing (Housing.com)',risk:'Broker’s ₹1.4 Cr figure was wrong by over 3×. Luxury ticket narrows tenants; ~18 months of rent before exit.'},
+    {name:'Godrej Whitefield',area:'Whitefield / ORR',place:'ITPL belt (working name)',builder:'Godrej',type:'Apartment',price:0.91,priceNote:'~₹91 L from at ~₹14,000/sq ft (EOI)',delivery:'2031-03',status:'Pre-launch',rera:'Expected at launch (end 2026)',source:'https://www.godrejswhitefield.com/whitefield/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Working name and EOI only; completion is at the exit date, so no rent and full construction risk.'},
+    {name:'Prestige Evergreen',area:'Whitefield / ORR',place:'Varthur · Whitefield',builder:'Prestige',type:'Apartment',price:0.92,priceNote:'1–4 BHK ₹92 L–3.85 Cr; 24 acres, 14 towers, ~2,000 homes (Raintree Park Phase 2)',delivery:'2030-06',status:'Under construction',rera:'RERA registered (verify number)',source:'https://www.prestigesevergreen.com/',evidence:'Channel-partner site; unverified',risk:'Several brokers give Jun 2030 possession, leaving ~15 months of rent. Very large supply alongside Raintree Park.'},
+    {name:'Prestige Hoskote',area:'Hoskote',place:'Hoskote belt (listed as Dalasagere)',builder:'Prestige',type:'Apartment',price:1.79,priceNote:'From ₹1.79 Cr; 80 acres, ~5,200 homes',delivery:null,status:'Launching 2026',rera:'Application in process (per listing)',source:'https://www.prestigeshoskote.com/hoskote/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Pre-RERA township with huge supply; handover likely after Sep 2031. The only Dalasagere in OSM is ~17 km north-east of Hoskote town, not on NH-75; confirm the actual site.'},
+    {name:'Godrej Melange',area:'Hoskote',place:'Hoskote',builder:'Godrej',type:'Apartment',price:1.35,priceNote:'Pre-launch ~₹8,490/sq ft → ~₹1.35 Cr for 1,590 sq ft 3 BHK; 623 homes',delivery:'2030-12',status:'Launching 2026',rera:'Expected (per listing)',source:'https://www.sobhaoneresidences.com/hoskote/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Larger 3/4 BHK in Hoskote; short rent window before exit even if delivered on time.'},
+    {name:'Prestige Lakeside · Hoskote',area:'Hoskote',place:'Dasarahalli · Hoskote',builder:'Prestige',type:'Apartment',price:0.92,priceNote:'2 BHK from ~₹92 L (indicative)',delivery:'2030-12',status:'Launching late 2026',rera:'Confirm at launch',source:'https://www.sobhaoneresidences.com/hoskote/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Not yet launched; “~2030” possession is a marketing estimate.'},
+    {name:'Birla Hoskote',area:'Hoskote',place:'Hoskote',builder:'Birla',type:'Apartment',price:null,priceNote:'Price on request',delivery:null,status:'Upcoming',rera:'Not yet registered',source:'https://www.prestigeshoskote.com/hoskote/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Working name only, no RERA. Brokers float ~₹7,500–9,500/sq ft and possession anywhere from Dec 2028 to 2030 — not reliable yet.'},
+    {name:'Prestige Park Street',area:'Airport / Devanahalli',place:'Devanahalli',builder:'Prestige',type:'Apartment',price:0.85,priceNote:'From ~₹85 L; 5 acres, ~480 homes',delivery:'2030-10',status:'Launching Oct 2026',rera:'Expected at launch',source:'https://www.prestigekiadb.com/prestige-group/prestige-group-projects-in-devanahalli-and-north-bangalore-2026-update.html',evidence:'Channel-partner site; unverified',risk:'Pre-launch; brokers quote possession from Dec 2029 to Oct 2030. Compact project; about a year of rent at best.'},
+    {name:'Sattva Aeropolis',area:'Airport / Devanahalli',place:'Kannamangala · NH-44, near airport halt station',builder:'Sattva',type:'Apartment',price:0.46,priceNote:'Studio/1/3 BHK 306–1,004 sq ft; from ₹46.2 L (your link), Housing.com studio from ₹31 L; launched May 2022, 1,001 units',delivery:'2026-07',status:'Ready (possession Jul 2026)',rera:'PRM/KA/RERA/1250/303/PR/110522/004869',source:'https://www.sattvaaeropolis.co.in/',evidence:'Channel-partner site; unverified',risk:'Ready now per Housing.com, so rent can start immediately. Entry prices are studios; airport-side demand skews to single professionals.'},
+    {name:'Purva Aerocity',area:'Airport / Devanahalli',place:'Chikkajala / Kadiganahalli · off NH-44',builder:'Puravankara',type:'Apartment',price:null,priceNote:'1–3 BHK; price on request',delivery:'2028-12',status:'Under construction (per brokers)',rera:'Verify phase',source:'https://www.prestigedevanahalli.com/devanahalli/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'Brokers disagree: one says launched Jan 2024 with 2028 possession, another calls it an upcoming pre-launch. Get the RERA record first.'},
+    {name:'Tata Carnatica',area:'Airport / Devanahalli',place:'Yartiganahalli · Shettigere Road',builder:'Tata',type:'Apartment',price:1.40,priceNote:'~₹1.4 Cr from; apartments and plots',delivery:null,status:'New phases',rera:'Verify phase',source:'https://www.prestigedevanahalli.com/devanahalli/new-launch-projects-2026.html',evidence:'Channel-partner site; unverified',risk:'150-acre mixed township (plots, apartments, retail); broker pages still call it pre-launch. Confirm which phase the price and handover refer to. The Varnam apartment phase is listed separately.'},
+    {name:'Prestige Greenbrook',area:'IVC Road',place:'Indrasanahalli · IVC Road',builder:'Prestige',type:'Plot',price:1.35,priceNote:'324 plots, 1,500–2,400 sq ft, ₹1.35–2.30 Cr at ~₹9,000/sq ft',delivery:'2027-03',status:'Under development',rera:'RERA registered (verify number)',source:'https://www.squareyards.com/bangalore-residential-property/prestige-greenbrook/340942/project',evidence:'Portal listings (Housing.com / 99acres / Square Yards)',risk:'Portals agree on Mar 2027 possession (a broker’s Nov 2031 was wrong). No rent as a plot; premium per sq ft for the corridor.'},
+    {name:'Prestige KIADB',area:'KIADB / Bagalur',place:'KIADB Aerospace Park Phase 2 (also marketed as Prestige Devanahalli / Park Lane)',builder:'Prestige',type:'Apartment',price:0.70,priceNote:'Brokers quote 1 BHK ₹70–74 L, 2 BHK ₹1.1–1.24 Cr; Magicbricks ₹65 L–1.69 Cr; ~1,800 homes',delivery:'2031-12',status:'Pre-launch',rera:'Reported registered Sep 2026 (number not yet seen)',source:'https://synergyinfracon.com/news/prestige-kiadb-aerospace-park-north-bengaluru-project-location-launch-date-and-price-details-bagalur-bengaluru',evidence:'Channel-partner site; unverified',risk:'Same project sold under three names (Prestige KIADB / Devanahalli / Park Lane). Brokers and a press release report RERA registration in Sep 2026 for the 32.26-acre site (~1,800 homes, 9 towers); formal launch pencilled for 16 Oct. Check the number on K-RERA. Possession quoted Dec 2030–Dec 2031, at or after exit.'},
+    {name:'Brigade El Dorado',area:'KIADB / Bagalur',place:'Huvinayakanahalli · Aerospace Park',builder:'Brigade',type:'Apartment',price:0.59,priceNote:'1–3 BHK 521–1,561 sq ft from ₹59 L (Housing.com); earlier phases ready',delivery:'2029-06',status:'Under construction',rera:'Verify phase',source:'https://nxtfootstep.com/brigade-el-dorado-review-2026-is-it-worth-buying/',evidence:'Portal / review; confirm',risk:'Lowest established-builder entry in the aerospace belt; ~6 km from nearest metro. Large supply in the area.'},
+    {name:'Nikoo Homes 9',area:'KIADB / Bagalur',place:'Near SAP Labs / Shell, KIADB Aerospace SEZ (per listing)',builder:'Bhartiya',type:'Apartment',price:0.60,priceNote:'Studio from ~₹60–62 L (EOI ~₹11–12k/sq ft); 16 acres, ~1,584 homes, 8 towers',delivery:null,status:'Pre-launch (EOI)',rera:'Not yet registered',source:'https://nikoohomes9kiadb.com/',evidence:'Channel-partner site; unverified',risk:'Coming soon, no RERA or handover date yet; broker quotes range ₹60 L–₹1.2 Cr entry. OSM shows a different “Bhartiya Garden Estate” at Navaratna Agrahara, ~7 km west; confirm which site this is.'},
+    {name:'TVS Emerald Altura',area:'KIADB / Bagalur',place:'Sathanur · Bagalur Main Road (SH-104)',builder:'TVS Emerald',type:'Apartment',price:1.52,priceNote:'2/3 BHK 1,227–1,901 sq ft from ₹1.52 Cr (Housing.com); your link: 3 BHK ₹1.78 Cr, 3.5 BHK ₹2.30 Cr',delivery:'2030-12',status:'Under construction',rera:'PRM/KA/RERA/1251/309/PR/040426/008572',source:'https://www.alturainsathanur.co.in/',evidence:'Channel-partner site; unverified',risk:'Housing.com gives Dec 2030; brokers say 2028–29 or Apr 2033, so check the RERA completion date. ~11 km from the aerospace park, closer to Yelahanka/Thanisandra.'},
+    {name:'Nambiar District 25 · Phase 1',area:'Sarjapur Road',place:'Dommasandra · Sarjapur Road',builder:'Nambiar',type:'Apartment',price:null,priceNote:'Sold out; resale / assignment quotes only',delivery:'2030-02',status:'Under construction',rera:'PRM/KA/RERA/1251/308/PR/100125/007377',source:'https://nambiarprojects.com/nambiar-district-25/',evidence:'Channel-partner site; unverified',risk:'Sold out, so entry only via resale/assignment. Housing.com lists possession from Aug 2030; confirm on RERA. Mid-tier builder, not A-grade.'},
+    {name:'Nambiar District 25 · Phase 2',area:'Sarjapur Road',place:'Dommasandra · Sarjapur Road',builder:'Nambiar',type:'Apartment',price:1.57,priceNote:'From ~₹1.57 Cr (2 BHK); limited inventory',delivery:'2030-09',status:'Under construction',rera:'PRM/KA/RERA/1251/308/PR/200825/008011',source:'https://nambiarprojects.com/nambiar-district-25/',evidence:'Channel-partner site; unverified',risk:'About a year of rent before a Sep 2031 exit if delivered on time. 200-acre township with 10+ phases means sustained competing supply.'},
+    {name:'Nambiar District 25 · Phase 3',area:'Sarjapur Road',place:'Dommasandra · Sarjapur Road',builder:'Nambiar',type:'Apartment',price:1.70,priceNote:'2 BHK 1,260 sq ft from ~₹1.70 Cr (another site: ₹1.47 Cr); up to 4.5 BHK ₹4.23 Cr',delivery:'2032-03',status:'Under construction',rera:'PRM/KA/RERA/1251/308/PR/260526/008686',source:'https://nambiarprojects.com/nambiar-district-25/',evidence:'Channel-partner site; unverified',risk:'Handover Mar 2032, after the five-year exit. Muthanallur metro station is only proposed.'},
+    // Added 28 Sep 2026 (missing-projects pass): portal listings where available, otherwise broker data.
+    {name:'Tata Varnam · Phase 1',area:'Airport / Devanahalli',place:'Shettigere · inside Tata Carnatica',builder:'Tata',type:'Apartment',price:1.66,priceNote:'2/3/5 BHK flats, duplex townhouses and row houses; from ₹1.66 Cr (Housing.com), brokers quote ₹1.31 Cr, Square Yards ₹2.03 Cr; 583 flats on 19.48 acres',delivery:'2030-08',status:'Under construction',rera:'RERA registered, Phases 1A–1D (verify numbers)',source:'https://housing.com/in/buy/projects/page/355552-tata-varnam-phase-1d-by-tata-housing-development-in-shettigere',evidence:'Portal listing (Housing.com)',risk:'Sources give possession anywhere from Feb 2028 to Aug 2030 depending on sub-phase; confirm which of 1A–1D a quote belongs to. Entry prices vary by ~₹70 L across sources.'},
+    {name:'Brigade Orchards · Ivory',area:'Airport / Devanahalli',place:'Brigade Orchards township · Devanahalli',builder:'Brigade',type:'Apartment',price:0.39,priceNote:'1/1.5/2/3 BHK, ₹39 L–1.01 Cr; Phase 2 possession Dec 2027',delivery:'2027-12',status:'Under construction',rera:'Verify phase (Ph 1 and Ph 2 registered separately)',source:'https://housing.com/in/buy/projects/page/270415-ivory-at-brigade-orchards-by-brigade-enterprises-ltd-in-devanahalli',evidence:'Portal listing (Housing.com)',risk:'Lowest entry is a compact 1 BHK. Established township with lived-in phases, but many phases compete for resale buyers.'},
+    {name:'Brigade Orchards · Ebony',area:'Airport / Devanahalli',place:'Bychapura · Brigade Orchards township',builder:'Brigade',type:'Apartment',price:1.70,priceNote:'3/3.5 BHK from ₹1.70 Cr (developer); 232 homes',delivery:'2029-03',status:'Under construction',rera:'Verify on K-RERA',source:'https://www.brigadegroup.com/residential/projects/bengaluru/ebony-at-brigade-orchards',evidence:'Developer price',risk:'Larger 3 BHK ticket in a township that already has several ready phases; about 2.5 years of rent before a Sep 2031 exit if on time.'},
+    {name:'Brigade Orchards · Fairmont',area:'Airport / Devanahalli',place:'Bychapura · Brigade Orchards township',builder:'Brigade',type:'Apartment',price:1.64,priceNote:'3/4 BHK ₹1.64–1.99 Cr',delivery:'2027-12',status:'Under construction',rera:'Verify on K-RERA',source:'https://housing.com/in/buy/projects/page/311179-fairmont-at-brigade-orchards-by-brigade-enterprises-ltd-in-bychapura',evidence:'Portal listing; confirm price',risk:'Near-term handover gives a long rent window; 3/4 BHK narrows the tenant pool in an airport-side location.'},
+    {name:'Brigade Orchards · Laurel & Maple',area:'Airport / Devanahalli',place:'Brigade Orchards township · Devanahalli',builder:'Brigade',type:'Apartment',price:0.97,priceNote:'Senior living; from ₹97 L (developer); 311 homes on 2.5 acres',delivery:'2030-03',status:'Under construction',rera:'Verify on K-RERA',source:'https://www.brigadegroup.com/residential/projects/bengaluru/laurel-maple-at-brigade-orchards',evidence:'Developer price',risk:'Senior-living format limits both tenants and resale buyers; treat as a niche product, not a general rental.'},
+    {name:'Brigade Red Earth',area:'Airport / Devanahalli',place:'Devanahalli (exact site not published)',builder:'Brigade',type:'Plot',price:0.86,priceNote:'380 villa plots, 1,200–2,400 sq ft, ₹86.4 L–1.72 Cr; 17 acres',delivery:'2030-06',status:'Pre-launch',rera:'RERA pending',source:'https://www.propnewz.com/project/brigade-red-earth-devanahalli-bangalore',evidence:'Channel-partner site; unverified',risk:'Pre-launch EOI with no RERA number; brokers quote Jun 2030 possession. No rent as a plot.'},
+    {name:'Assetz Promise of Spring',area:'Airport / Devanahalli',place:'Devanahalli (exact site not in OSM)',builder:'Assetz',type:'Plot',price:1.26,priceNote:'Plots 1,810–2,124 sq ft from ₹1.26 Cr (Housing.com); other listings ₹78 L–2.14 Cr; 320 plots on 23 acres',delivery:'2026-10',status:'Near possession',rera:'RERA approved (verify number)',source:'https://housing.com/in/buy/projects/page/319203-promise-of-spring-by-assetz-property-group-in-devanahalli',evidence:'Portal listing (Housing.com)',risk:'Handover due Oct 2026. No rent as a plot; resale plots on Magicbricks ask ~₹9,200/sq ft, so compare before buying new.'},
+    {name:'Embassy Springs',area:'IVC Road',place:'Nagamangala · off NH-44 / IVC Road',builder:'Embassy',type:'Plot',price:0.93,priceNote:'Plots plus 2/3 BHK flats from ₹93.4 L (Housing.com); a 3,000 sq ft resale plot asks ₹4.20 Cr (~₹14,000/sq ft)',delivery:null,status:'Ready (resale plots)',rera:'Check phase',source:'https://housing.com/in/buy/projects/page/335107-embassy-springs-by-embassy-group-in-devanahalli',evidence:'Portal listing (Housing.com)',risk:'Large township mixing plots and flats; resale plot asks vary widely. No rent as a plot; check title and layout approval per phase.'},
+    {name:'Prestige Sunset Park',area:'IVC Road',place:'IVC Road (exact site not in OSM)',builder:'Prestige',type:'Plot',price:0.72,priceNote:'350 plots, 1,200–3,000 sq ft, from ₹72 L (another broker: ₹48 L–1.8 Cr); 33 acres',delivery:'2028-12',status:'Launching (brokers disagree)',rera:'One broker says registered; another says pre-launch',source:'https://synergyinfracon.com/projects/prestige-sunset-park',evidence:'Channel-partner site; unverified',risk:'Broker sites disagree on RERA status and entry price by ₹24 L. No rent as a plot.'},
+    {name:'Prestige Autumn Leaves',area:'IVC Road',place:'Off IVC Road · Devanahalli',builder:'Prestige',type:'Plot',price:1.28,priceNote:'Villa plots 1,350–4,000 sq ft from ₹1.28–1.34 Cr (broker sites); 99acres lists it as a new launch',delivery:null,status:'New launch',rera:'Conflicting: “240 RERA plots” vs “awaiting RERA”',source:'https://www.99acres.com/prestige-autumn-leaves-devanahalli-bangalore-north-npxid-r454654',evidence:'Portal listing; confirm RERA',risk:'Sources disagree on size (240 vs ~500 plots, 40 acres) and RERA status. No possession date published.'},
+    {name:'Brigade WTC Devanahalli',area:'KIADB / Bagalur',place:'KIADB Aerospace Park Phase 2 (also marketed as Brigade Innovation Gardens)',builder:'Brigade',type:'Apartment',price:0.65,priceNote:'Broker guides: from ₹62–75 L; 2 BHK ~₹1.02 Cr, 3 BHK ~₹1.48 Cr at ~₹10,200–11,000/sq ft; ~7,195 homes on 75 acres',delivery:null,status:'Pre-launch',rera:'Not yet registered',source:'https://www.propnewz.com/project/brigade-wtc-devanahalli',evidence:'Channel-partner site; unverified',risk:'Prices are broker estimates from area rates, not a filed price list. Huge supply next to Prestige KIADB and El Dorado; no handover date yet.'},
+    {name:'Provident Ecopolitan · Phase 2',area:'KIADB / Bagalur',place:'Hoovinayakanahalli · Aerospace Park',builder:'Puravankara',type:'Apartment',price:0.45,priceNote:'1–3.5 BHK ₹42 L–1.75 Cr; 405 sq ft 1 BHK ~₹45 L all-in; 1,200 homes, 9 towers on 10 acres',delivery:'2027-09',status:'Under construction',rera:'RERA registered (verify phase number)',source:'https://housiey.com/projects/provident-ecopolitan',evidence:'Channel-partner site; unverified',risk:'One site quoted “₹3.50 Cr+” and a 9 BHK, clearly wrong. Later phases run to Apr 2029. Compact units suit rental but face heavy nearby supply.'},
+    {name:'Godrej Ananda · Phase III',area:'KIADB / Bagalur',place:'Bagalur',builder:'Godrej',type:'Apartment',price:0.92,priceNote:'2/3 BHK 998–1,630 sq ft from ₹91.9 L (Housing.com); older phases resell ~₹1.5 Cr for 3 BHK',delivery:'2027-12',status:'Under construction',rera:'Verify phase',source:'https://housing.com/in/buy/projects/page/305491-godrej-ananda-phase-iii-by-godrej-properties-ltd-in-bagalur',evidence:'Portal listing (Housing.com)',risk:'Near-term handover and an existing resident base support rent; Bagalur is ~12 km from the aerospace park gate.'},
+    {name:'Brigade Granada',area:'Whitefield / ORR',place:'Sannatammanahalli · Whitefield–Hoskote Road (north of Kadugodi)',builder:'Brigade',type:'Apartment',price:1.45,priceNote:'2.5/3 BHK from ~₹1.45 Cr (EOI); 1 BHK quoted ₹87 L–1.07 Cr; ~40 acres, 14 towers, ~2,000 homes',delivery:'2030-12',status:'Pre-launch (EOI)',rera:'RERA awaited',source:'https://www.brigadegranada.org.in/price/',evidence:'Channel-partner site; unverified',risk:'EOI only; broker figures range from ₹87 L to ₹3.99 Cr and possession “from 2030”. Some sites label it Hoskote. No rent before exit if handover slips.'},
+    {name:'Prestige Park Grove',area:'Whitefield / ORR',place:'Seegehalli / Chikkabanahalli · Whitefield',builder:'Prestige',type:'Apartment',price:0.97,priceNote:'1–4 BHK flats and 4 BHK villas, 658–4,170 sq ft, from ₹96.7 L (Housing.com); 72-acre township',delivery:'2028-06',status:'Under construction',rera:'RERA registered (verify tower)',source:'https://housing.com/in/buy/projects/page/300312-prestige-park-grove-by-prestige-projects-pvt-ltd-in-whitefield',evidence:'Portal listing (Housing.com)',risk:'A developer-affiliated site says Dec 2027; Housing.com says Jun 2028. Large township with thousands of units handing over together.'},
+    {name:'Prestige Lavender Fields',area:'Whitefield / ORR',place:'Varthur',builder:'Prestige',type:'Apartment',price:null,priceNote:'1–4 BHK 669–3,656 sq ft; a 2,244 sq ft 4 BHK asks ₹3.36 Cr (Magicbricks)',delivery:'2027-05',status:'Under construction',rera:'Verify tower',source:'https://housing.com/in/buy/projects/page/294617-prestige-lavender-fields-by-prestige-projects-pvt-ltd-in-varthur',evidence:'Portal listing (Housing.com)',risk:'Mostly sold; buy via resale/assignment. Varthur congestion. Get a live quote for the configuration you want.'},
+    {name:'Godrej Splendour',area:'Whitefield / ORR',place:'Belathur side · Whitefield',builder:'Godrej',type:'Apartment',price:null,priceNote:'Resale only; 1–4 BHK, 23+ Housing.com and 200+ Magicbricks listings',delivery:null,status:'Ready (resale)',rera:'Check tower OC',source:'https://housing.com/in/buy/bengaluru/whitefield-gid/projects/godrej-splendour-pid/',evidence:'Portal listing (Housing.com)',risk:'OSM still tags part of the site as under construction; confirm OC for the tower. Many resale listings mean price negotiation room.'},
+    {name:'Assetz Marq',area:'Whitefield / ORR',place:'Kannamangala · Whitefield',builder:'Assetz',type:'Apartment',price:null,priceNote:'Resale only; studio–3 BHK across Marq phases',delivery:null,status:'Ready (resale)',rera:'Completed project; check OC',source:'https://www.99acres.com/assetz-marq-3-whitefield-bangalore-east-npxid-r385000',evidence:'Portal listing (99acres)',risk:'Kannamangala is east of Kadugodi with slower connectivity; rental possible now.'},
+    {name:'Godrej Lakeside Orchard',area:'Sarjapur Road',place:'Chikkakannalli / Kodathi · Sarjapur Road',builder:'Godrej',type:'Apartment',price:2.60,priceNote:'Resale; a 1,881 sq ft 3 BHK asks ₹2.60 Cr (~₹13,800/sq ft, Housing.com)',delivery:null,status:'Ready (resale)',rera:'Check tower OC',source:'https://www.99acres.com/godrej-lakeside-orchard-resale-in-sarjapur-road-bangalore-east-1178360-npffid',evidence:'Portal listing (Housing.com)',risk:'Price shown is one 3 BHK ask, not an entry price. Rental possible now; RGA Tech Park is next door.'},
+    {name:'Assetz Codename Sublime',area:'Hoskote',place:'Off Old Madras Road · Hoskote',builder:'Assetz',type:'Apartment',price:1.84,priceNote:'3 BHK only, 1,608–1,790 sq ft, EOI from ₹1.84–1.93 Cr; ~800 homes on 11 acres',delivery:null,status:'Pre-launch (EOI)',rera:'RERA pending',source:'https://assetzproject.com/assetz-codename-sublime/',evidence:'Channel-partner site; unverified',risk:'Codename project with no RERA or possession date. 3 BHK-only at ~₹11,400/sq ft is a premium for Hoskote.'}
+  ];
+  const areas=['Airport / Devanahalli','KIADB / Bagalur','IVC Road','Sarjapur Road','Hoskote','Whitefield / ORR'];
+  const areaColor={'Airport / Devanahalli':'#2f6f9f','KIADB / Bagalur':'#7a5aa6','IVC Road':'#b7791f','Sarjapur Road':'#c2553a','Hoskote':'#2f855a','Whitefield / ORR':'#1f7a8c'};
+  const configurations={
+    'Sattva City':[2,3,4],'Godrej Royale Woods':[1,2,3],'Godrej MSR City · Barca I':[2,3],
+    'Birla Trimaya · Phase 4':[1,2,3,4],'Prestige Finsbury Park · Hyde':[1,2],
+    'Assetz Sora & Saki · Phase 1':[3,4],'Purva Northern Lights · Phase 1':[2,3,4],
+    'Godrej Park Retreat · Phase 2':[1,2,3],'Birla Evara · Phase 1':[1,2,3,4],
+    'Godrej Parkshire':[2,3],'Sobha One World · Wing 1–2':[1,2,3,4],
+    'Godrej Woodscapes':[1,2,3,4],'Sobha Neopolis · Phase 1':[1,3,4],
+    'Prestige Sarjapur Road':[1,2,3],'Sobha Celsia':[2,3,4],'Prestige Aston Park':[2,3],'Godrej Verano':[1,2,3],'Assetz 63 Degree East':[1,2,3,4],
+    'Sobha Royal Pavilion':[2,3,4],'Sobha Dream Acres':[1,2,3],'Prestige Lakeside Habitat':[1,2,3,4],'Brigade Cornerstone Utopia':[1,2,3],
+    'Prestige Shantiniketan':[2,3],'Sobha Windsor':[2,3,4],'Brigade Cosmopolis':[2,3,4],'Prestige Elm Park':[3,4],'Brigade Avalon':[3,4],
+    'Godrej Whitefield':[1,2,3,4],'Prestige Evergreen':[1,2,3,4],'Prestige Hoskote':[2,3,4],'Godrej Melange':[3,4],'Prestige Lakeside · Hoskote':[2,3,4],
+    'Birla Hoskote':[2,3],'Prestige Devanahalli':[1,2,3],'Prestige Park Street':[1,2,3],'Sattva Aeropolis':[1,3],'Prestige Somerville':[2,3,4],'Prestige Raintree Park':[3,4],'Prestige KIADB':[1,2,3],'Brigade El Dorado':[1,2,3],
+    'Nikoo Homes 9':[1,2,3,4],'TVS Emerald Altura':[2,3],'Nambiar District 25 · Phase 1':[2,3,4],'Nambiar District 25 · Phase 2':[2,3,4],'Nambiar District 25 · Phase 3':[2,3,4],
+    'Tata Varnam · Phase 1':[2,3,4],'Brigade Orchards · Ivory':[1,2,3],'Brigade Orchards · Ebony':[3],'Brigade Orchards · Fairmont':[3,4],'Brigade Orchards · Laurel & Maple':[1,2,3],
+    'Brigade WTC Devanahalli':[1,2,3,4],'Provident Ecopolitan · Phase 2':[1,2,3],'Godrej Ananda · Phase III':[2,3],'Brigade Granada':[1,2,3,4],'Prestige Park Grove':[1,2,3,4],
+    'Prestige Lavender Fields':[1,2,3,4],'Godrej Splendour':[1,2,3,4],'Assetz Marq':[1,2,3],'Godrej Lakeside Orchard':[2,3,4],'Assetz Codename Sublime':[3]
+  };
+  // Geocoded 28 Sep 2026 against OpenStreetMap (Photon). site = project footprint in OSM; village = locality centroid; corridor = exact site unknown.
+  const pins={
+    'Sattva City':[13.1848,77.6465],'Godrej Royale Woods':[13.2247,77.6881],'Godrej MSR City · Barca I':[13.1990,77.6606],
+    'Birla Trimaya · Phase 4':[13.1894,77.6699],'Century Greens · resale':[13.2165,77.6188],'Prestige Crystal Lawns':[13.2320,77.6212],
+    'Brigade Oasis · Phase 3':[13.2722,77.6655],'Prestige Marigold · Phase 2':[13.2042,77.5823],'Prestige Finsbury Park · Hyde':[13.1422,77.6827],
+    'Assetz Sora & Saki · Phase 1':[13.1482,77.6810],'Purva Northern Lights · Phase 1':[13.1395,77.6893],'Godrej Park Retreat · Phase 2':[12.8919,77.7052],
+    'Birla Evara · Phase 1':[12.8818,77.7010],'Prestige City · earlier phases':[12.8763,77.7670],'Godrej Parkshire':[13.0469,77.7833],
+    'Sobha One World · Wing 1–2':[13.0603,77.7755],'Godrej Woodscapes':[13.0490,77.7519],'Sobha Neopolis · Phase 1':[12.9324,77.7142],
+    'Prestige Raintree Park':[12.9543,77.7485],'Prestige Somerville':[12.9545,77.7425],
+    'Prestige Sarjapur Road':[12.8815,77.7892],'Sobha Celsia':[12.9070,77.6620],'Prestige Aston Park':[12.8763,77.7670],'Godrej Verano':[12.8900,77.7550],
+    'Assetz 63 Degree East':[12.8869,77.7048],'Sobha Royal Pavilion':[12.8974,77.7045],'Sobha Dream Acres':[12.9367,77.7228],'Prestige Lakeside Habitat':[12.9315,77.7344],
+    'Brigade Cornerstone Utopia':[12.9313,77.7456],'Prestige Shantiniketan':[12.9923,77.7290],'Sobha Windsor':[12.9718,77.7652],'Brigade Cosmopolis':[12.9620,77.7462],
+    'Prestige Elm Park':[12.9801,77.7604],'Brigade Avalon':[12.9657,77.7477],'Godrej Whitefield':[12.9950,77.7450],'Prestige Evergreen':[12.9543,77.7492],
+    'Prestige Hoskote':[13.0800,77.7750],'Godrej Melange':[13.0680,77.8000],'Prestige Lakeside · Hoskote':[13.0995,77.8361],'Birla Hoskote':[13.0780,77.8080],
+    'Prestige Devanahalli':[13.4072,77.6967],'Prestige Park Street':[13.2437,77.7123],'Sattva Aeropolis':[13.2103,77.6740],'Purva Aerocity':[13.1670,77.6262],
+    'Tata Carnatica':[13.1913,77.6664],'Prestige Greenbrook':[13.2347,77.6172],'Prestige KIADB':[13.1700,77.7150],'Brigade El Dorado':[13.1451,77.6813],
+    'Nikoo Homes 9':[13.1600,77.7080],'TVS Emerald Altura':[13.1248,77.6319],'Nambiar District 25 · Phase 1':[12.8747,77.7361],'Nambiar District 25 · Phase 2':[12.8739,77.7439],'Nambiar District 25 · Phase 3':[12.8730,77.7400],
+    'Tata Varnam · Phase 1':[13.1830,77.6680],'Brigade Orchards · Ivory':[13.2305,77.7240],'Brigade Orchards · Ebony':[13.2290,77.7258],'Brigade Orchards · Fairmont':[13.2318,77.7222],
+    'Brigade Orchards · Laurel & Maple':[13.2296,77.7212],'Brigade Red Earth':[13.2600,77.7250],'Assetz Promise of Spring':[13.2530,77.7000],'Embassy Springs':[13.2086,77.6183],
+    'Prestige Sunset Park':[13.2250,77.6100],'Prestige Autumn Leaves':[13.2400,77.6300],'Brigade WTC Devanahalli':[13.1760,77.7200],'Provident Ecopolitan · Phase 2':[13.1466,77.6832],
+    'Godrej Ananda · Phase III':[13.1467,77.6757],'Brigade Granada':[13.0479,77.7607],'Prestige Park Grove':[13.0157,77.7540],'Prestige Lavender Fields':[12.9349,77.7404],
+    'Godrej Splendour':[13.0106,77.7459],'Assetz Marq':[13.0249,77.7644],'Godrej Lakeside Orchard':[12.8897,77.7062],'Assetz Codename Sublime':[13.0700,77.7700]
+  };
+  const pinQuality={
+    'Century Greens · resale':'village','Purva Northern Lights · Phase 1':'village','Prestige Sarjapur Road':'village','Prestige Lakeside · Hoskote':'village',
+    'Prestige Devanahalli':'village','Nikoo Homes 9':'village','Prestige KIADB':'village','Brigade Avalon':'village',
+    'Sobha Celsia':'village','Prestige Aston Park':'village','Godrej Verano':'corridor','Godrej Whitefield':'corridor','Prestige Hoskote':'corridor',
+    'Godrej Melange':'corridor','Birla Hoskote':'corridor','Prestige Park Street':'corridor',
+    'Tata Varnam · Phase 1':'village','Brigade Orchards · Ebony':'village','Brigade Orchards · Fairmont':'village','Brigade Orchards · Laurel & Maple':'village',
+    'Brigade Red Earth':'corridor','Assetz Promise of Spring':'corridor','Prestige Sunset Park':'corridor','Prestige Autumn Leaves':'corridor',
+    'Brigade WTC Devanahalli':'corridor','Brigade Granada':'village','Assetz Codename Sublime':'corridor'
+  };
+  const pinLabel={site:'Project site (OpenStreetMap footprint)',village:'Village / landmark area only',corridor:'Exact site unknown — corridor placeholder'};
+  const quality=p=>pinQuality[p.name]||'site';
+  const anchors={
+    airport:{label:'Kempegowda Airport',short:'Airport',at:[13.1986,77.7066]},
+    itpl:{label:'ITPL, Whitefield',short:'ITPL',at:[12.9869,77.7370]},
+    manyata:{label:'Manyata Tech Park',short:'Manyata',at:[13.0475,77.6206]},
+    rga:{label:'RGA Tech Park, Sarjapur Rd',short:'RGA',at:[12.9015,77.7050]},
+    aero:{label:'KIADB Aerospace Park',short:'Aerospace Pk',at:[13.1810,77.7241]},
+    cbd:{label:'MG Road (CBD)',short:'CBD',at:[12.9756,77.6066]}
+  };
+
+  // Price outlook, research pass 28 Sep 2026. rate = 99acres average asking ₹/sq ft (super built-up); txn = Karnataka registration average, last 12 months; hist5 = 99acres five-year change.
+  // Growth % a year for years 1–3, 4–5, 6–7 and 8–10.
+  const HORIZONS=[3,5,7,10],PERIOD=[0,0,0,1,1,2,2,3,3,3],SCEN={bear:'Bear',base:'Base',bull:'Bull'};
+  const outlook={
+    'Airport / Devanahalli':{loc:'Devanahalli',rate:10000,txn:10166,hist5:127,base:[6.5,7.5,6.5,5.5],bear:[1.5,3,3,2.5],bull:[10,11,9,7.5],
+      note:'Registered deals (₹10,166) already match asking: demand is real, but there is no discount cushion if sentiment turns.',
+      drivers:['Blue Line metro to the airport (Doddajala and Airport City stations) 72% built in Aug 2026; target Dec 2027, likely 2028','Foxconn iPhone campus in the Devanahalli ITIR: 30,000 hired, 50,000 targeted','STRR ring road nearly complete; aerospace and hardware parks close by'],
+      risks:['+127% in five years is the steepest run of the six corridors; hardest to repeat','Heavy launch pipeline: Sattva City, Birla Trimaya, Godrej MSR City, Prestige Marigold','Second-airport site (south Bengaluru or Tumakuru) still undecided; BIAL exclusivity ends in 2033']},
+    'KIADB / Bagalur':{loc:'Bagalur',rate:10400,txn:7781,hist5:108,base:[6.5,7.5,6.5,6],bear:[1.5,3,3,3],bull:[10,11,9,8],
+      drivers:['Blue Line stations at Bagalur Cross and Bettahalasur on the Hebbal–airport stretch','KIADB Aerospace Park and SEZ employers; developers shifting pipelines north (Embassy: 90% of its city pipeline)','Airport-side jobs and the STRR'],
+      risks:['Registered deals average ₹7,781 against ₹10,400 asking, a ~25% gap','Several 1,500+ home launches at once: Purva Northern Lights, Prestige KIADB, Nikoo Homes 9, El Dorado','Warehousing and data-centre neighbours limit premium pockets']},
+    'IVC Road':{loc:'IVC Road plots',rate:9000,txn:null,hist5:null,base:[7,8,7,6],bear:[1,2,2.5,3],bull:[12,12,10,9],
+      note:'Plot rate from current listings (Greenbrook and Crystal Lawns ~₹9,000/sq ft; Century Greens resale ~₹8,250). No reliable portal plot index exists for this belt.',
+      drivers:['Land does not depreciate; branded gated plots near the airport are scarce','Foxconn ITIR and airport jobs within 15–20 km','STRR crosses the corridor'],
+      risks:['No rent and a thin resale market; plots can stall for years (city prices were almost flat 2019–21)','Title, land conversion and layout approvals need legal checks','Least data behind it: treat this corridor as the most uncertain']},
+    'Sarjapur Road':{loc:'Sarjapur Road',rate:12300,txn:9420,hist5:105,base:[6,6.5,6.5,7],bear:[1.5,2.5,3,3],bull:[9,10,9,9],
+      note:'Anarock: Sarjapur–Attibele went from ₹4,568 to ₹7,800/sq ft in 2022–25 (+71%) and is projected +25% more by 2028.',
+      drivers:['RGA, Wipro and ORR tech parks; GCC hiring keeps rents firm','Blue Line ORR section (Silk Board–KR Puram) helps the northern end','KIADB’s planned 647-acre industrial park between Sarjapur and Attibele'],
+      risks:['Red Line metro (Sarjapur–Hebbal) still lacks Central approval; now seen opening ~2033','Registered deals average ₹9,420 against ₹12,300 asking','Large township supply: Prestige City, Nambiar District 25']},
+    'Hoskote':{loc:'Hoskote',rate:7550,txn:4162,hist5:91,base:[4,5.5,6.5,6.5],bear:[0,1.5,3,3],bull:[8,10,9,8],
+      drivers:['STRR Hoskote interchanges opened Sep 2026; NH-75 and the Chennai expressway','Cheapest entry of the six corridors','Spill-over from Whitefield as ITPL-side land runs out'],
+      risks:['Developers themselves name Hoskote as a pocket where several projects launched into the same price band (BW Businessworld, Sep 2026)','Registered deals average ₹4,162 against ₹7,550 asking, a ~45% gap','No metro planned; long commute to the job hubs']},
+    'Whitefield / ORR':{loc:'Whitefield',rate:13700,txn:null,hist5:100,base:[5.5,6.5,6,5.5],bear:[1.5,2.5,3,3],bull:[8.5,9,8,7],
+      note:'Sub-markets on 99acres: Varthur ₹13,050 (+135%), Panathur ₹15,400 (+130%), Budigere Cross ₹12,600 (+125%), Gunjur ₹11,200 (+118%) over five years.',
+      drivers:['Largest office cluster (ITPL, EPIP, ORR); Purple Line metro already running','Blue Line ORR section to add Panathur and Marathahalli access from ~2027–28','Deepest rental market; city yields up to 4.6% (Anarock)'],
+      risks:['Already the priciest corridor; affordability caps further gains','Ageing stock in older townships needs capex','Registered deals in Varthur average ₹10,072 against ₹13,050 asking']}
+  };
+  const OLD_STOCK=new Set(['Sobha Celsia','Prestige Shantiniketan']);
+  const seasoned=p=>p.type==='Apartment'&&isReady(p)&&!OLD_STOCK.has(p.name)&&(!p.delivery||p.delivery<'2023');
+  const unregisteredLaunch=p=>tier(p)==='Broker site'&&stage(p)==='Pre-launch / launch'&&!/PRM\/KA/.test(p.rera);
+  function adjust(p,s){
+    let a=0;
+    if(p.type==='Plot')a+={bear:-1,base:.5,bull:1.5}[s];
+    if(OLD_STOCK.has(p.name))a-=1.5;else if(seasoned(p))a-=.5;
+    if(unregisteredLaunch(p))a+={bear:-1.5,base:-.5,bull:0}[s];
+    return a;
+  }
+  const adjustNotes=p=>[p.type==='Plot'&&'plot: +0.5 pp a year in base (land does not depreciate), −1 bear, +1.5 bull',OLD_STOCK.has(p.name)&&'resale over 10 years old: −1.5 pp a year',seasoned(p)&&'5–10-year-old resale: −0.5 pp a year',unregisteredLaunch(p)&&'broker-only pre-launch without RERA: −0.5 pp base, −1.5 bear'].filter(Boolean);
+  function corridorFactor(area,years,s,adj=0){const r=outlook[area][s];let f=1;for(let y=0;y<years;y++)f*=1+(r[PERIOD[y]]+adj)/100;return f;}
+  const growthFactor=(p,years,s)=>corridorFactor(p.area,years,s,adjust(p,s));
+  const projCagr=(p,years,s)=>(growthFactor(p,years,s)**(1/years)-1)*100;
+  const projText=(p,years,s)=>p.price===null?`×${growthFactor(p,years,s).toFixed(2)}`:`₹${(p.price*growthFactor(p,years,s)).toFixed(2)} Cr`;
+  const projShort=(p,years,s)=>p.price===null?`×${growthFactor(p,years,s).toFixed(2)}`:(p.price*growthFactor(p,years,s)).toFixed(2);
+  const fmtK=v=>`₹${(v/1000).toFixed(1)}k`;
+
+  const $=id=>document.getElementById(id);
+  const esc=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money=v=>v===null?'Quote needed':`₹${v.toFixed(2)} Cr`;
+  const mi=s=>{const[y,m]=s.split('-').map(Number);return y*12+m-1;};
+  const rentalReady=p=>p.type==='Apartment'&&p.status.startsWith('Ready');
+  const isReady=p=>p.status.startsWith('Ready');
+  const due=p=>p.delivery||(isReady(p)?NOW:null);
+  const stage=p=>isReady(p)?'Ready':/Near possession/.test(p.status)?'Near possession':/Pre-launch|Launching|Upcoming|New launch|New phases/.test(p.status)?'Pre-launch / launch':'Under construction';
+  const tier=p=>/Channel/.test(p.evidence)?'Broker site':/Developer/.test(p.evidence)?'Developer':'Portal / guide';
+  const handover=p=>p.delivery?(p.type==='Plot'&&isReady(p)?'Ready resale':`${p.delivery.slice(5)==='01'&&isReady(p)?'Ready since ':''}${new Date(p.delivery+'-01T00:00:00').toLocaleDateString('en-IN',{month:'short',year:'numeric'})}`):isReady(p)?'Ready':'Confirm phase';
+  const rentMonths=p=>{if(p.type==='Plot')return 0;if(rentalReady(p))return mi(EXIT)-mi(NOW);if(!p.delivery)return null;return Math.max(0,mi(EXIT)-Math.max(mi(p.delivery),mi(NOW)));};
+  const rentLabel=p=>{const m=rentMonths(p);return m===null?'Confirm':m===0?(p.type==='Plot'?'None (plot)':'None'):`${m} mo`;};
+  const late=p=>Boolean(p.delivery&&p.delivery>EXIT);
+  const km=(a,b)=>{const t=x=>x*Math.PI/180,dLat=t(b[0]-a[0]),dLng=t(b[1]-a[1]),h=Math.sin(dLat/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dLng/2)**2;return 12742*Math.asin(Math.sqrt(h));};
+  const dist=(p,key)=>km(pins[p.name],anchors[key].at);
+  const byName=name=>projects.find(p=>p.name===name);
+  const toggle=(set,v)=>set.has(v)?set.delete(v):set.add(v);
+  const chips=p=>`<span class="chip">${p.type}</span>${configurations[p.name]?`<span class="chip">${configurations[p.name].join('/')} BHK</span>`:''}<span class="chip ${rentalReady(p)?'ready':late(p)?'late':!due(p)?'unknown':''}">${esc(p.status)}</span>${late(p)?'<span class="chip late">After exit</span>':''}${tier(p)==='Broker site'?'<span class="chip unknown">Broker data</span>':''}`;
+
+  let shortlist;try{shortlist=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'));}catch{shortlist=new Set();}
+  const saveShortlist=()=>{try{localStorage.setItem(STORE,JSON.stringify([...shortlist]));}catch{}};
+  const compare=new Set();
+  const fresh=()=>({q:'',areas:new Set(),builders:new Set(),stages:new Set(),tiers:new Set(),type:'',bhk:new Set(),budget:Infinity,includeQuote:true,deadline:'',anchor:'airport',radius:Infinity,rental:false,shortlist:false});
+  let state=fresh();
+  const ui={sort:'area',tableKey:'area',tableDir:1,view:'explore',drawer:null,hovered:null,scen:'base'};
+
+  function matches(p,ignore){
+    if(state.q&&![p.name,p.place,p.builder,p.risk,p.area,p.status].join(' ').toLowerCase().includes(state.q))return false;
+    if(ignore!=='area'&&state.areas.size&&!state.areas.has(p.area))return false;
+    if(state.builders.size&&!state.builders.has(p.builder))return false;
+    if(state.stages.size&&!state.stages.has(stage(p)))return false;
+    if(state.tiers.size&&!state.tiers.has(tier(p)))return false;
+    if(state.type&&p.type!==state.type)return false;
+    if(state.bhk.size&&!(configurations[p.name]||[]).some(b=>state.bhk.has(b)))return false;
+    if(p.price===null?!state.includeQuote:p.price>state.budget)return false;
+    if(state.deadline&&!(due(p)&&due(p)<=state.deadline))return false;
+    if(state.radius!==Infinity&&dist(p,state.anchor)>state.radius)return false;
+    if(state.rental&&!rentalReady(p))return false;
+    if(state.shortlist&&!shortlist.has(p.name))return false;
+    return true;
+  }
+  const sorters={
+    area:(a,b)=>areas.indexOf(a.area)-areas.indexOf(b.area)||a.name.localeCompare(b.name),
+    price:(a,b)=>(a.price??Infinity)-(b.price??Infinity)||a.name.localeCompare(b.name),
+    delivery:(a,b)=>(due(a)??'9999').localeCompare(due(b)??'9999')||a.name.localeCompare(b.name),
+    rent:(a,b)=>(rentMonths(b)??-1)-(rentMonths(a)??-1)||a.name.localeCompare(b.name),
+    near:(a,b)=>dist(a,state.anchor)-dist(b,state.anchor),
+    growth:(a,b)=>projCagr(b,10,ui.scen)-projCagr(a,10,ui.scen)||a.name.localeCompare(b.name),
+    name:(a,b)=>a.name.localeCompare(b.name)
+  };
+  const filtered=()=>projects.filter(p=>matches(p)).sort(sorters[ui.sort]);
+
+  function buildStatic(){
+    const facet=a=>`<button type="button" class="facet" data-area="${esc(a)}" aria-pressed="false"><i style="background:${areaColor[a]}"></i><span>${esc(a)}</span><b data-count="${esc(a)}">0</b></button>`;
+    $('areaFacets').innerHTML=areas.map(facet).join('');
+    $('legend').innerHTML=areas.map(facet).join('')+'<div class="legend-note">Click a corridor to filter. ■ landmark · solid pin = project site · dashed = village only · faded = site unknown</div>';
+    $('builderChips').innerHTML=[...new Set(projects.map(p=>p.builder))].sort().map(b=>`<button type="button" class="chip-btn" data-builder="${esc(b)}" aria-pressed="false">${esc(b)}</button>`).join('');
+    $('anchor').innerHTML=Object.entries(anchors).map(([k,a])=>`<option value="${k}">${esc(a.label)}</option>`).join('');
+    $('calcProject').innerHTML='<option value="">Manual entry</option>'+projects.filter(p=>p.price!==null).map(p=>`<option value="${esc(p.name)}">${esc(p.name)} · ${money(p.price)}</option>`).join('');
+  }
+
+  function syncFilterUI(){
+    document.querySelectorAll('[data-area]').forEach(b=>b.setAttribute('aria-pressed',state.areas.has(b.dataset.area)));
+    document.querySelectorAll('[data-count]').forEach(el=>el.textContent=projects.filter(p=>p.area===el.dataset.count&&matches(p,'area')).length);
+    document.querySelectorAll('[data-builder]').forEach(b=>b.setAttribute('aria-pressed',state.builders.has(b.dataset.builder)));
+    document.querySelectorAll('[data-type]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.type===state.type));
+    document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',state.stages.has(b.dataset.stage)));
+    document.querySelectorAll('[data-tier]').forEach(b=>b.setAttribute('aria-pressed',state.tiers.has(b.dataset.tier)));
+    document.querySelectorAll('[data-bhk]').forEach(b=>b.setAttribute('aria-pressed',state.bhk.has(Number(b.dataset.bhk))));
+    document.querySelectorAll('[data-scen]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.scen===ui.scen));
+    $('budgetOut').textContent=state.budget===Infinity?'Any':`≤ ₹${state.budget.toFixed(2)} Cr`;
+    $('radiusOut').textContent=state.radius===Infinity?'Any distance':`≤ ${state.radius} km`;
+    const active=(state.q?1:0)+state.areas.size+state.builders.size+state.stages.size+state.tiers.size+(state.type?1:0)+state.bhk.size+(state.budget!==Infinity?1:0)+(state.includeQuote?0:1)+(state.deadline?1:0)+(state.radius!==Infinity?1:0)+(state.rental?1:0)+(state.shortlist?1:0);
+    $('activeCount').textContent=active?`${active} active`:'';
+  }
+
+  function renderKpis(visible){
+    $('kShown').textContent=`${visible.length}/${projects.length}`;
+    $('kAreas').textContent=new Set(visible.map(p=>p.area)).size;
+    const prices=visible.map(p=>p.price).filter(v=>v!==null).sort((a,b)=>a-b);
+    const mid=prices.length?(prices.length%2?prices[(prices.length-1)/2]:(prices[prices.length/2-1]+prices[prices.length/2])/2):null;
+    $('kMedian').textContent=mid===null?'—':money(mid);
+    $('kRent').textContent=visible.filter(p=>(rentMonths(p)||0)>0).length;
+    $('kShort').textContent=shortlist.size;
+    $('cmpBadge').textContent=compare.size;
+  }
+
+  function rowHtml(p){
+    return `<article class="row${compare.has(p.name)?' comparing':''}${ui.hovered===p.name?' hot':''}" data-name="${esc(p.name)}" style="--c:${areaColor[p.area]}" tabindex="0">
+      <div class="row-top"><h3>${esc(p.name)}</h3><button type="button" class="star${shortlist.has(p.name)?' on':''}" data-star="${esc(p.name)}" aria-pressed="${shortlist.has(p.name)}" aria-label="Shortlist ${esc(p.name)}">★</button></div>
+      <div class="row-sub">${esc(p.place)} · ${esc(p.builder)}</div>
+      <div class="row-metrics"><div><span>Entry</span><b>${money(p.price)}</b></div><div><span>Handover</span><b>${esc(handover(p))}</b></div><div><span>Rent pre-exit</span><b>${rentLabel(p)}</b></div><div><span>To ${esc(anchors[state.anchor].short)}</span><b>${dist(p,state.anchor).toFixed(1)} km</b></div><div><span>5 yr · ${SCEN[ui.scen]}</span><b>${projText(p,5,ui.scen)}</b></div></div>
+      <div class="row-foot"><div class="chips">${chips(p)}</div><label class="cmp"><input type="checkbox" data-compare="${esc(p.name)}" ${compare.has(p.name)?'checked':''}>Compare</label><button type="button" class="link-btn" data-open="${esc(p.name)}">Details →</button></div>
+    </article>`;
+  }
+  function renderList(visible){
+    $('results').textContent=`${visible.length} of ${projects.length} projects`;
+    if(!visible.length){$('list').innerHTML='<div class="empty">No matches. Widen the budget, distance or remove a filter.</div>';return;}
+    $('list').innerHTML=ui.sort==='area'?areas.map(a=>{const e=visible.filter(p=>p.area===a);return e.length?`<div class="district"><i style="background:${areaColor[a]}"></i>${esc(a)}<span>${e.length} ${e.length===1?'option':'options'}</span></div>${e.map(rowHtml).join('')}`:'';}).join(''):visible.map(rowHtml).join('');
+  }
+
+  // Map
+  let map=null,landmarks=null;const markers=new Map();
+  const baseStyle=name=>{const q=quality(byName(name));return {radius:compare.has(name)?10:8,weight:shortlist.has(name)?3:2,color:shortlist.has(name)?'#d59b3a':q==='site'?'#ffffff':'#1f2930',dashArray:q==='site'?'':'3 3',fillColor:areaColor[byName(name).area],fillOpacity:q==='corridor'?.35:.95};};
+  const popupHtml=p=>`<div class="pop"><b>${esc(p.name)}</b><span>${esc(p.place)} · ${esc(p.builder)}<br>Pin: ${esc(pinLabel[quality(p)])}</span><div>${money(p.price)} · ${esc(handover(p))} · rent ${rentLabel(p)}<br>In 5 yrs (${SCEN[ui.scen].toLowerCase()}): ${projText(p,5,ui.scen)}</div><button type="button" data-open="${esc(p.name)}">Open details</button></div>`;
+  function initMap(){
+    if(!window.L){$('map').innerHTML='<div class="map-fallback"><strong>Map unavailable</strong><span>Leaflet and map tiles need an internet connection.</span></div>';return;}
+    map=L.map('map',{zoomSnap:.5}).setView([13.07,77.69],10.5);
+    const esri=(service,maxZoom)=>L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`,{maxZoom,attribution:'Tiles &copy; Esri and contributors'});
+    const basemaps={'Streets':esri('World_Street_Map',19),'Light':esri('Canvas/World_Light_Gray_Base',16),'Satellite':esri('World_Imagery',19)};
+    basemaps.Streets.addTo(map);
+    L.control.layers(basemaps,null,{position:'bottomright'}).addTo(map);
+    landmarks=L.layerGroup(Object.values(anchors).map(a=>L.marker(a.at,{icon:L.divIcon({className:'lm',iconSize:[12,12]}),keyboard:false}).bindTooltip(esc(a.label),{permanent:true,direction:'right',offset:[8,0],className:'lm-label'}))).addTo(map);
+    projects.forEach(p=>{
+      const m=L.circleMarker(pins[p.name],baseStyle(p.name)).bindPopup(()=>popupHtml(p),{maxWidth:280}).bindTooltip(esc(p.name),{direction:'top',offset:[0,-8]});
+      m.on('click',()=>flashRow(p.name));m.on('mouseover',()=>hover(p.name));m.on('mouseout',()=>hover(null));
+      markers.set(p.name,m);
+    });
+    L.control.scale({imperial:false}).addTo(map);
+  }
+  function fitTo(visible){
+    if(!map||!visible.length)return;
+    const pts=visible.map(p=>pins[p.name]);
+    pts.length===1?map.setView(pts[0],13):map.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:13});
+  }
+  function renderMap(visible){
+    if(!map)return;
+    const names=new Set(visible.map(p=>p.name));
+    markers.forEach((m,n)=>{if(names.has(n)){if(!map.hasLayer(m))m.addTo(map);m.setStyle(baseStyle(n));}else if(map.hasLayer(m))m.remove();});
+    $('showLandmarks').checked?landmarks.addTo(map):landmarks.remove();
+    if($('autoFit').checked&&ui.view==='explore')fitTo(visible);
+  }
+  function hover(name){
+    if(name===ui.hovered)return;
+    const rowOf=n=>document.querySelector(`.row[data-name="${CSS.escape(n)}"]`);
+    if(ui.hovered){markers.get(ui.hovered)?.setStyle(baseStyle(ui.hovered));rowOf(ui.hovered)?.classList.remove('hot');}
+    ui.hovered=name;
+    if(name){const m=markers.get(name);if(m){m.setStyle({radius:13,weight:3,color:'#193a38'});m.bringToFront();}rowOf(name)?.classList.add('hot');}
+  }
+  function flashRow(name){
+    const row=document.querySelector(`.row[data-name="${CSS.escape(name)}"]`);if(!row)return;
+    row.scrollIntoView({block:'nearest',behavior:'smooth'});row.classList.remove('flash');void row.offsetWidth;row.classList.add('flash');
+  }
+  function focusOnMap(name){
+    const m=markers.get(name);if(!map||!m)return;
+    if(!map.hasLayer(m)){toast('Hidden by the current filters');return;}
+    map.flyTo(m.getLatLng(),Math.max(map.getZoom(),13),{duration:.6});m.openPopup();
+  }
+
+  // Table
+  const cols=[['name','Project'],['area','Corridor'],['builder','Developer'],['type','Type'],['bhk','BHK'],['price','Entry'],['p3','3 yr'],['p5','5 yr'],['p7','7 yr'],['p10','10 yr'],['cagr','CAGR 10y'],['delivery','Handover'],['rent','Rent pre-exit'],['airport','Airport km'],['itpl','ITPL km'],['evidence','Evidence']];
+  const PROJ_COLS=new Set(['p3','p5','p7','p10','cagr']);
+  const projSort=y=>p=>p.price===null?-1:p.price*growthFactor(p,y,ui.scen);
+  const tval={name:p=>p.name,area:p=>areas.indexOf(p.area),builder:p=>p.builder,type:p=>p.type,bhk:p=>(configurations[p.name]||[9])[0],price:p=>p.price??Infinity,p3:projSort(3),p5:projSort(5),p7:projSort(7),p10:projSort(10),cagr:p=>projCagr(p,10,ui.scen),delivery:p=>due(p)??'9999',rent:p=>rentMonths(p)??-1,airport:p=>dist(p,'airport'),itpl:p=>dist(p,'itpl'),evidence:p=>p.evidence};
+  const cmp=(x,y)=>typeof x==='string'?x.localeCompare(y):x===y?0:x<y?-1:1;
+  function renderTable(visible){
+    const k=ui.tableKey,d=ui.tableDir;
+    const rows=[...visible].sort((a,b)=>cmp(tval[k](a),tval[k](b))*d||a.name.localeCompare(b.name));
+    $('dataTable').innerHTML=`<thead><tr><th style="width:34px"></th>${cols.map(([key,label])=>`<th class="${PROJ_COLS.has(key)?'proj-h':''}"><button type="button" data-sort="${key}" class="${key===k?'on':''}" title="${PROJ_COLS.has(key)?`${SCEN[ui.scen]} case, ₹ Cr`:''}">${label}${key===k?(d>0?' ▲':' ▼'):''}</button></th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(p=>`<tr data-open="${esc(p.name)}">
+      <td><button type="button" class="star${shortlist.has(p.name)?' on':''}" data-star="${esc(p.name)}" aria-label="Shortlist ${esc(p.name)}">★</button></td>
+      <td><div class="name-cell"><i style="background:${areaColor[p.area]}"></i>${esc(p.name)}</div></td><td>${esc(p.area)}</td><td>${esc(p.builder)}</td><td>${p.type}</td>
+      <td>${configurations[p.name]?configurations[p.name].join('/'):'—'}</td><td class="num">${money(p.price)}</td>${HORIZONS.map(y=>`<td class="num proj${p.price===null?' mult':''}">${projShort(p,y,ui.scen)}</td>`).join('')}<td class="num proj">${projCagr(p,10,ui.scen).toFixed(1)}%</td><td>${esc(handover(p))}</td><td class="num">${rentLabel(p)}</td>
+      <td class="num">${dist(p,'airport').toFixed(1)}</td><td class="num">${dist(p,'itpl').toFixed(1)}</td><td>${esc(p.evidence)}</td></tr>`).join(''):`<tr><td colspan="${cols.length+1}"><div class="empty">No matches.</div></td></tr>`}</tbody>`;
+  }
+
+  // Timeline
+  function renderTimeline(visible){
+    const box=$('timeline'),W=Math.max(820,box.clientWidth),Lft=270,R=40,top=44,rowH=30;
+    const rows=[...visible].sort(sorters.delivery),start=mi('2024-01'),end=mi('2033-06');
+    const x=m=>Lft+(m-start)/(end-start)*(W-Lft-R),H=top+Math.max(rows.length,1)*rowH+20;
+    let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Handover timeline">`;
+    s+=`<rect x="${x(mi(NOW))}" y="${top-8}" width="${x(mi(EXIT))-x(mi(NOW))}" height="${H-top}" fill="#f4faf6"/>`;
+    for(let y=2024;y<=2033;y++){const gx=x(mi(`${y}-01`));s+=`<line class="tl-grid" x1="${gx}" x2="${gx}" y1="${top-8}" y2="${H-12}"/><text class="tl-year" x="${gx+4}" y="${top-16}">${y}</text>`;}
+    s+=`<line x1="${x(mi(NOW))}" x2="${x(mi(NOW))}" y1="${top-30}" y2="${H-12}" stroke="#193a38" stroke-dasharray="3 3"/><text x="${x(mi(NOW))+4}" y="${top-32}" font-size="10.5" font-weight="700" fill="#193a38">Today</text>`;
+    s+=`<line x1="${x(mi(EXIT))}" x2="${x(mi(EXIT))}" y1="${top-30}" y2="${H-12}" stroke="#b25b31" stroke-width="2"/><text x="${x(mi(EXIT))+4}" y="${top-32}" font-size="10.5" font-weight="700" fill="#b25b31">Exit Sep 2031</text>`;
+    rows.forEach((p,i)=>{
+      const y=top+i*rowH+rowH/2,name=p.name.length>36?p.name.slice(0,35)+'…':p.name,rm=rentMonths(p);
+      s+=`<g class="tl-row" data-open="${esc(p.name)}"><title>${esc(p.name)} — ${esc(handover(p))}; rent before exit: ${rentLabel(p)}</title><rect class="tl-hit" x="0" y="${y-rowH/2}" width="${W}" height="${rowH}"/><circle cx="16" cy="${y}" r="4" fill="${areaColor[p.area]}"/><text class="tl-label" x="28" y="${y+4}">${esc(name)}</text>`;
+      if(due(p)){
+        const dm=Math.max(mi(due(p)),start),from=Math.max(dm,mi(NOW));
+        if(rm>0)s+=`<rect class="tl-rent" x="${x(from)}" y="${y-4}" width="${x(mi(EXIT))-x(from)}" height="8" rx="4"/>`;
+        s+=`<circle cx="${x(dm)}" cy="${y}" r="7" fill="${areaColor[p.area]}" stroke="#fff" stroke-width="2"/><text class="tl-date" x="${x(dm)+12}" y="${y-7}">${esc(handover(p))}${rm>0?` · ${rm} mo rent`:''}</text>`;
+      }else s+=`<text class="tl-unknown" x="${Lft+6}" y="${y+4}">Handover not published — confirm phase</text>`;
+      s+='</g>';
+    });
+    if(!rows.length)s+=`<text x="${W/2}" y="${top+14}" text-anchor="middle" fill="#65727a">No matches.</text>`;
+    box.innerHTML=s+'</svg>';
+  }
+
+  // Compare
+  function renderCompare(){
+    const chosen=[...compare].map(byName);
+    if(!chosen.length){$('comparison').innerHTML='<div class="empty">Tick “Compare” on up to three projects in Map &amp; list, or add one from its details panel.</div>';return;}
+    const known=chosen.filter(p=>p.price!==null).map(p=>p.price),minPrice=known.length?Math.min(...known):null;
+    const maxRent=Math.max(...chosen.map(p=>rentMonths(p)??0)),maxCagr=Math.max(...chosen.map(p=>projCagr(p,10,ui.scen))),sc=SCEN[ui.scen].toLowerCase();
+    const rows=[
+      ['Corridor',p=>esc(p.area)],['Developer',p=>esc(p.builder)],['Asset',p=>p.type],['Configurations',p=>configurations[p.name]?configurations[p.name].join(' / ')+' BHK':'—'],
+      ['Indicative entry',p=>money(p.price),p=>p.price!==null&&p.price===minPrice&&known.length>1],['Price basis',p=>esc(p.priceNote)],
+      ['Handover',p=>esc(handover(p))],['Status',p=>esc(p.status)],['Rent months before exit',p=>rentLabel(p),p=>maxRent>0&&rentMonths(p)===maxRent],
+      [`Value in 5 yrs (${sc})`,p=>projText(p,5,ui.scen)],[`Value in 10 yrs (${sc})`,p=>projText(p,10,ui.scen)],[`10-yr growth a year (${sc})`,p=>`${projCagr(p,10,ui.scen).toFixed(1)}% <small style="color:var(--muted)">(${projCagr(p,10,'bear').toFixed(1)}–${projCagr(p,10,'bull').toFixed(1)}%)</small>`,p=>chosen.length>1&&projCagr(p,10,ui.scen)===maxCagr],
+      ['To airport',p=>dist(p,'airport').toFixed(1)+' km'],['To ITPL',p=>dist(p,'itpl').toFixed(1)+' km'],['To Manyata',p=>dist(p,'manyata').toFixed(1)+' km'],
+      ['Evidence',p=>esc(p.evidence)],['Key risk',p=>esc(p.risk)],['RERA',p=>esc(p.rera)],['Source',p=>`<a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">Open listing ↗</a>`]
+    ];
+    $('comparison').innerHTML=`<table class="cmp-table"><thead><tr><th></th>${chosen.map(p=>`<th><span style="color:${areaColor[p.area]}">●</span> ${esc(p.name)}<button type="button" data-uncompare="${esc(p.name)}">Remove ×</button></th>`).join('')}</tr></thead><tbody>${rows.map(([label,fn,best])=>`<tr><td>${label}</td>${chosen.map(p=>`<td class="${best&&best(p)?'best':''}">${fn(p)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+  function toggleCompare(name,box){
+    if(!compare.has(name)&&compare.size>=3){if(box)box.checked=false;toast('Compare up to three projects');return;}
+    toggle(compare,name);update();if(ui.drawer)renderDrawer();
+  }
+  function toggleShort(name){toggle(shortlist,name);saveShortlist();update();if(ui.drawer)renderDrawer();toast(shortlist.has(name)?'Added to shortlist':'Removed from shortlist');}
+
+  // Calculator
+  function calc(){
+    const price=Number($('calcPrice').value),g=Number($('calcGrowth').value),c=Number($('calcCosts').value),y=Number($('calcYield').value),months=Number($('calcMonths').value);
+    $('growthOut').textContent=`${g.toFixed(1)}%`;
+    if(!(price>0)||!(c>=0&&c<100)||!(y>=0)||!(months>=0&&months<=60)){$('calcOut').innerHTML='<div style="grid-column:1/-1"><span>Check inputs</span>Enter a positive price, costs 0–99%, yield ≥ 0 and 0–60 months.</div>';$('sens').innerHTML='';return;}
+    const outlay=price*(1+c/100),rent=price*y/100*months/12;
+    const run=gr=>{const exit=price*(1+gr/100)**5;return{exit,net:exit+rent-outlay,ann:(((exit+rent)/outlay)**(1/5)-1)*100};};
+    const r=run(g),be=((1+c/100)**(1/5)-1)*100,sign=v=>`${v>=0?'+':'−'}₹${Math.abs(v).toFixed(2)} Cr`;
+    $('calcOut').innerHTML=`<div><span>Gross exit</span><b>${money(r.exit)}</b></div><div><span>Rent collected</span><b>${money(rent)}</b></div><div class="${r.net>=0?'pos':'neg'}"><span>Net after costs</span><b>${sign(r.net)}</b></div><div class="${r.ann>=0?'pos':'neg'}"><span>Simple annualised</span><b>${r.ann.toFixed(1)}%</b></div><div style="grid-column:1/-1;background:none;padding:0"><span>Break-even price growth without rent: ${be.toFixed(1)}% a year</span></div>`;
+    const steps=[0,2,4,6,8,10,12],results=steps.map(run),maxAbs=Math.max(...results.map(v=>Math.abs(v.net)),.01);
+    $('sens').innerHTML=`<thead><tr><th>Growth / yr</th><th>Exit value</th><th>Net after costs</th><th style="width:34%"></th></tr></thead><tbody>${steps.map((s,i)=>`<tr data-growth="${s}" class="${s===g?'on':''}"><td>${s}%</td><td>${money(results[i].exit)}</td><td>${sign(results[i].net)}</td><td><div class="bar${results[i].net<0?' neg':''}" style="width:${Math.abs(results[i].net)/maxAbs*100}%"></div></td></tr>`).join('')}</tbody>`;
+  }
+  function loadProject(name){
+    const p=byName(name);if(!p||p.price===null)return;
+    $('calcProject').value=name;$('calcPrice').value=p.price.toFixed(2);$('calcMonths').value=rentMonths(p)??0;$('calcYield').value=p.type==='Plot'?0:3;
+    $('calcGrowth').value=Math.round(projCagr(p,5,'base')*2)/2;
+    $('calcHint').textContent=`Research outlook for ${p.name} over five years: ${projCagr(p,5,'bear').toFixed(1)}% bear · ${projCagr(p,5,'base').toFixed(1)}% base · ${projCagr(p,5,'bull').toFixed(1)}% bull a year. Slider set to base; click a row below to test others.`;
+    calc();
+  }
+
+  // Drawer
+  function openDrawer(name){if(!byName(name))return;ui.drawer=name;renderDrawer();$('scrim').hidden=false;$('drawer').classList.add('open');$('drawer').setAttribute('aria-hidden','false');$('drawerClose').focus();}
+  function closeDrawer(){ui.drawer=null;$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');$('scrim').hidden=true;}
+  function renderDrawer(){
+    const p=byName(ui.drawer),distances=Object.entries(anchors).map(([k,a])=>[a.label,dist(p,k)]),far=Math.max(...distances.map(d=>d[1]));
+    const gmaps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(`${p.name} ${p.place} Bengaluru`);
+    $('drawerBody').innerHTML=`<div class="d-area" style="--c:${areaColor[p.area]}">${esc(p.area)}</div><h2>${esc(p.name)}</h2><p class="d-sub">${esc(p.place)} · ${esc(p.builder)}</p><div class="chips">${chips(p)}</div>
+      <div class="d-metrics"><div><span>Indicative entry</span><b>${money(p.price)}</b><small>${esc(p.priceNote)}</small></div><div><span>Target handover</span><b>${esc(handover(p))}</b><small>${esc(p.status)}</small></div>
+      <div><span>Rent months before Sep 2031</span><b>${rentLabel(p)}</b><small>Upper bound; excludes fit-out and letting time</small></div><div><span>Configurations</span><b>${configurations[p.name]?configurations[p.name].join(' / ')+' BHK':p.type==='Plot'?'Residential plot':'Confirm'}</b><small>${esc(p.evidence)}</small></div></div>
+      <div class="d-risk"><strong>Key risk</strong>${esc(p.risk)}</div>
+      ${projSection(p)}
+      <h3>Straight-line distance</h3><ul class="d-dist">${distances.map(([l,d])=>`<li><span>${esc(l)}</span><b>${d.toFixed(1)} km</b><div class="track"><i style="width:${d/far*100}%"></i></div></li>`).join('')}</ul><p class="d-note">Pin accuracy: <strong>${esc(pinLabel[quality(p)])}</strong>. Road distance and peak-hour time will be longer.</p>
+      <h3>RERA</h3><div class="d-rera"><code>${esc(p.rera)}</code><button type="button" class="action" data-copy="${esc(p.rera)}">Copy</button></div>
+      <div class="d-actions"><button type="button" class="action primary" data-act="short">${shortlist.has(p.name)?'★ Shortlisted':'☆ Add to shortlist'}</button><button type="button" class="action" data-act="compare">${compare.has(p.name)?'Remove from compare':'Add to compare'}</button><button type="button" class="action" data-act="model" ${p.price===null?'disabled title="No indicative price"':''}>Model this price</button><button type="button" class="action" data-act="map">Show on map</button></div>
+      <div class="d-links"><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">Source listing ↗</a><a href="https://rera.karnataka.gov.in/" target="_blank" rel="noopener noreferrer">Karnataka RERA ↗</a><a href="${esc(gmaps)}" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></div>`;
+  }
+
+  function fanSvg(p){
+    const W=438,H=124,l=8,r=74,t=10,b=20,col={bear:'#b25b31',base:'#246b56',bull:'#335c82'};
+    const lines=Object.keys(SCEN).map(s=>({s,pts:Array.from({length:11},(_,y)=>growthFactor(p,y,s))}));
+    const hi=Math.max(...lines.flatMap(x=>x.pts)),lo=Math.min(1,...lines.flatMap(x=>x.pts));
+    const X=y=>l+y/10*(W-l-r),Y=v=>t+(hi-v)/((hi-lo)||1)*(H-t-b);
+    let g=`<svg class="d-fan" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Projection fan chart">`;
+    HORIZONS.concat(0).forEach(y=>g+=`<line x1="${X(y)}" x2="${X(y)}" y1="${t}" y2="${H-b}" stroke="#e8ecea"/><text x="${X(y)}" y="${H-5}" text-anchor="middle" font-size="10" fill="#65727a">${y?`${y} yr`:'Now'}</text>`);
+    lines.forEach(({s,pts})=>{g+=`<polyline fill="none" stroke="${col[s]}" stroke-width="${s===ui.scen?3:1.6}" points="${pts.map((v,y)=>`${X(y)},${Y(v)}`).join(' ')}"/>`;
+      HORIZONS.forEach(y=>g+=`<circle cx="${X(y)}" cy="${Y(pts[y])}" r="${s===ui.scen?3.5:2.5}" fill="${col[s]}"><title>${SCEN[s]} · ${y} yr: ${projText(p,y,s)}</title></circle>`);
+      g+=`<text x="${X(10)+6}" y="${Y(pts[10])+4}" font-size="11" font-weight="700" fill="${col[s]}">${SCEN[s]} ×${pts[10].toFixed(2)}</text>`;});
+    return g+'</svg>';
+  }
+  function projSection(p){
+    const o=outlook[p.area],notes=adjustNotes(p);
+    const rows=Object.keys(SCEN).map(s=>`<tr class="${s===ui.scen?'on':''}"><td>${SCEN[s]}</td>${HORIZONS.map(y=>`<td>${projText(p,y,s)}</td>`).join('')}<td>${projCagr(p,10,s).toFixed(1)}%</td></tr>`).join('');
+    return `<h3>Price projection</h3>${fanSvg(p)}<table class="d-proj"><thead><tr><th>Scenario</th>${HORIZONS.map(y=>`<th>${y} yr</th>`).join('')}<th>/yr 10y</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="d-note">${p.price===null?'No price is published, so values are multiples of what you pay. ':''}${esc(p.area)} base path: ${o.base.join('% → ')}% a year (years 1–3, 4–5, 6–7, 8–10).${notes.length?` Project adjustment: ${esc(notes.join('; '))}.`:''} Nominal, before costs and tax. <button type="button" class="link-btn" data-act="outlook">Corridor research →</button></p>`;
+  }
+
+  // Outlook
+  function renderOutlook(){
+    const s=ui.scen,visible=filtered(),box=$('olChart');
+    $('olChartNote').textContent=`${SCEN[s]} case · corridor averages before project adjustments · click a line for its card`;
+    const W=Math.max(760,box.clientWidth),H=310,l=58,r=190,t=16,b=34;
+    const series=areas.map(a=>({a,pts:Array.from({length:11},(_,y)=>outlook[a].rate*corridorFactor(a,y,s))}));
+    const all=series.flatMap(x=>x.pts),lo=Math.floor(Math.min(...all)/2000)*2000,hi=Math.ceil(Math.max(...all)/2000)*2000;
+    const X=y=>l+y/10*(W-l-r),Y=v=>t+(hi-v)/(hi-lo)*(H-t-b);
+    let g=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected corridor rates">`;
+    for(let v=lo;v<=hi;v+=2000)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#edf1ef"/><text x="${l-8}" y="${Y(v)+4}" text-anchor="end" font-size="10.5" fill="#65727a">₹${v/1000}k</text>`;
+    [0,...HORIZONS].forEach(y=>g+=`<line x1="${X(y)}" x2="${X(y)}" y1="${t}" y2="${H-b}" stroke="${y?'#e3e9e6':'#c9d3cf'}" ${y?'stroke-dasharray="3 3"':''}/><text x="${X(y)}" y="${H-b+16}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#65727a">${y?`${y} yr · ${2026+y}`:'Sep 2026'}</text>`);
+    const ends=series.map(x=>({a:x.a,v:x.pts[10],y:Y(x.pts[10])})).sort((m,n)=>m.y-n.y);
+    ends.forEach((e,i)=>{if(i&&e.y-ends[i-1].y<15)e.y=ends[i-1].y+15;});
+    series.forEach(({a,pts})=>{
+      g+=`<g class="ol-line" data-card="${esc(a)}"><title>${esc(a)}: ${HORIZONS.map(y=>`${y} yr ${fmtK(pts[y])}`).join(' · ')}</title><polyline fill="none" stroke="${areaColor[a]}" stroke-width="2.5" points="${pts.map((v,y)=>`${X(y)},${Y(v)}`).join(' ')}"/>`;
+      HORIZONS.forEach(y=>g+=`<circle cx="${X(y)}" cy="${Y(pts[y])}" r="3.5" fill="${areaColor[a]}"/>`);
+      const e=ends.find(x=>x.a===a);g+=`<text x="${X(10)+8}" y="${e.y+4}" font-size="11.5" font-weight="700" fill="${areaColor[a]}">${esc(a)} ${fmtK(pts[10])}</text></g>`;
+    });
+    box.innerHTML=g+'</svg>';
+    $('olCards').innerHTML=areas.map(a=>{
+      const o=outlook[a],n=visible.filter(p=>p.area===a).length;
+      return `<article class="ol-card" id="ol-${areas.indexOf(a)}" style="--c:${areaColor[a]}"><h3>${esc(a)}<small>${n} matching project${n===1?'':'s'}</small></h3>
+        <div class="ol-now"><div><span>Asking · ${esc(o.loc)}</span><b>₹${o.rate.toLocaleString('en-IN')}</b></div><div><span>Registered deals</span><b>${o.txn?'₹'+o.txn.toLocaleString('en-IN'):'—'}</b></div><div><span>Last 5 years</span><b>${o.hist5===null?'n/a':'+'+o.hist5+'%'}</b></div></div>
+        ${o.note?`<p class="ol-sub">${esc(o.note)}</p>`:''}
+        <table class="ol-proj"><thead><tr><th>₹/sq ft</th>${HORIZONS.map(y=>`<th>${y} yr</th>`).join('')}<th>/yr 10y</th></tr></thead><tbody>${Object.keys(SCEN).map(k=>`<tr class="${k===s?'on':''}"><td>${SCEN[k]}</td>${HORIZONS.map(y=>`<td>${fmtK(o.rate*corridorFactor(a,y,k))}</td>`).join('')}<td>${((corridorFactor(a,10,k)**.1-1)*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>
+        <h4>Drivers</h4><ul>${o.drivers.map(d=>`<li>${esc(d)}</li>`).join('')}</ul><h4 class="risk">Risks</h4><ul>${o.risks.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>
+        <button type="button" class="action" data-area-go="${esc(a)}" ${n?'':'disabled'}>Show ${n} in table →</button></article>`;
+    }).join('');
+  }
+
+  let toastTimer;
+  function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+  function showView(v){
+    ui.view=v;
+    document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===v));
+    document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!=='view-'+v);
+    if(v==='explore'&&map){map.invalidateSize();if($('autoFit').checked)fitTo(filtered());}
+    if(v==='timeline')renderTimeline(filtered());
+    if(v==='outlook')renderOutlook();
+  }
+
+  function update(){
+    const visible=filtered();
+    syncFilterUI();renderKpis(visible);renderList(visible);renderMap(visible);renderTable(visible);renderCompare();
+    if(ui.view==='timeline')renderTimeline(visible);
+    if(ui.view==='outlook')renderOutlook();
+  }
+
+  // Events
+  $('search').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();update();});
+  [$('areaFacets'),$('legend')].forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-area]');if(b){toggle(state.areas,b.dataset.area);update();}}));
+  $('builderChips').addEventListener('click',e=>{const b=e.target.closest('[data-builder]');if(b){toggle(state.builders,b.dataset.builder);update();}});
+  $('typeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(b){state.type=b.dataset.type;update();}});
+  $('stageChips').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b){toggle(state.stages,b.dataset.stage);update();}});
+  $('tierChips').addEventListener('click',e=>{const b=e.target.closest('[data-tier]');if(b){toggle(state.tiers,b.dataset.tier);update();}});
+  $('bhkChips').addEventListener('click',e=>{const b=e.target.closest('[data-bhk]');if(b){toggle(state.bhk,Number(b.dataset.bhk));update();}});
+  $('budget').addEventListener('input',e=>{const v=Number(e.target.value);state.budget=v>=BUDGET_MAX?Infinity:v;update();});
+  $('includeQuote').addEventListener('change',e=>{state.includeQuote=e.target.checked;update();});
+  $('deadline').addEventListener('change',e=>{state.deadline=e.target.value;update();});
+  $('anchor').addEventListener('change',e=>{state.anchor=e.target.value;update();});
+  $('radius').addEventListener('input',e=>{const v=Number(e.target.value);state.radius=v>=RADIUS_MAX?Infinity:v;update();});
+  $('rental').addEventListener('change',e=>{state.rental=e.target.checked;update();});
+  $('shortOnly').addEventListener('change',e=>{state.shortlist=e.target.checked;update();});
+  $('sort').addEventListener('change',e=>{ui.sort=e.target.value;update();});
+  $('reset').addEventListener('click',()=>{state=fresh();$('search').value='';$('budget').value=BUDGET_MAX;$('radius').value=RADIUS_MAX;$('includeQuote').checked=true;$('deadline').value='';$('anchor').value='airport';$('rental').checked=false;$('shortOnly').checked=false;update();});
+  $('autoFit').addEventListener('change',()=>{if($('autoFit').checked)fitTo(filtered());});
+  $('showLandmarks').addEventListener('change',()=>renderMap(filtered()));
+  $('resetView').addEventListener('click',()=>map&&map.setView([13.07,77.69],10.5));
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+  $('clearCompare').addEventListener('click',()=>{compare.clear();update();});
+
+  $('list').addEventListener('click',e=>{if(e.target.closest('[data-star],[data-open],label,input'))return;const row=e.target.closest('.row');if(row)focusOnMap(row.dataset.name);});
+  $('list').addEventListener('change',e=>{const c=e.target.closest('[data-compare]');if(c)toggleCompare(c.dataset.compare,c);});
+  $('list').addEventListener('mouseover',e=>{const row=e.target.closest('.row');hover(row?row.dataset.name:null);});
+  $('list').addEventListener('mouseleave',()=>hover(null));
+  $('list').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.contains('row'))openDrawer(e.target.dataset.name);});
+  $('dataTable').addEventListener('click',e=>{const b=e.target.closest('[data-sort]');if(!b)return;ui.tableDir=ui.tableKey===b.dataset.sort?-ui.tableDir:1;ui.tableKey=b.dataset.sort;renderTable(filtered());});
+  $('comparison').addEventListener('click',e=>{const b=e.target.closest('[data-uncompare]');if(b){compare.delete(b.dataset.uncompare);update();}});
+  $('olCards').addEventListener('click',e=>{const b=e.target.closest('[data-area-go]');if(!b)return;state.areas=new Set([b.dataset.areaGo]);update();showView('table');});
+  $('olChart').addEventListener('click',e=>{const g=e.target.closest('[data-card]');if(!g)return;const c=$('ol-'+areas.indexOf(g.dataset.card));c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash');});
+  document.addEventListener('click',e=>{
+    const sc=e.target.closest('[data-scen]');if(sc){ui.scen=sc.dataset.scen;update();if(ui.drawer)renderDrawer();return;}
+    const star=e.target.closest('[data-star]');if(star){toggleShort(star.dataset.star);return;}
+    const open=e.target.closest('[data-open]');if(open)openDrawer(open.dataset.open);
+  });
+  $('drawerBody').addEventListener('click',e=>{
+    const copy=e.target.closest('[data-copy]');
+    if(copy){if(navigator.clipboard)navigator.clipboard.writeText(copy.dataset.copy).then(()=>toast('RERA number copied'),()=>toast('Copy blocked; select the text manually'));else toast('Copy blocked; select the text manually');return;}
+    const act=e.target.closest('[data-act]')?.dataset.act,name=ui.drawer;if(!act)return;
+    if(act==='short')toggleShort(name);
+    if(act==='compare')toggleCompare(name);
+    if(act==='model'){loadProject(name);closeDrawer();showView('model');}
+    if(act==='map'){closeDrawer();showView('explore');focusOnMap(name);}
+    if(act==='outlook'){const a=byName(name).area;closeDrawer();showView('outlook');$('ol-'+areas.indexOf(a))?.scrollIntoView({block:'start'});}
+  });
+  $('drawerClose').addEventListener('click',closeDrawer);$('scrim').addEventListener('click',closeDrawer);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&ui.drawer)closeDrawer();
+    if(e.key==='/'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('search').focus();}
+  });
+  ['calcPrice','calcGrowth','calcCosts','calcYield','calcMonths'].forEach(id=>$(id).addEventListener('input',calc));
+  $('calcProject').addEventListener('change',e=>{if(e.target.value)loadProject(e.target.value);else{$('calcHint').textContent='Manual entry: choose a growth rate, or load a project to use its research range.';calc();}});
+  $('sens').addEventListener('click',e=>{const r=e.target.closest('[data-growth]');if(r){$('calcGrowth').value=r.dataset.growth;calc();}});
+  let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(ui.view==='timeline')renderTimeline(filtered());if(ui.view==='outlook')renderOutlook();},150);});
+  $('export').addEventListener('click',()=>{
+    const fields=['area','name','place','builder','type','price','priceNote','delivery','status','rera','evidence','risk','source'];
+    const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';
+    const s=ui.scen,proj=HORIZONS.map(y=>`value${y}y_${s}`);
+    const csv=[[...fields,'stage','dataSource','rentMonthsBeforeExit','airportKm','itplKm',...proj,`cagr10y_${s}`].map(quote).join(','),...filtered().map(p=>[...fields.map(f=>p[f]),stage(p),tier(p),rentMonths(p),dist(p,'airport').toFixed(1),dist(p,'itpl').toFixed(1),...HORIZONS.map(y=>projShort(p,y,s)),projCagr(p,10,s).toFixed(2)].map(quote).join(','))].join('\r\n');
+    const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+    const link=document.createElement('a');link.href=url;link.download='bengaluru-investment-atlas.csv';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    toast('CSV exported');
+  });
+
+  buildStatic();initMap();update();calc();
+</script>
+</body>
+</html>

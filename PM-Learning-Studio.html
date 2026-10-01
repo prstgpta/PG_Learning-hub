@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Learning Studio — Master Product Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#122730; --ink-2:#0C1B22; --ink-3:#1B3A46;
+  --paper:#F1ECE0; --paper-2:#FBF8F1; --paper-3:#ffffff;
+  --signal:#E7A23C; --signal-deep:#C9812A;
+  --go:#3F8C79; --alert:#C24B3A; --plum:#7C5C8E; --blue:#3E6E8E;
+  --text:#20323A; --muted:#5C6B70;
+  --line:rgba(18,39,48,.14); --line-light:rgba(241,236,224,.16);
+  --shadow:0 24px 60px -30px rgba(0,0,0,.55);
+  --shadow-sm:0 6px 20px -12px rgba(0,0,0,.5);
+  --sidebar-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;background:var(--ink);color:var(--paper);
+  font-family:"Newsreader",Georgia,serif;font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 12% -8%,rgba(231,162,60,.10),transparent 42%),radial-gradient(circle at 92% 4%,rgba(63,140,121,.10),transparent 46%);
+}
+h1,h2,h3,h4,h5{font-family:"Archivo",system-ui,sans-serif;font-weight:800;line-height:1.12;margin:0}
+.mono{font-family:"Space Mono",monospace}
+a{color:var(--signal-deep)}
+button{font-family:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+
+/* ---------- App layout ---------- */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--ink-2);border-right:1px solid var(--line-light);padding:20px 14px 40px;display:flex;flex-direction:column;gap:6px;z-index:40}
+.sidebar::-webkit-scrollbar{width:8px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(241,236,224,.14);border-radius:8px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 14px;border-bottom:1px solid var(--line-light);margin-bottom:8px}
+.brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--signal),var(--signal-deep));display:grid;place-items:center;font-family:"Archivo";font-weight:900;color:var(--ink);flex:none;font-size:18px}
+.brand b{font-family:"Archivo";font-size:15px;letter-spacing:.02em;color:var(--paper);display:block;line-height:1.1}
+.brand span{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal)}
+.nav-group-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:14px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:rgba(241,236,224,.78);text-decoration:none;font-family:"Archivo";font-weight:600;font-size:14px;border:1px solid transparent;cursor:pointer;transition:.15s;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(241,236,224,.05);color:var(--paper)}
+.nav-item.active{background:rgba(231,162,60,.14);border-color:rgba(231,162,60,.35);color:var(--signal)}
+.nav-item .ic{width:22px;text-align:center;flex:none;font-size:15px}
+.nav-item .dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:transparent;border:1.5px solid rgba(241,236,224,.28);flex:none}
+.nav-item.done .dot{background:var(--go);border-color:var(--go)}
+.nav-num{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);width:22px;text-align:center;flex:none}
+
+/* ---------- Main ---------- */
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(12,27,34,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-light);padding:12px 26px;display:flex;align-items:center;gap:16px}
+.hamburger{display:none;background:none;border:1px solid var(--line-light);color:var(--paper);border-radius:8px;width:38px;height:38px;font-size:18px;cursor:pointer}
+.progress-wrap{flex:1;max-width:520px}
+.progress-top{display:flex;justify-content:space-between;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;color:rgba(241,236,224,.75);margin-bottom:5px}
+.progress-bar{height:8px;background:rgba(241,236,224,.12);border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--signal),var(--go));border-radius:100px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.topbar-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{font-family:"Archivo";font-weight:600;font-size:13px;padding:9px 15px;border-radius:9px;border:1px solid var(--line-light);background:rgba(241,236,224,.04);color:var(--paper);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn:hover{border-color:var(--signal);color:var(--signal)}
+.btn.primary{background:var(--signal);color:var(--ink);border-color:var(--signal)}
+.btn.primary:hover{background:var(--signal-deep);color:var(--ink)}
+.btn.ghost-danger:hover{border-color:var(--alert);color:var(--alert)}
+
+.content{padding:34px 40px 90px;max-width:1080px;width:100%;margin:0 auto}
+@media(max-width:1180px){.content{padding:30px 26px 80px}}
+
+/* ---------- Sheets & typography ---------- */
+.view{display:none;animation:fade .4s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sheet{background:var(--paper);color:var(--text);border-radius:18px;padding:34px 38px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.4);margin-bottom:22px}
+@media(max-width:640px){.sheet{padding:24px 20px;border-radius:14px}}
+.sheet h2{font-size:clamp(1.6rem,3.4vw,2.3rem);color:var(--ink);margin:.1em 0 .35em;letter-spacing:-.01em}
+.sheet h3{font-size:1.28rem;color:var(--ink);margin:1.5em 0 .4em}
+.sheet h4{font-size:1.02rem;color:var(--ink);margin:1.1em 0 .3em}
+.sheet p{margin:.6em 0}
+.sheet ul,.sheet ol{margin:.6em 0;padding-left:1.3em}
+.sheet li{margin:.35em 0}
+.sheet strong,.sheet b{color:var(--ink)}
+.eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--signal-deep);display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.eyebrow::before{content:"";width:30px;height:2px;background:var(--signal)}
+.lead{font-size:1.1rem;color:#33454c}
+
+/* callouts */
+.note{border-left:4px solid var(--signal);background:rgba(231,162,60,.10);padding:13px 17px;border-radius:0 10px 10px 0;margin:16px 0;font-size:.97rem}
+.note.do{border-color:var(--go);background:rgba(63,140,121,.10)}
+.note.dont{border-color:var(--alert);background:rgba(194,75,58,.09)}
+.note.key{border-color:var(--plum);background:rgba(124,92,142,.10)}
+.note .lbl{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:4px;color:var(--muted)}
+.note.do .lbl{color:var(--go)}.note.dont .lbl{color:var(--alert)}.note.key .lbl{color:var(--plum)}
+
+blockquote{margin:20px 0;padding:18px 22px;background:var(--ink);color:var(--paper);border-radius:12px}
+blockquote p{font-size:1.1rem;line-height:1.5;margin:0}
+blockquote cite{display:block;margin-top:10px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;font-style:normal;color:var(--signal)}
+
+/* grids & cards */
+.grid{display:grid;gap:16px;margin:20px 0}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:760px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:18px}
+.card .tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal-deep)}
+.card h4{margin:.3em 0 .25em}
+.card p{font-size:.94rem;margin:.25em 0;color:#3c4c53}
+.card.click{cursor:pointer;transition:.15s}
+.card.click:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm);border-color:var(--signal)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.94rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td b{color:var(--ink)}
+tr:last-child td{border-bottom:none}
+
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:7px;background:var(--ink);color:var(--signal);font-family:"Archivo";font-weight:700;font-size:.85rem}
+.pill{display:inline-block;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px;border:1px solid var(--line);color:var(--muted)}
+.pill.go{color:var(--go);border-color:rgba(63,140,121,.4);background:rgba(63,140,121,.08)}
+.pill.sig{color:var(--signal-deep);border-color:rgba(201,129,42,.4);background:rgba(231,162,60,.1)}
+.pill.plum{color:var(--plum);border-color:rgba(124,92,142,.4);background:rgba(124,92,142,.08)}
+.pill.blue{color:var(--blue);border-color:rgba(62,110,142,.4);background:rgba(62,110,142,.08)}
+
+/* accordion */
+.acc{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden;background:var(--paper-2)}
+.acc-head{padding:15px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:"Archivo";font-weight:700;color:var(--ink);font-size:1.02rem;user-select:none}
+.acc-head:hover{background:rgba(231,162,60,.06)}
+.acc-head .caret{margin-left:auto;transition:.2s;color:var(--muted);flex:none}
+.acc.open .acc-head .caret{transform:rotate(90deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 18px}
+.acc.open .acc-body{max-height:2000px;padding:0 18px 16px}
+.acc-body p:first-child{margin-top:0}
+
+/* ---------- Dashboard ---------- */
+.hero-dash{background:linear-gradient(135deg,var(--ink-3),var(--ink-2));border:1px solid var(--line-light);color:var(--paper);border-radius:20px;padding:38px 40px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero-dash h1{font-size:clamp(2rem,4.5vw,3.1rem);letter-spacing:-.02em;margin-bottom:12px}
+.hero-dash h1 em{font-style:normal;color:var(--signal)}
+.hero-dash p{color:rgba(241,236,224,.85);font-size:1.12rem;max-width:44em}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+@media(max-width:760px){.stat-row{grid-template-columns:1fr 1fr}}
+.stat{background:rgba(241,236,224,.05);border:1px solid var(--line-light);border-radius:13px;padding:16px 18px}
+.stat .n{font-family:"Archivo";font-weight:800;font-size:1.9rem;color:var(--signal)}
+.stat .l{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,236,224,.7)}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.mod-card{background:var(--paper);color:var(--text);border-radius:15px;padding:20px;cursor:pointer;transition:.18s;border:1px solid rgba(255,255,255,.4);box-shadow:var(--shadow-sm);position:relative;display:flex;flex-direction:column;gap:6px;min-height:150px}
+.mod-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.mod-card .mc-ic{font-size:26px}
+.mod-card .mc-num{position:absolute;top:16px;right:18px;font-family:"Space Mono",monospace;font-size:12px;color:var(--muted)}
+.mod-card h3{color:var(--ink);font-size:1.12rem}
+.mod-card p{font-size:.9rem;color:#4a5a61;margin:0;flex:1}
+.mod-card .mc-foot{display:flex;align-items:center;gap:8px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mod-card .mc-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;color:transparent}
+.mod-card.done .mc-check{background:var(--go);border-color:var(--go);color:#fff}
+
+/* ---------- Quiz ---------- */
+.quiz-box{background:var(--ink);color:var(--paper);border-radius:16px;padding:26px 30px;margin-top:24px}
+.quiz-box h3{color:var(--signal);margin-bottom:4px}
+.quiz-q{margin:18px 0}
+.quiz-q .qtext{font-family:"Archivo";font-weight:700;font-size:1.05rem;margin-bottom:12px;display:flex;gap:10px}
+.quiz-opt{display:block;width:100%;text-align:left;padding:12px 15px;margin:8px 0;border-radius:10px;border:1px solid var(--line-light);background:rgba(241,236,224,.04);color:var(--paper);cursor:pointer;transition:.15s;font-size:.98rem;font-family:"Newsreader",serif}
+.quiz-opt:hover{border-color:var(--signal)}
+.quiz-opt.correct{background:rgba(63,140,121,.22);border-color:var(--go)}
+.quiz-opt.wrong{background:rgba(194,75,58,.2);border-color:var(--alert)}
+.quiz-opt.disabled{pointer-events:none;opacity:.65}
+.quiz-opt .mk{float:right;font-weight:700}
+.quiz-explain{font-size:.92rem;color:rgba(241,236,224,.82);margin-top:8px;padding:10px 14px;border-left:3px solid var(--signal);background:rgba(231,162,60,.08);border-radius:0 8px 8px 0;display:none}
+.quiz-explain.show{display:block}
+.quiz-result{margin-top:20px;padding:18px;border-radius:12px;background:rgba(241,236,224,.06);text-align:center;display:none}
+.quiz-result.show{display:block}
+.quiz-result .score{font-family:"Archivo";font-weight:900;font-size:2.4rem;color:var(--signal)}
+
+/* ---------- Flashcards ---------- */
+.fc-stage{perspective:1400px;max-width:560px;margin:24px auto}
+.fc{position:relative;width:100%;height:320px;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.fc.flip{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:30px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:var(--shadow)}
+.fc-front{background:var(--paper);color:var(--ink)}
+.fc-back{background:var(--ink-3);color:var(--paper);transform:rotateY(180deg)}
+.fc-face .kind{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-deep);margin-bottom:14px}
+.fc-back .kind{color:var(--signal)}
+.fc-face .term{font-family:"Archivo";font-weight:800;font-size:1.7rem;margin-bottom:8px}
+.fc-face .def{font-size:1.02rem;line-height:1.5}
+.fc-face .hint{position:absolute;bottom:16px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5}
+.fc-controls{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:20px}
+.fc-count{font-family:"Space Mono",monospace;font-size:13px;color:rgba(241,236,224,.75);min-width:80px;text-align:center}
+
+/* ---------- Glossary / search ---------- */
+.searchbar{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
+.searchbar input{flex:1;min-width:200px;padding:12px 16px;border-radius:11px;border:1px solid var(--line);background:var(--paper-2);color:var(--text);font-family:"Newsreader",serif;font-size:1rem}
+.searchbar input:focus{outline:2px solid var(--signal)}
+.filter-tags{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
+.ftag{font-family:"Space Mono",monospace;font-size:11px;padding:6px 12px;border-radius:100px;border:1px solid var(--line-light);background:rgba(241,236,224,.04);color:rgba(241,236,224,.8);cursor:pointer}
+.ftag.active{background:var(--signal);color:var(--ink);border-color:var(--signal)}
+.term-row{display:grid;grid-template-columns:220px 1fr;gap:16px;padding:13px 4px;border-bottom:1px dotted var(--line)}
+.term-row:last-child{border:none}
+.term-row dt{font-family:"Archivo";font-weight:700;color:var(--ink);font-size:1rem}
+.term-row dt .cat{display:block;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal-deep);margin-top:3px}
+.term-row dd{margin:0;font-size:.96rem;color:#3c4c53}
+@media(max-width:640px){.term-row{grid-template-columns:1fr;gap:3px}}
+.empty{padding:30px;text-align:center;color:var(--muted);font-family:"Space Mono",monospace;font-size:13px}
+
+/* ---------- Interview bank ---------- */
+.iv-item{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden}
+.iv-q{padding:16px 18px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;font-family:"Archivo";font-weight:700;color:var(--ink);font-size:1.02rem}
+.iv-q:hover{background:rgba(231,162,60,.06)}
+.iv-q .cat{margin-left:auto}
+.iv-a{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 18px}
+.iv-item.open .iv-a{max-height:1400px;padding:0 18px 18px}
+.iv-a .approach{font-size:.95rem;color:#3c4c53}
+.iv-a h5{font-family:"Archivo";color:var(--ink);margin:12px 0 4px;font-size:.95rem}
+
+/* ---------- RICE calc ---------- */
+.calc{background:var(--ink);color:var(--paper);border-radius:16px;padding:26px 30px;margin:20px 0}
+.calc-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+@media(max-width:640px){.calc-row{grid-template-columns:1fr}}
+.calc label{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(241,236,224,.75);display:block;margin-bottom:6px}
+.calc input,.calc select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line-light);background:rgba(241,236,224,.06);color:var(--paper);font-family:"Space Mono",monospace;font-size:1rem}
+.calc-out{margin-top:18px;text-align:center;padding:18px;border-radius:12px;background:rgba(231,162,60,.12);border:1px solid rgba(231,162,60,.3)}
+.calc-out .rscore{font-family:"Archivo";font-weight:900;font-size:2.6rem;color:var(--signal)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink-3);color:var(--paper);padding:13px 22px;border-radius:11px;box-shadow:var(--shadow);font-family:"Archivo";font-weight:600;font-size:.95rem;z-index:200;opacity:0;transition:.3s;border:1px solid var(--signal)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+.scrim{position:fixed;inset:0;background:rgba(6,14,18,.6);backdrop-filter:blur(3px);z-index:35;display:none}
+.scrim.show{display:block}
+
+.footer-note{text-align:center;color:rgba(241,236,224,.5);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.05em;padding:24px;line-height:1.8}
+
+.next-prev{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+.mark-done{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding:18px;border-radius:12px;background:rgba(63,140,121,.1);border:1px solid rgba(63,140,121,.3)}
+.mark-done .txt{font-family:"Archivo";font-weight:700;color:var(--ink);font-size:1rem}
+
+@media(max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);transform:translateX(-105%);transition:transform .28s ease;box-shadow:var(--shadow)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:grid;place-items:center}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div><b>PM Learning Studio</b><span>Product Management</span></div>
+    </div>
+    <nav id="nav"><!-- built by JS --></nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+      <div class="progress-wrap">
+        <div class="progress-top"><span id="progLabel">Your progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn ghost-danger" id="resetBtn" title="Reset all progress">Reset</button>
+      </div>
+    </header>
+    <main class="content" id="content"><!-- views injected by JS --></main>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   PM LEARNING STUDIO — data + app logic
+   Content distilled from the Product Focus "Product Management
+   Journal" series (Vols 1-15) and general PM best practice.
+   ================================================================ */
+"use strict";
+
+/* placeholder anchors filled incrementally */
+const MODULES = [
+{
+  id:"role", num:1, icon:"🎯", title:"The PM Role & Responsibilities",
+  tagline:"What a product manager actually does",
+  blurb:"The mission, the boundaries, and the difference between PM, PO and Project Manager.",
+  html:`
+    <p class="lead">A product manager is the person who makes sure the right product gets built for the right people, for the right business reasons — and that it succeeds in the market. You are the <b>CEO of the product</b> in influence, but almost never in authority. Your power comes from clarity, evidence and trust, not from telling people what to do.</p>
+
+    <div class="note key"><span class="lbl">One-line definition</span>Product management is the discipline of discovering a product that is <b>valuable, usable, feasible and viable</b>, and then leading the whole business to deliver and grow it.</div>
+
+    <h3>The four questions you exist to answer</h3>
+    <table>
+      <tr><th>Dimension</th><th>The question</th><th>Who you partner with</th></tr>
+      <tr><td><b>Valuable</b></td><td>Will customers want it and pay (in money or attention)?</td><td>Customers, Sales, Marketing</td></tr>
+      <tr><td><b>Usable</b></td><td>Can people actually use it easily?</td><td>Design / UX</td></tr>
+      <tr><td><b>Feasible</b></td><td>Can we build it with the time, tech and people we have?</td><td>Engineering</td></tr>
+      <tr><td><b>Viable</b></td><td>Does it work for our business (revenue, cost, strategy, legal)?</td><td>Finance, Legal, Leadership</td></tr>
+    </table>
+    <p>Marty Cagan calls these the <b>four big risks</b>. Great discovery is simply tackling all four <em>before</em> you spend months building.</p>
+
+    <h3>Two hats: strategic and tactical</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Strategic / Outbound</span><h4>Facing the market</h4><p>Market analysis, customer needs, propositions, pricing, business cases, positioning, roadmap and strategy. "Are we building the right thing?"</p></div>
+      <div class="card"><span class="tag">Tactical / Inbound</span><h4>Facing the build</h4><p>Requirements, backlog, working with engineering &amp; design, release readiness, launch. "Are we building the thing right?"</p></div>
+    </div>
+    <p>The Product Focus model splits this into <b>Market-facing</b> and <b>Product-facing</b> activities. Weak PMs collapse into only the tactical hat (a glorified backlog admin). Strong PMs protect time for the strategic hat.</p>
+
+    <h3>Not the same job: PM vs PO vs Project Manager</h3>
+    <table>
+      <tr><th>Role</th><th>Owns</th><th>Time horizon</th><th>Core question</th></tr>
+      <tr><td><b>Product Manager</b></td><td>The <em>why</em> &amp; <em>what</em> — value &amp; strategy</td><td>Weeks → years</td><td>Are we solving the right problem?</td></tr>
+      <tr><td><b>Product Owner</b></td><td>The <em>what next</em> — backlog for the dev team (a Scrum role)</td><td>Sprint → release</td><td>Is the backlog clear and ready?</td></tr>
+      <tr><td><b>Project Manager</b></td><td>The <em>when</em> &amp; <em>how</em> — plan, schedule, risk</td><td>Project duration</td><td>Are we on time and on budget?</td></tr>
+    </table>
+    <div class="note"><span class="lbl">Interview gold</span>In small companies one person wears all three hats. In larger Agile orgs, the PM is strategic and market-facing while the PO is a delivery-focused subset. If asked "PM vs PO?", say: <em>"PO is a Scrum role focused on the backlog; PM is the broader business role responsible for the product's success in the market."</em></div>
+
+    <h3>A week in the life</h3>
+    <ul>
+      <li><b>Talk to customers &amp; the market</b> — interviews, sales calls, support tickets, data.</li>
+      <li><b>Decide &amp; prioritise</b> — what's in, what's out, and why.</li>
+      <li><b>Write it down</b> — one-pagers, requirements, roadmap updates.</li>
+      <li><b>Unblock the team</b> — answer questions, make trade-off calls fast.</li>
+      <li><b>Align stakeholders</b> — sales, marketing, support, leadership, finance.</li>
+      <li><b>Measure</b> — did the last thing we shipped move the metric?</li>
+    </ul>
+
+    <div class="note do"><span class="lbl">Do</span>Own the outcome even when nobody formally gave you authority. That ownership mindset ("high agency") is what separates a PM from a ticket-taker.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Become "the feature factory manager" who just relays stakeholder requests to engineers. If you can't explain the <em>problem</em> behind a feature, you're not doing product management.</div>
+  `,
+  quiz:[
+    {q:"Which set best captures the four risks a PM must de-risk?",opts:["Cheap, fast, good, scalable","Valuable, Usable, Feasible, Viable","Design, Build, Test, Ship","Market, Money, Metrics, Morale"],a:1,ex:"Marty Cagan's four big product risks: value, usability, feasibility and business viability."},
+    {q:"A stakeholder says 'build a chatbot'. The strongest PM response is:",opts:["Add it to the sprint immediately","Ask what problem we're solving, for whom, and how we'll know it's real","Refuse — chatbots are outdated","Ask engineering how long it will take"],a:1,ex:"PMs fall in love with the problem, not the solution. Start with the problem and the evidence."},
+    {q:"The Product Owner role is best described as:",opts:["The person who owns company strategy","A Scrum role focused on a clear, prioritised backlog for the dev team","The same as a project manager","The person who signs off the budget"],a:1,ex:"PO is a delivery-focused Scrum role. PM is the broader market/business role."},
+    {q:"Where does a PM's real power come from?",opts:["Formal authority over engineers","Controlling the budget","Clarity, evidence and trust (influence)","Reporting to the CEO"],a:2,ex:"PMs lead through influence — clear thinking, evidence and relationships — not command."}
+  ]
+},
+{
+  id:"mindset", num:2, icon:"🧠", title:"The PM Mindset",
+  tagline:"How great product managers think",
+  blurb:"Problem-first thinking, outcomes over output, product sense and prioritising by leverage.",
+  html:`
+    <p class="lead">Frameworks are learnable in a weekend. The <b>mindset</b> is what makes a PM effective — and it's exactly what interviewers probe for. Master these habits and every framework becomes obvious.</p>
+
+    <div class="grid g2">
+      <div class="card"><span class="tag">Habit 01</span><h4>Problem first, solution second</h4><p>Fall in love with the problem, stay skeptical of any solution. "What problem, for whom, and how do we know it's real?" comes before "what shall we build?"</p></div>
+      <div class="card"><span class="tag">Habit 02</span><h4>Outcomes over output</h4><p>Shipping a feature is output. A changed customer behaviour or business result is the outcome. Measure yourself on outcomes.</p></div>
+      <div class="card"><span class="tag">Habit 03</span><h4>Think in hypotheses &amp; evidence</h4><p>"We believe X will cause Y; we'll know because Z metric moves." Opinions start the conversation; evidence ends it.</p></div>
+      <div class="card"><span class="tag">Habit 04</span><h4>Prioritise ruthlessly</h4><p>Strategy is deciding what <em>not</em> to do. There are always ten good ideas and time for two. Saying a reasoned "no" is the daily job.</p></div>
+      <div class="card"><span class="tag">Habit 05</span><h4>High agency</h4><p>Find a way through the ambiguity, the org and the missing data instead of waiting to be told. You're the owner even when nobody appointed you.</p></div>
+      <div class="card"><span class="tag">Habit 06</span><h4>Zoom in and out</h4><p>Hold the 3-year vision and this-sprint bug at once. Move between altitudes without losing either.</p></div>
+    </div>
+
+    <div class="note key"><span class="lbl">Shreyas Doshi — the LNO framework</span>Sort every task by leverage. <b>L</b>everage tasks (strategy, a key launch, hiring) deserve your best hours. <b>N</b>eutral tasks deserve competent-and-done. <b>O</b>verhead tasks deserve the minimum to not be a bottleneck. Burnout comes from treating overhead like leverage.</div>
+
+    <h3>"Product sense" — the thing interviewers keep testing</h3>
+    <p>Product sense is intuition for what makes a product good, built from deliberate attention. You develop it by: using many products critically ("why did they make <em>that</em> choice?"), reading teardowns, talking to real users constantly, and forming opinions you can <b>defend with a reason</b>, not just taste. It's trainable — it just isn't fast.</p>
+
+    <h3>Output vs Outcome vs Impact</h3>
+    <table>
+      <tr><th>Level</th><th>Example</th><th>Good target?</th></tr>
+      <tr><td><b>Output</b></td><td>"We shipped the new onboarding flow"</td><td>No — that's just activity</td></tr>
+      <tr><td><b>Outcome</b></td><td>"Activation rose from 40% to 55%"</td><td>Yes — behaviour changed</td></tr>
+      <tr><td><b>Impact</b></td><td>"Retention up drove +£1.2M ARR"</td><td>Yes — business result</td></tr>
+    </table>
+
+    <blockquote><p>"Fall in love with the problem, not the solution."</p><cite>— popularised by Uri Levine, co-founder of Waze</cite></blockquote>
+
+    <div class="note dont"><span class="lbl">Don't</span>Confuse being busy with being effective. A crisp one-pager that gets ten people rowing the same way beats any feature you personally spec'd in a vacuum.</div>
+  `,
+  quiz:[
+    {q:"'We shipped a redesigned checkout' is an example of:",opts:["An outcome","An output","An impact","A KPI"],a:1,ex:"Shipping is output (activity). The outcome is the behaviour change it causes."},
+    {q:"In Shreyas Doshi's LNO framework, strategy and a major launch are:",opts:["Overhead tasks","Neutral tasks","Leverage tasks","Optional tasks"],a:2,ex:"Leverage tasks deserve your best hours; overhead deserves the minimum."},
+    {q:"The best way to build 'product sense' is to:",opts:["Memorise more frameworks","Critically study products and talk to users constantly","Wait for it to come with age","Copy competitors exactly"],a:1,ex:"Product sense is trained by deliberate attention: critique products, read teardowns, talk to users."},
+    {q:"A hypothesis-driven PM frames an idea as:",opts:["'This is obviously a great feature'","'We believe X will cause Y; we'll know because Z moves'","'The CEO wants it'","'Competitors have it'"],a:1,ex:"Tie every idea to a testable belief and a metric that would prove it."}
+  ]
+},
+{
+  id:"lifecycle", num:3, icon:"🔄", title:"The Product Lifecycle",
+  tagline:"Discover → Define → Design → Deliver → Measure",
+  blurb:"The continuous loop every other framework plugs into, plus the market lifecycle curve.",
+  html:`
+    <p class="lead">You never "finish" a product. You run a loop continuously, getting a little less wrong each turn. Two lifecycles matter: the <b>build loop</b> (how you work) and the <b>market lifecycle</b> (how a product ages in the market).</p>
+
+    <h3>The build loop</h3>
+    <table>
+      <tr><th>Stage</th><th>The question</th><th>Key activities</th><th>Main artifact</th></tr>
+      <tr><td><b>Discover</b></td><td>What's a real, painful problem?</td><td>Interviews, data, market research, opportunity mapping</td><td>Problem statement</td></tr>
+      <tr><td><b>Define</b></td><td>What does winning look like?</td><td>Target outcome, North Star, success metrics, scope</td><td>PRD / one-pager, OKRs</td></tr>
+      <tr><td><b>Design</b></td><td>What's the best solution?</td><td>Ideate, prototype, test assumptions with users</td><td>Prototype, spec</td></tr>
+      <tr><td><b>Deliver</b></td><td>How do we ship it well?</td><td>Break into work, unblock, launch (beta → GA)</td><td>Backlog, release, GTM plan</td></tr>
+      <tr><td><b>Measure &amp; Learn</b></td><td>Did it work? What now?</td><td>Instrument, read funnels &amp; cohorts, decide to scale/iterate/kill</td><td>Metrics review, decision</td></tr>
+    </table>
+    <div class="note"><span class="lbl">Continuous, not sequential</span>Drawn as a line for teaching, but it's a loop. In a healthy team <b>discovery never stops</b> — you research the next problem while delivering the current one. Teresa Torres calls this <b>continuous discovery</b>: small research touchpoints every week, not one big phase at the start.</div>
+
+    <h3>Dual-track Agile</h3>
+    <p>Modern teams run two parallel tracks: a <b>discovery track</b> (research, prototypes, validating what to build) feeding a <b>delivery track</b> (engineering building validated work). Ideas only cross into delivery once the four risks are reduced.</p>
+
+    <h3>The market lifecycle (the S-curve)</h3>
+    <table>
+      <tr><th>Phase</th><th>What's happening</th><th>PM focus</th></tr>
+      <tr><td><b>Introduction</b></td><td>Launch; few customers; educating the market</td><td>Product/market fit, early adopters, learning fast</td></tr>
+      <tr><td><b>Growth</b></td><td>Adoption accelerates; competitors appear</td><td>Scale, differentiate, widen the moat</td></tr>
+      <tr><td><b>Maturity</b></td><td>Market saturates; growth flattens</td><td>Efficiency, pricing, retention, new segments</td></tr>
+      <tr><td><b>Decline</b></td><td>Demand falls; substitutes take over</td><td>Harvest, reposition, or sunset gracefully</td></tr>
+    </table>
+    <p>Matched to <b>adoption</b> (Rogers' curve): Innovators → Early Adopters → <em>the chasm</em> → Early Majority → Late Majority → Laggards. Geoffrey Moore's <em>Crossing the Chasm</em> is about the hard leap from early adopters to the pragmatic mainstream.</p>
+
+    <div class="note do"><span class="lbl">Do</span>Know which lifecycle phase your product is in — it changes everything: an Introduction product needs learning and PMF; a Maturity product needs retention and margin.</div>
+  `,
+  quiz:[
+    {q:"'Continuous discovery' means:",opts:["One big research phase before building","Small, regular research touchpoints every week","Only researching after launch","Letting engineers do the research"],a:1,ex:"Teresa Torres: weekly touchpoints with customers, in parallel with delivery."},
+    {q:"Dual-track Agile runs which two tracks in parallel?",opts:["Design and marketing","Discovery and delivery","Sales and support","Frontend and backend"],a:1,ex:"A discovery track validates what to build; a delivery track builds validated work."},
+    {q:"'Crossing the chasm' refers to the leap between:",opts:["Growth and maturity","Early adopters and the early (pragmatic) majority","Beta and GA","Introduction and decline"],a:1,ex:"Geoffrey Moore's chasm sits between visionary early adopters and the mainstream majority."},
+    {q:"A product in the Maturity phase should focus most on:",opts:["Finding product/market fit","Retention, pricing and efficiency","Educating the market from scratch","Recruiting innovators"],a:1,ex:"Mature markets are about margin, retention and squeezing more value, not first-time PMF."}
+  ]
+},
+{
+  id:"discovery", num:4, icon:"🔍", title:"Discovery & Market Analysis",
+  tagline:"Understand the market, customers and competition",
+  blurb:"Customer interviews, jobs-to-be-done, sizing (TAM/SAM/SOM), and competitive analysis.",
+  html:`
+    <p class="lead">Discovery is how you avoid building the wrong thing. It answers three questions: <b>Is the problem real? Is it big enough? Can we win?</b> Great PMs treat this as a continuous habit, not a one-off phase.</p>
+
+    <h3>Talk to customers — properly</h3>
+    <p>The biggest discovery mistake is asking leading questions and pitching your idea. Instead, dig into real past behaviour.</p>
+    <div class="note do"><span class="lbl">Do — The Mom Test</span>Ask about their life and specific past events, not your idea. "Walk me through the last time you faced this." Good questions can't be flattered. Talk about <em>their</em> problem, not your solution.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Ask "Would you use a product that does X?" People are polite and predict their future behaviour badly. Hypotheticals produce false positives.</div>
+
+    <h3>Jobs To Be Done (JTBD)</h3>
+    <p>People don't buy products; they "hire" them to make progress. The classic line: <em>"People don't want a quarter-inch drill, they want a quarter-inch hole"</em> — and really, a picture on the wall. Framing needs as jobs reveals the real competition (sometimes it's "do nothing" or a spreadsheet).</p>
+    <p>Template: <b>When</b> [situation], <b>I want to</b> [motivation], <b>so I can</b> [expected outcome].</p>
+
+    <h3>Sizing the market: TAM / SAM / SOM</h3>
+    <table>
+      <tr><th>Term</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td><b>TAM</b></td><td>Total Addressable Market — everyone who could ever need it</td><td>All coffee drinkers worldwide</td></tr>
+      <tr><td><b>SAM</b></td><td>Serviceable Available Market — the slice you can actually serve</td><td>Coffee drinkers in your cities</td></tr>
+      <tr><td><b>SOM</b></td><td>Serviceable Obtainable Market — what you can realistically win</td><td>Customers near your shops in year 1</td></tr>
+    </table>
+
+    <h3>Understand the competition</h3>
+    <ul>
+      <li><b>Direct</b> competitors solve the same problem the same way. <b>Indirect</b> solve it differently (incl. "do nothing" and spreadsheets).</li>
+      <li>Map them on the <b>criteria customers actually care about</b>, not on a feature checklist you invented.</li>
+      <li>Watch for the <b>analyst racket</b> — vendor-influenced "quadrants" can mislead. Verify with real buyers.</li>
+    </ul>
+
+    <h3>Frameworks to structure analysis</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Macro</span><h4>PESTLE</h4><p>Political, Economic, Social, Technological, Legal, Environmental forces shaping your market.</p></div>
+      <div class="card"><span class="tag">Industry</span><h4>Porter's Five Forces</h4><p>Rivalry, new entrants, substitutes, buyer power, supplier power — how attractive/defensible the market is.</p></div>
+      <div class="card"><span class="tag">Position</span><h4>SWOT</h4><p>Strengths, Weaknesses (internal) + Opportunities, Threats (external). Simple but easily shallow — force specifics.</p></div>
+      <div class="card"><span class="tag">Segment</span><h4>Segmentation</h4><p>Group the market by need/behaviour, then pick a beachhead segment to win first.</p></div>
+    </div>
+  `,
+  quiz:[
+    {q:"Which question best follows 'The Mom Test'?",opts:["'Would you buy a tool that does X?'","'Do you like my idea?'","'Walk me through the last time you dealt with this problem.'","'How much would you pay for this?'"],a:2,ex:"Ask about specific past behaviour, not hypotheticals or your idea."},
+    {q:"SOM stands for:",opts:["Serviceable Obtainable Market","Sum Of Money","Standard Operating Metric","Segment Of Market"],a:0,ex:"SOM = the realistic share you can obtain, inside SAM, inside TAM."},
+    {q:"Jobs To Be Done reframes a need as:",opts:["A list of features","The progress a customer is trying to make","The cheapest possible solution","A competitor's roadmap"],a:1,ex:"JTBD focuses on the progress/outcome the customer 'hires' a product for."},
+    {q:"Porter's Five Forces assesses:",opts:["A team's velocity","How attractive and defensible a market is","A product's UI quality","Customer satisfaction"],a:1,ex:"Five Forces gauges industry attractiveness: rivalry, entrants, substitutes, buyer & supplier power."}
+  ]
+},
+{
+  id:"proposition", num:5, icon:"💡", title:"Propositions & Personas",
+  tagline:"Why should I buy from you?",
+  blurb:"Value propositions, personas, and articulating benefits customers actually care about.",
+  html:`
+    <p class="lead">A proposition answers the customer's blunt question: <b>"Why should I buy from you rather than the alternative — or do nothing?"</b> If you can't answer it in a sentence, neither can your customer.</p>
+
+    <h3>Features vs Advantages vs Benefits (FAB)</h3>
+    <table>
+      <tr><th>Layer</th><th>Definition</th><th>Example (a drill)</th></tr>
+      <tr><td><b>Feature</b></td><td>What it is / has</td><td>18V brushless motor</td></tr>
+      <tr><td><b>Advantage</b></td><td>What that does</td><td>Drills faster, lasts longer</td></tr>
+      <tr><td><b>Benefit</b></td><td>Why the customer cares</td><td>Finish the job in half the time</td></tr>
+    </table>
+    <div class="note"><span class="lbl">Rule</span>Customers buy benefits, not features. Always translate "we built X" into "so you can Y". A proposition made of features is a spec sheet, not a reason to buy.</div>
+
+    <h3>Building a sharp value proposition</h3>
+    <p>A useful template (Geoffrey Moore's positioning statement):</p>
+    <blockquote><p>For <b>[target customer]</b> who <b>[need/opportunity]</b>, our <b>[product]</b> is a <b>[category]</b> that <b>[key benefit]</b>. Unlike <b>[alternative]</b>, we <b>[key differentiator]</b>.</p></blockquote>
+    <p>The <b>Value Proposition Canvas</b> (Strategyzer) pairs the customer side — jobs, pains, gains — with your side — products, pain relievers, gain creators. A strong proposition is where those two halves genuinely match.</p>
+
+    <h3>Personas — getting under the customer's skin</h3>
+    <p>A persona is a believable, evidence-based archetype of a target user, so the whole team designs for a real human instead of "the user". A good persona has:</p>
+    <ul>
+      <li>Name, role and a photo (memorable, not a stereotype)</li>
+      <li><b>Goals &amp; motivations</b> — what progress they want</li>
+      <li><b>Pains &amp; frustrations</b> — what gets in the way</li>
+      <li><b>Context</b> — environment, tech comfort, constraints</li>
+      <li>A <b>defining quote</b> that captures their mindset</li>
+    </ul>
+    <div class="note dont"><span class="lbl">Don't</span>Invent personas from imagination. Base them on real interviews and data, or they'll just reinforce your own assumptions. And keep them few — 2 to 4 primary personas, not twelve.</div>
+    <div class="note key"><span class="lbl">B2B nuance</span>In B2B you often manage several personas per deal: the <b>user</b>, the <b>economic buyer</b> (holds the budget), the <b>champion</b> (sells internally), and the <b>blocker</b>. Your proposition must speak to each.</div>
+  `,
+  quiz:[
+    {q:"'Finish the job in half the time' is an example of a:",opts:["Feature","Advantage","Benefit","Specification"],a:2,ex:"Benefit = why the customer cares. Feature is 'what it has'; advantage is 'what it does'."},
+    {q:"A value proposition primarily answers:",opts:["How much does it cost to build?","Why buy from you vs the alternative or nothing?","Which sprint will it ship in?","Who is the product owner?"],a:1,ex:"A proposition is the compelling reason to choose you over alternatives, including inaction."},
+    {q:"A good persona should be:",opts:["Invented to match your idea","Based on real research and evidence","As numerous as possible","Only about demographics"],a:1,ex:"Personas must be grounded in real interviews/data, and kept to a few primary ones."},
+    {q:"In B2B, the person who holds the budget is the:",opts:["Champion","User","Economic buyer","Blocker"],a:2,ex:"The economic buyer controls spend; the champion sells internally; the user uses it."}
+  ]
+},
+{
+  id:"strategy", num:6, icon:"♟️", title:"Product Strategy",
+  tagline:"Vision, strategy, and saying no with a reason",
+  blurb:"Vision vs strategy vs tactics, Playing to Win, Blue Ocean, OKRs and the North Star.",
+  html:`
+    <p class="lead">Without a strategy you're the ball in a pinball machine — bounced from request to request with no control. Strategy is the <b>reasoned choice of where to play and how to win</b>. It gives you the credibility to say no.</p>
+
+    <h3>The hierarchy: Vision → Strategy → Roadmap → Tactics</h3>
+    <table>
+      <tr><th>Level</th><th>Answers</th><th>Horizon</th></tr>
+      <tr><td><b>Mission / Vision</b></td><td>Why we exist &amp; the future we want to create</td><td>3–10 yrs</td></tr>
+      <tr><td><b>Product strategy</b></td><td>Where we'll play, how we'll win, what we won't do</td><td>1–3 yrs</td></tr>
+      <tr><td><b>Roadmap / OKRs</b></td><td>What outcomes we'll pursue next and in what order</td><td>Quarters</td></tr>
+      <tr><td><b>Backlog / tactics</b></td><td>The specific work right now</td><td>Sprints</td></tr>
+    </table>
+    <div class="note key"><span class="lbl">Not a strategy</span>"Grow revenue 30%" is a goal, not a strategy. "Do more marketing" is a tactic. A strategy explains the <b>logic</b>: which customers, which problem, why we can win, and the hard trade-offs we accept.</div>
+
+    <h3>Roger Martin — Playing to Win (5 questions)</h3>
+    <ol>
+      <li><b>What is our winning aspiration?</b> (the purpose)</li>
+      <li><b>Where will we play?</b> (markets, segments, channels)</li>
+      <li><b>How will we win?</b> (the differentiated way we beat rivals)</li>
+      <li><b>What capabilities must be in place?</b></li>
+      <li><b>What management systems are required?</b></li>
+    </ol>
+
+    <h3>Other strategy lenses</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Compete differently</span><h4>Blue Ocean</h4><p>Instead of bloody "red ocean" competition, create uncontested space. Use the <b>ERRC grid</b>: Eliminate, Reduce, Raise, Create factors the industry takes for granted.</p></div>
+      <div class="card"><span class="tag">Focus</span><h4>Good Strategy / Bad Strategy</h4><p>Rumelt's kernel: a clear <b>diagnosis</b>, a <b>guiding policy</b>, and <b>coherent actions</b>. Bad strategy is fluff and goals with no logic.</p></div>
+      <div class="card"><span class="tag">Portfolio</span><h4>BCG Matrix</h4><p>Stars, Cash Cows, Question Marks, Dogs — where to invest, milk, bet or exit across a product set.</p></div>
+      <div class="card"><span class="tag">Direction</span><h4>Ansoff Matrix</h4><p>Grow via market penetration, market development, product development, or diversification.</p></div>
+    </div>
+
+    <h3>Turning strategy into goals: OKRs &amp; the North Star</h3>
+    <p><b>OKRs</b> = one ambitious <em>Objective</em> + 2–4 measurable <em>Key Results</em>. Set outcomes ("increase weekly active teams to 10k"), not tasks ("ship feature X").</p>
+    <p>The <b>North Star Metric</b> is the single measure that best captures the value customers get (e.g. Spotify: time spent listening; Airbnb: nights booked). It aligns the whole team without micromanaging.</p>
+    <div class="note do"><span class="lbl">Do</span>Write a one-page strategy: the problem/opportunity, target customers, how you'll win, the few big bets, and — crucially — what you are explicitly <b>not</b> doing.</div>
+  `,
+  quiz:[
+    {q:"Which is an actual strategy, not just a goal or tactic?",opts:["'Increase revenue by 30%'","'Run more ads'","'Win SMB teams by being the easiest tool to adopt, sacrificing enterprise features'","'Ship five features this quarter'"],a:2,ex:"Strategy states where to play + how to win + the trade-off accepted. The others are goals/tactics."},
+    {q:"'Playing to Win' asks all of these EXCEPT:",opts:["Where will we play?","How will we win?","What's our winning aspiration?","How many story points this sprint?"],a:3,ex:"Story points are delivery tactics, not one of Roger Martin's five strategic choices."},
+    {q:"A North Star Metric should:",opts:["Track internal effort","Capture the core value customers receive","Be a vanity number like total signups","Change every sprint"],a:1,ex:"The North Star reflects delivered customer value (e.g. nights booked, time listening)."},
+    {q:"Blue Ocean's ERRC grid stands for:",opts:["Estimate, Rank, Rate, Choose","Eliminate, Reduce, Raise, Create","Explore, Refine, Release, Check","Engage, Retain, Refer, Convert"],a:1,ex:"ERRC reshapes value by eliminating/reducing some factors and raising/creating others."}
+  ]
+},
+/* __MORE_MODULES__ */
+{
+  id:"roadmap", num:7, icon:"🗺️", title:"Roadmaps",
+  tagline:"Where the product is heading — and why",
+  blurb:"Theme/outcome-based roadmaps, Now-Next-Later, and roadmaps vs release plans.",
+  html:`
+    <p class="lead">A roadmap is a <b>graphical, living view of where your product is heading</b>. It steers and coordinates teams across the business. Its danger: people read it as a dated promise. Your job is to communicate direction while protecting flexibility.</p>
+
+    <h3>Three things people mean by "roadmap"</h3>
+    <ul>
+      <li><b>A plan for development</b> — what the team will work on.</li>
+      <li><b>A commitment to customers</b> — dangerous if read as dates.</li>
+      <li><b>A vision for management</b> — how the product will evolve.</li>
+    </ul>
+    <div class="note dont"><span class="lbl">Don't</span>Publish a roadmap as a Gantt chart of dated features. It becomes a stick to beat you with, kills flexibility, and pushes teams to ship on time rather than ship value.</div>
+
+    <h3>Feature roadmap vs Outcome/Theme roadmap</h3>
+    <table>
+      <tr><th>Type</th><th>Organised by</th><th>Best for</th></tr>
+      <tr><td><b>Feature timeline</b></td><td>Specific features on dates</td><td>Committed near-term work; risky as a promise</td></tr>
+      <tr><td><b>Theme / outcome</b></td><td>Problems &amp; goals ("reduce churn")</td><td>Keeping teams focused on <em>why</em>, allowing <em>how</em> to flex</td></tr>
+      <tr><td><b>Now / Next / Later</b></td><td>Confidence horizons, not dates</td><td>Honest communication of certainty</td></tr>
+    </table>
+    <div class="note key"><span class="lbl">Now / Next / Later</span>The most PM-friendly format. <b>Now</b> = committed, detailed. <b>Next</b> = likely, shaped. <b>Later</b> = directional bets. Certainty shrinks as you look further out — say so honestly.</div>
+
+    <h3>Where roadmap ideas come from — and how to filter</h3>
+    <ul>
+      <li>Sources: customer requests, sales, support tickets, data/analytics, strategy, tech debt, competitors, your own vision.</li>
+      <li>Filter every idea through the <b>strategy</b>: does it serve where we chose to play and how we chose to win?</li>
+      <li>Balance the mix: keep-the-lights-on, customer-requested, and strategic bets.</li>
+    </ul>
+
+    <h3>Do roadmaps and Agile conflict?</h3>
+    <p>No — if the roadmap is about <b>outcomes and direction</b>, not a fixed feature schedule. Agile decides <em>how</em> and <em>exactly when</em>; the roadmap sets <em>where</em> and <em>why</em>. Keep it a living document you revisit every quarter.</p>
+    <div class="note do"><span class="lbl">Do</span>Add a visible disclaimer: "Direction, not dated commitment — subject to change as we learn." Tie each item to a strategic outcome so stakeholders see the reasoning.</div>
+  `,
+  quiz:[
+    {q:"The most honest way to show decreasing certainty over time is:",opts:["A dated Gantt chart","Now / Next / Later horizons","A feature list with deadlines","A single launch date"],a:1,ex:"Now/Next/Later communicates confidence levels instead of false-precision dates."},
+    {q:"A theme/outcome roadmap is organised by:",opts:["Individual features and dates","Problems and goals to achieve","Engineer names","Sprint numbers"],a:1,ex:"Outcome roadmaps focus on the 'why', letting the 'how' flex."},
+    {q:"Roadmaps and Agile conflict when the roadmap is:",opts:["Focused on outcomes","A fixed schedule of dated features","Reviewed quarterly","Tied to strategy"],a:1,ex:"A dated feature promise fights Agile's adapt-as-you-learn nature; an outcome roadmap doesn't."},
+    {q:"Every candidate roadmap item should first be filtered through:",opts:["The loudest stakeholder","The product strategy","Engineering capacity only","Alphabetical order"],a:1,ex:"Strategy is the filter: does this serve where we play and how we win?"}
+  ]
+},
+{
+  id:"requirements", num:8, icon:"📋", title:"Requirements",
+  tagline:"Turning needs into buildable clarity",
+  blurb:"MRD vs PRD, user stories, use cases, job stories, acceptance criteria and INVEST.",
+  html:`
+    <p class="lead">Requirements bridge the market and the build. Done well, they give engineering enough clarity to build the right thing without over-specifying <em>how</em>. The golden rule: <b>describe the problem and the desired outcome, not your pet solution.</b></p>
+
+    <h3>MRD vs PRD (and who writes what)</h3>
+    <table>
+      <tr><th>Doc</th><th>Answers</th><th>Owner</th></tr>
+      <tr><td><b>MRD</b> — Market Requirements</td><td>What does the <em>market</em> need &amp; why (problems, segments, size)</td><td>Product Manager</td></tr>
+      <tr><td><b>PRD</b> — Product Requirements</td><td>What should the <em>product</em> do to meet that need</td><td>PM (with the team)</td></tr>
+      <tr><td><b>Backlog</b> (stories)</td><td>The next buildable slices</td><td>PM / Product Owner</td></tr>
+    </table>
+    <p>Modern lean teams often collapse the MRD/PRD into a short <b>one-pager</b> or a set of well-written stories — but the <em>thinking</em> behind each still has to happen.</p>
+
+    <h3>Four ways to write requirements</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Classic</span><h4>"The system shall…"</h4><p>Precise, testable statements. Good for regulated/complex systems; risks being solution-heavy and long.</p></div>
+      <div class="card"><span class="tag">Agile</span><h4>User Story</h4><p>"As a [user], I want [goal], so that [benefit]." Keeps the user and the why front-and-centre.</p></div>
+      <div class="card"><span class="tag">Flow</span><h4>Use Case</h4><p>Actor + goal + step-by-step interaction incl. alternate paths. Great for complex flows.</p></div>
+      <div class="card"><span class="tag">JTBD</span><h4>Job Story</h4><p>"When [situation], I want to [motivation], so I can [outcome]." Focuses on context over persona.</p></div>
+    </div>
+
+    <h3>What makes a user story good — INVEST + DoR/DoD</h3>
+    <p><b>INVEST:</b> Independent, Negotiable, Valuable, Estimable, Small, Testable.</p>
+    <ul>
+      <li><b>Acceptance criteria</b> define "done" for a story — often written as Given/When/Then (Gherkin).</li>
+      <li><b>Definition of Ready (DoR)</b> — the story is clear enough to start.</li>
+      <li><b>Definition of Done (DoD)</b> — the team's shared bar for "truly finished" (tested, documented, deployed).</li>
+    </ul>
+    <div class="note key"><span class="lbl">Don't forget non-functional requirements</span>Performance, security, accessibility, scalability, compliance, usability. They rarely appear as user stories but sink products when ignored. Also capture <b>process</b> and <b>UX</b> requirements.</div>
+
+    <h3>The MVP mindset</h3>
+    <p>A Minimum Viable Product is the <b>smallest thing that delivers real value and lets you learn</b> — not a broken half-product. Slice vertically (a thin end-to-end experience), not horizontally (a backend with no usable front).</p>
+    <div class="note do"><span class="lbl">Do</span>For each requirement ask "how will we test this is met?" If you can't state the test, the requirement isn't clear yet.</div>
+  `,
+  quiz:[
+    {q:"The user-story format is:",opts:["'The system shall process X'","'As a [user], I want [goal], so that [benefit]'","'When [situation], I want [motivation]'","'Given/When/Then'"],a:1,ex:"User story = role, goal, benefit. Job story uses 'When...'; Given/When/Then is acceptance criteria."},
+    {q:"INVEST's 'T' stands for:",opts:["Timely","Testable","Trackable","Technical"],a:1,ex:"INVEST = Independent, Negotiable, Valuable, Estimable, Small, Testable."},
+    {q:"An MVP should be:",opts:["A broken half-built product","The smallest thing that delivers value and enables learning","The full product minus marketing","A backend with no UI"],a:1,ex:"MVP = minimum + viable: a thin but real slice that lets you learn."},
+    {q:"Performance, security and accessibility are examples of:",opts:["Vanity metrics","Non-functional requirements","User personas","Story points"],a:1,ex:"These are non-functional requirements — easy to forget, costly to ignore."}
+  ]
+},
+{
+  id:"prioritization", num:9, icon:"⚖️", title:"Prioritization",
+  tagline:"Choosing what to build next — with a reason",
+  blurb:"RICE, MoSCoW, Kano, Value vs Effort, WSJF and the opportunity cost mindset.",
+  html:`
+    <p class="lead">There are always more good ideas than capacity. Prioritisation is the daily craft of turning "everything is urgent" into a defensible order. Frameworks don't make the decision <em>for</em> you — they make your reasoning <b>explicit and debatable</b>.</p>
+
+    <h3>The workhorses</h3>
+    <table>
+      <tr><th>Framework</th><th>How it scores</th><th>Best when</th></tr>
+      <tr><td><b>Value vs Effort</b></td><td>2×2: high value / low effort wins</td><td>Fast, rough triage</td></tr>
+      <tr><td><b>RICE</b></td><td>(Reach × Impact × Confidence) ÷ Effort</td><td>Comparing many features objectively</td></tr>
+      <tr><td><b>MoSCoW</b></td><td>Must / Should / Could / Won't (this time)</td><td>Scoping a release with stakeholders</td></tr>
+      <tr><td><b>Kano</b></td><td>Basic / Performance / Delighter needs</td><td>Balancing table-stakes vs wow</td></tr>
+      <tr><td><b>WSJF</b></td><td>Cost of Delay ÷ job size (SAFe)</td><td>Sequencing by economic urgency</td></tr>
+    </table>
+
+    <h3>RICE, in detail</h3>
+    <ul>
+      <li><b>Reach</b> — how many users/events in a period (e.g. per quarter).</li>
+      <li><b>Impact</b> — how much it moves the goal per user (e.g. 3 = massive, 1 = medium, 0.25 = minimal).</li>
+      <li><b>Confidence</b> — how sure you are of your estimates (100% / 80% / 50%).</li>
+      <li><b>Effort</b> — person-months of work.</li>
+    </ul>
+    <p><b>RICE score = (Reach × Impact × Confidence) ÷ Effort.</b> Higher = do sooner. Try the interactive calculator in <b>Tools → RICE Calculator</b>.</p>
+
+    <h3>Kano model — not all value is equal</h3>
+    <div class="grid g3">
+      <div class="card"><span class="tag">Must-be</span><h4>Basic needs</h4><p>Expected. Absence angers; presence is unnoticed. (A hotel room must be clean.)</p></div>
+      <div class="card"><span class="tag">Performance</span><h4>Linear needs</h4><p>More is better and customers will pay for it. (Faster load, longer battery.)</p></div>
+      <div class="card"><span class="tag">Delighters</span><h4>Excitement needs</h4><p>Unexpected wow that differentiates — until rivals copy it and it becomes basic.</p></div>
+    </div>
+
+    <div class="note key"><span class="lbl">The real mental model: opportunity cost</span>Every "yes" is a "no" to everything else that hour could build. The best PMs prioritise against the <b>strategy and the goal</b>, not the loudest voice. A framework's job is to expose assumptions, not to hide behind a number.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Treat RICE scores as truth. Garbage estimates give confident-looking garbage rankings. Use them to structure debate, then apply judgement.</div>
+  `,
+  quiz:[
+    {q:"The RICE formula is:",opts:["Reach + Impact + Confidence − Effort","(Reach × Impact × Confidence) ÷ Effort","Reach ÷ (Impact × Effort)","Impact × Effort × Confidence"],a:1,ex:"RICE = (Reach × Impact × Confidence) ÷ Effort. Higher is better."},
+    {q:"In MoSCoW, 'W' means:",opts:["Will do first","Won't do (this time)","Wish list forever","Weekly"],a:1,ex:"Won't-have-this-time — explicitly de-scoped for now, which is a real decision."},
+    {q:"A surprise feature that delights customers but they'd never ask for is a Kano:",opts:["Basic need","Performance need","Delighter (excitement need)","Reverse need"],a:2,ex:"Delighters create wow; over time rivals copy them and they become basic expectations."},
+    {q:"The deepest reason prioritisation matters is:",opts:["It fills the sprint","Opportunity cost — every yes is a no to something else","It pleases stakeholders","It's required by Scrum"],a:1,ex:"Capacity is finite; choosing one thing means not doing others. That's the core trade-off."}
+  ]
+},
+{
+  id:"agile", num:10, icon:"🏃", title:"Agile & Scrum",
+  tagline:"How modern product teams build",
+  blurb:"Agile values, Scrum roles/events/artifacts, Kanban, and how PM fits with Agile.",
+  html:`
+    <p class="lead">Agile is a <b>mindset</b>, not a process: deliver value in small increments, get feedback fast, and adapt. Scrum and Kanban are two popular ways to <em>do</em> Agile. As a PM you set the <b>what &amp; why</b>; the team owns the <b>how</b>.</p>
+
+    <h3>The Agile Manifesto — 4 values</h3>
+    <ul>
+      <li><b>Individuals &amp; interactions</b> over processes and tools</li>
+      <li><b>Working software</b> over comprehensive documentation</li>
+      <li><b>Customer collaboration</b> over contract negotiation</li>
+      <li><b>Responding to change</b> over following a plan</li>
+    </ul>
+    <p>"…while there is value in the items on the right, we value the items on the left more." Backed by 12 principles (deliver frequently, welcome change, sustainable pace, reflect &amp; adjust).</p>
+
+    <h3>Scrum in one table</h3>
+    <table>
+      <tr><th>Category</th><th>Elements</th></tr>
+      <tr><td><b>Roles</b></td><td>Product Owner (value &amp; backlog), Scrum Master (process &amp; unblocking), Developers (build it)</td></tr>
+      <tr><td><b>Events</b></td><td>Sprint (1–4 wks), Sprint Planning, Daily Scrum (standup), Sprint Review (demo), Retrospective</td></tr>
+      <tr><td><b>Artifacts</b></td><td>Product Backlog, Sprint Backlog, Increment (potentially shippable)</td></tr>
+    </table>
+    <div class="note"><span class="lbl">Key distinction</span>The <b>Product Backlog</b> is the ordered list of everything that might be built (PM/PO owns it). The <b>Sprint Backlog</b> is what the team committed to for this sprint (the team owns it).</div>
+
+    <h3>Scrum vs Kanban</h3>
+    <table>
+      <tr><th></th><th>Scrum</th><th>Kanban</th></tr>
+      <tr><td>Cadence</td><td>Fixed-length sprints</td><td>Continuous flow</td></tr>
+      <tr><td>Core idea</td><td>Commit to a sprint goal</td><td>Limit work-in-progress (WIP)</td></tr>
+      <tr><td>Change mid-cycle</td><td>Avoided during a sprint</td><td>Anytime</td></tr>
+      <tr><td>Best for</td><td>Feature delivery in cycles</td><td>Support / ops / steady flow</td></tr>
+    </table>
+
+    <h3>Estimation &amp; flow terms</h3>
+    <ul>
+      <li><b>Story points</b> — relative size (effort/complexity/uncertainty), not hours. Often Fibonacci (1,2,3,5,8).</li>
+      <li><b>Velocity</b> — points completed per sprint; a planning aid, <em>not</em> a productivity target to game.</li>
+      <li><b>Burndown / burnup</b> — remaining/completed work over time.</li>
+      <li><b>Cycle time / lead time</b> — how long work takes to flow through (Kanban health).</li>
+    </ul>
+
+    <div class="note key"><span class="lbl">"What's the point of PM in Agile?"</span>Scrum has a Product Owner but no strategy, market analysis, pricing or GTM. Someone must still decide <em>what problems are worth solving and why</em>. That's product leadership — the PM. Agile makes the PM more important, not less.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Let "Agile" become an excuse for no plan or no discovery. Doing sprints ≠ being agile. And velocity is a capacity signal, not a KPI — pressuring it just inflates estimates.</div>
+  `,
+  quiz:[
+    {q:"Who owns and orders the Product Backlog?",opts:["The Scrum Master","The Product Owner","The whole company","QA"],a:1,ex:"The PO/PM owns backlog value & order; the team owns the Sprint Backlog."},
+    {q:"Story points estimate:",opts:["Exact hours","Relative size/effort/complexity","Dollar cost","Number of bugs"],a:1,ex:"Points are a relative measure, deliberately not hours."},
+    {q:"The core mechanic of Kanban is:",opts:["Fixed sprints","Limiting work-in-progress and continuous flow","Story-point poker","Quarterly releases"],a:1,ex:"Kanban = visualise flow + WIP limits + continuous delivery."},
+    {q:"'Responding to change over following a plan' is:",opts:["A Scrum event","An Agile Manifesto value","A Kanban metric","A prioritisation method"],a:1,ex:"It's one of the four Agile Manifesto values."},
+    {q:"Velocity is best used as:",opts:["A productivity KPI to maximise","A planning aid for capacity","A bonus metric","A customer-facing number"],a:1,ex:"Velocity helps forecast; turning it into a target just inflates estimates."}
+  ]
+},
+{
+  id:"metrics", num:11, icon:"📊", title:"Metrics & Analytics",
+  tagline:"Measuring what matters",
+  blurb:"North Star, AARRR pirate metrics, HEART, funnels, cohorts, leading vs lagging, guardrails.",
+  html:`
+    <p class="lead">"If you can't measure it, you can't improve it." Metrics turn opinions into decisions. The skill isn't drowning in dashboards — it's picking the <b>few numbers that reflect real value</b> and knowing what action each would trigger.</p>
+
+    <h3>AARRR — the "pirate metrics" funnel</h3>
+    <table>
+      <tr><th>Stage</th><th>Question</th><th>Example metric</th></tr>
+      <tr><td><b>Acquisition</b></td><td>How do they find us?</td><td>Signups, traffic, CAC</td></tr>
+      <tr><td><b>Activation</b></td><td>Do they reach first value fast?</td><td>% reaching the "aha" moment</td></tr>
+      <tr><td><b>Retention</b></td><td>Do they come back?</td><td>DAU/MAU, churn, cohort curves</td></tr>
+      <tr><td><b>Revenue</b></td><td>Do they pay?</td><td>MRR/ARR, ARPU, LTV</td></tr>
+      <tr><td><b>Referral</b></td><td>Do they tell others?</td><td>NPS, viral coefficient (K)</td></tr>
+    </table>
+
+    <h3>Google's HEART (for UX quality)</h3>
+    <p><b>H</b>appiness, <b>E</b>ngagement, <b>A</b>doption, <b>R</b>etention, <b>T</b>ask success — each paired with Goals-Signals-Metrics to make it measurable.</p>
+
+    <h3>Vocabulary that trips people up</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Direction</span><h4>Leading vs Lagging</h4><p><b>Leading</b> predicts the future (trial signups). <b>Lagging</b> confirms the past (quarterly revenue). Steer with leading, report with lagging.</p></div>
+      <div class="card"><span class="tag">Trap</span><h4>Vanity vs Actionable</h4><p>Vanity metrics (total signups ever) feel good but don't guide decisions. Actionable metrics tie to a change you can make.</p></div>
+      <div class="card"><span class="tag">Slice</span><h4>Cohorts</h4><p>Group users by when they joined and track behaviour over time — the honest way to see if retention is improving.</p></div>
+      <div class="card"><span class="tag">Safety</span><h4>Guardrail metrics</h4><p>Numbers that must NOT get worse while you chase a goal (e.g. don't grow signups by wrecking load time or support tickets).</p></div>
+    </div>
+
+    <h3>Money metrics every PM should know</h3>
+    <ul>
+      <li><b>CAC</b> — Customer Acquisition Cost. <b>LTV</b> — Lifetime Value. Healthy SaaS aims for <b>LTV:CAC ≥ 3</b>.</li>
+      <li><b>MRR / ARR</b> — Monthly/Annual Recurring Revenue. <b>ARPU</b> — Average Revenue Per User.</li>
+      <li><b>Churn</b> — % of customers (or revenue) lost per period. <b>NRR</b> — Net Revenue Retention (>100% = growing from existing customers).</li>
+      <li><b>Payback period</b> — months to recover CAC.</li>
+    </ul>
+
+    <h3>Testing changes: A/B testing</h3>
+    <p>Split traffic, change one variable, measure the difference, check <b>statistical significance</b> before believing it. Beware peeking early and tiny sample sizes.</p>
+    <div class="note do"><span class="lbl">Do</span>For every metric, define the <b>decision it drives</b>: "if activation < 50% we simplify onboarding." A metric with no attached action is just decoration.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Optimise one metric blind to guardrails — you can boost signups and quietly destroy retention. Watch the system, not a single number (Goodhart's Law).</div>
+  `,
+  quiz:[
+    {q:"In AARRR, 'reaching the aha moment quickly' is:",opts:["Acquisition","Activation","Referral","Revenue"],a:1,ex:"Activation = the user reaching first value quickly after arriving."},
+    {q:"A leading metric is one that:",opts:["Confirms past results","Predicts likely future results","Is always financial","Can't be influenced"],a:1,ex:"Leading metrics (e.g. trials started) predict; lagging metrics (e.g. revenue) confirm."},
+    {q:"A healthy SaaS ratio is often stated as:",opts:["CAC:LTV ≥ 3","LTV:CAC ≥ 3","Churn ≥ 3%","NPS ≥ 3"],a:1,ex:"You want lifetime value at least ~3× the cost to acquire the customer."},
+    {q:"A guardrail metric is one that:",opts:["You try to maximise","Must not get worse while you chase a goal","Only finance tracks","Measures vanity"],a:1,ex:"Guardrails protect the system (e.g. latency, support load) from being sacrificed."},
+    {q:"'Total signups since launch' is usually a:",opts:["Actionable metric","Guardrail","Vanity metric","Cohort"],a:2,ex:"A big cumulative number feels good but rarely guides a decision — that's vanity."}
+  ]
+},
+{
+  id:"pricing", num:12, icon:"💰", title:"Pricing",
+  tagline:"Setting the optimum price",
+  blurb:"Cost/competition/value pricing, price psychology, structures and SaaS models.",
+  html:`
+    <p class="lead">Pricing is the fastest lever on profit — a small price change beats most cost-cutting — yet PMs often leave it to sales or finance. Take control: price reflects <b>value to the customer</b>, not just your costs.</p>
+
+    <h3>Three ways to set price</h3>
+    <table>
+      <tr><th>Approach</th><th>Based on</th><th>Risk</th></tr>
+      <tr><td><b>Cost-plus</b></td><td>Your cost + a margin</td><td>Ignores what customers will actually pay; leaves money on the table</td></tr>
+      <tr><td><b>Competitor-based</b></td><td>What rivals charge</td><td>Races to the bottom; assumes rivals are right</td></tr>
+      <tr><td><b>Value-based</b></td><td>The worth to the customer</td><td>Hardest to quantify — and the most profitable when done well</td></tr>
+    </table>
+    <div class="note key"><span class="lbl">The goal</span>Capture a fair share of the value you create. If your product saves a customer £10k, cost-plus pricing at £500 is a gift to them and a loss to you.</div>
+
+    <h3>The psychology of pricing</h3>
+    <ul>
+      <li><b>Anchoring</b> — the first price seen frames everything after (a £199 tier makes £99 feel cheap).</li>
+      <li><b>Charm pricing</b> — £9.99 reads as "9-something", not 10.</li>
+      <li><b>Decoy effect</b> — a deliberately poor middle option pushes people to the premium.</li>
+      <li><b>Price = quality signal</b> — too cheap can undermine perceived value.</li>
+      <li><b>Loss aversion &amp; framing</b> — "save £X" vs "spend £X" land differently.</li>
+    </ul>
+
+    <h3>Pricing structures &amp; SaaS models</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">Structure</span><h4>Good-Better-Best (tiering)</h4><p>3 tiers anchor value and let customers self-select. The middle usually wins.</p></div>
+      <div class="card"><span class="tag">Structure</span><h4>Per-seat / per-user</h4><p>Simple, predictable; can penalise wide adoption.</p></div>
+      <div class="card"><span class="tag">Structure</span><h4>Usage / consumption</h4><p>Pay for what you use; scales with value but is less predictable.</p></div>
+      <div class="card"><span class="tag">Model</span><h4>Freemium &amp; free trial</h4><p>Free tier/trial drives acquisition; the art is the upgrade trigger.</p></div>
+    </div>
+    <p>Key concept: the <b>value metric</b> — the unit you charge by (per seat, per GB, per API call). Pick one that grows as the customer gets more value.</p>
+
+    <div class="note do"><span class="lbl">Do</span>Test willingness to pay directly. The <b>Van Westendorp</b> survey ("At what price is this too expensive? too cheap? getting expensive? a bargain?") reveals an acceptable price range.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Compete only on price. It's easy to match and starts a war you may lose. Differentiate on value, then price to it.</div>
+  `,
+  quiz:[
+    {q:"The most profitable (and hardest) pricing approach is:",opts:["Cost-plus","Competitor-based","Value-based","Random"],a:2,ex:"Value-based pricing captures the worth delivered to the customer — hardest to quantify, best returns."},
+    {q:"A 'value metric' is:",opts:["Your gross margin","The unit you charge by that scales with customer value","The competitor's price","The discount rate"],a:1,ex:"E.g. per seat, per GB, per transaction — it should grow as the customer gets more value."},
+    {q:"Placing a £199 plan next to a £99 plan uses:",opts:["Churn","Anchoring","A/B testing","Cost-plus"],a:1,ex:"Anchoring: the higher reference price makes the target look reasonable."},
+    {q:"The Van Westendorp method measures:",opts:["Server costs","Willingness to pay / acceptable price range","Sprint velocity","Market size"],a:1,ex:"Four price-perception questions reveal an acceptable pricing band."}
+  ]
+},
+{
+  id:"business-case", num:13, icon:"📈", title:"Business Cases & Finance",
+  tagline:"Making the numbers stack up",
+  blurb:"Building a business case, ROI/NPV/payback, sensitivity analysis and finance jargon.",
+  html:`
+    <p class="lead">A business case is the argument — in numbers and narrative — that an investment is worth making. PMs who speak finance get their products funded. You don't need an MBA; you need a handful of concepts and honesty about assumptions.</p>
+
+    <h3>What a good business case contains</h3>
+    <ol>
+      <li><b>The problem/opportunity</b> and strategic fit</li>
+      <li><b>Options considered</b> (including "do nothing")</li>
+      <li><b>Costs</b> — build, run, sell, support (one-off + ongoing)</li>
+      <li><b>Benefits</b> — revenue, savings, risk reduction (quantified where possible)</li>
+      <li><b>Financials</b> — ROI, payback, NPV over a time horizon</li>
+      <li><b>Risks &amp; assumptions</b>, and how you'll de-risk</li>
+      <li><b>Recommendation</b></li>
+    </ol>
+
+    <h3>Finance jargon, decoded</h3>
+    <table>
+      <tr><th>Term</th><th>Plain meaning</th></tr>
+      <tr><td><b>ROI</b></td><td>Return on Investment = (gain − cost) ÷ cost, as a %</td></tr>
+      <tr><td><b>Payback period</b></td><td>How long until the investment pays for itself</td></tr>
+      <tr><td><b>NPV</b></td><td>Net Present Value — future cash flows discounted to today's money. Positive = value-creating</td></tr>
+      <tr><td><b>IRR</b></td><td>Internal Rate of Return — the discount rate where NPV = 0; compare to your hurdle rate</td></tr>
+      <tr><td><b>Discount rate</b></td><td>Rate used to shrink future money to today (money later is worth less than money now)</td></tr>
+      <tr><td><b>CapEx vs OpEx</b></td><td>Capital (one-off assets) vs Operating (ongoing running costs)</td></tr>
+      <tr><td><b>Gross margin</b></td><td>Revenue − cost of goods sold, as a % — how much each sale actually contributes</td></tr>
+      <tr><td><b>Break-even</b></td><td>The volume/point where revenue equals total cost</td></tr>
+    </table>
+
+    <h3>Scenario &amp; sensitivity analysis</h3>
+    <p>Never present a single number as fact. Show <b>best / base / worst</b> case, and run <b>sensitivity analysis</b> — which assumption, if wrong, breaks the case? That's where your attention (and de-risking) should go.</p>
+
+    <div class="note dont"><span class="lbl">Don't — 7 classic mistakes</span>Over-optimistic adoption, ignoring ongoing costs, cherry-picking assumptions, no "do nothing" baseline, false precision, hiding risks, and reverse-engineering the numbers to a predetermined answer. Reviewers can smell all seven.</div>
+    <div class="note do"><span class="lbl">Do</span>Make assumptions explicit and easy to challenge. A business case people trust beats an optimistic one they don't. Tie benefits to a metric you'll actually track post-launch.</div>
+  `,
+  quiz:[
+    {q:"NPV being positive means the investment:",opts:["Is cheap to build","Creates value once future cash is discounted to today","Has no risk","Pays back instantly"],a:1,ex:"Positive NPV = discounted future cash flows exceed the cost. Money later is worth less than now."},
+    {q:"Payback period measures:",opts:["Total lifetime profit","How long until the investment recoups its cost","The discount rate","Gross margin"],a:1,ex:"It's the time to recover the initial outlay."},
+    {q:"Sensitivity analysis tells you:",opts:["The exact future","Which assumption most affects the outcome if wrong","The competitor's price","The sprint length"],a:1,ex:"It reveals the assumptions your case is most fragile to — where to focus de-risking."},
+    {q:"A credible business case always includes:",opts:["Only the best case","A 'do nothing' baseline and explicit assumptions","A guaranteed ROI","No risks"],a:1,ex:"Compare against doing nothing and expose assumptions so reviewers can trust the case."}
+  ]
+},
+{
+  id:"gtm", num:14, icon:"🚀", title:"Go-to-Market & Launch",
+  tagline:"Hit the ground running",
+  blurb:"GTM strategy, launch checklist, beta vs GA, early adopters and outcome-focused launches.",
+  html:`
+    <p class="lead">Building it is half the job; getting it adopted is the other half. A launch is a <b>cross-functional event</b> you orchestrate — sales, marketing, support, ops and legal all have to be ready on the same day. The measure of success is adoption and value, not just "we shipped on the date".</p>
+
+    <h3>A Go-to-Market strategy answers</h3>
+    <ul>
+      <li><b>Who</b> is the target segment &amp; persona?</li>
+      <li><b>What</b> is the proposition &amp; positioning (the messaging)?</li>
+      <li><b>How</b> will we reach them — channels (sales-led, product-led, partners, marketing)?</li>
+      <li><b>How much</b> — pricing &amp; packaging?</li>
+      <li><b>How</b> do we support &amp; onboard them?</li>
+    </ul>
+    <div class="note key"><span class="lbl">Motion matters</span><b>Sales-led</b> (reps close deals — high ACV, complex B2B) vs <b>Product-led growth (PLG)</b> (the product sells itself via free/trial and self-serve). Your GTM motion shapes the whole plan.</div>
+
+    <h3>Launch tiers &amp; phasing</h3>
+    <table>
+      <tr><th>Phase</th><th>Purpose</th></tr>
+      <tr><td><b>Alpha</b></td><td>Internal / friendly testing — find the big breakages</td></tr>
+      <tr><td><b>Beta</b></td><td>Limited real users — validate value &amp; iron out issues</td></tr>
+      <tr><td><b>GA (General Availability)</b></td><td>Open to all — the full launch</td></tr>
+      <tr><td><b>Soft vs Hard launch</b></td><td>Quiet gradual rollout vs big-bang announcement</td></tr>
+    </table>
+    <p>Not every launch is Tier-1. Size the noise to the news: a big platform release warrants a full campaign; a minor feature may just need release notes.</p>
+
+    <h3>Early adopters &amp; the launch checklist</h3>
+    <p>Recruit <b>early adopters</b> — they tolerate rough edges, give rich feedback, and become references. Then work a <b>cross-functional launch checklist</b>: product ready, docs &amp; training, sales enablement, pricing in systems, support briefed, marketing assets, legal/compliance, analytics instrumented, rollback plan.</p>
+    <div class="note"><span class="lbl">Stakeholder tool</span>Use a simple RACI/stakeholder map so everyone knows who's Responsible, Accountable, Consulted and Informed for each launch task. Silence is not readiness.</div>
+
+    <div class="note do"><span class="lbl">Do — outcome, not output</span>Define launch success up front as adoption/activation targets, not "we hit the date". Instrument before launch so you can see whether customers actually get value.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Launch to everyone before you can support them, or pick a date that clashes with a holiday, a major event, or a competitor's headline moment. Timing is a decision, not an accident.</div>
+  `,
+  quiz:[
+    {q:"'GA' in a launch means:",opts:["Good Availability","General Availability — open to all","Gradual Alpha","Guaranteed Adoption"],a:1,ex:"GA = the full public release after alpha/beta."},
+    {q:"Product-led growth (PLG) means:",opts:["Sales reps close every deal","The product itself drives acquisition via free/trial self-serve","Marketing owns the roadmap","Only enterprise sales"],a:1,ex:"PLG lets the product sell itself; sales-led relies on reps for higher-value deals."},
+    {q:"Early adopters are valuable because they:",opts:["Pay the most","Tolerate rough edges and give rich feedback","Never complain","Require no support"],a:1,ex:"They accept imperfection, provide feedback, and become references."},
+    {q:"The best definition of launch success is:",opts:["We shipped on the planned date","Customer adoption and value against pre-set targets","Number of press releases","Lines of code shipped"],a:1,ex:"Outcome over output — measure adoption/activation, not just hitting the date."}
+  ]
+},
+{
+  id:"marketing", num:15, icon:"📣", title:"Product Marketing",
+  tagline:"Getting products in front of customers",
+  blurb:"Positioning, messaging, the 4 Ps, inbound/content and PMM vs PM.",
+  html:`
+    <p class="lead">Product marketing (PMM) is the bridge between the product and the market: <b>the right message, to the right people, in the right place, at the right time.</b> PM decides what to build; PMM makes sure the world knows why it matters and buys it.</p>
+
+    <h3>PM vs PMM</h3>
+    <table>
+      <tr><th></th><th>Product Manager</th><th>Product Marketing Manager</th></tr>
+      <tr><td>Focus</td><td>Build the right product</td><td>Take it to market &amp; sell it</td></tr>
+      <tr><td>Owns</td><td>Roadmap, requirements, value</td><td>Positioning, messaging, launch, enablement</td></tr>
+      <tr><td>Question</td><td>What &amp; why do we build?</td><td>How do we win the buyer's mind?</td></tr>
+    </table>
+    <p>In smaller companies the PM does both. They overlap heavily on personas, proposition and launch.</p>
+
+    <h3>Positioning &amp; messaging</h3>
+    <p><b>Positioning</b> = the place your product occupies in the customer's mind vs alternatives. <b>Messaging</b> = the words that convey it. Good messaging leads with the <b>customer's problem and benefit</b>, not your feature list, and is consistent everywhere.</p>
+    <blockquote><p>For [target] who [need], [product] is the [category] that [benefit], because [reason to believe]. Unlike [alternative], [differentiator].</p></blockquote>
+
+    <h3>The marketing mix — 4 Ps (→ 7 Ps)</h3>
+    <ul>
+      <li><b>Product</b> — what it is &amp; the value it gives</li>
+      <li><b>Price</b> — pricing &amp; packaging</li>
+      <li><b>Place</b> — channels &amp; distribution</li>
+      <li><b>Promotion</b> — how you communicate &amp; generate demand</li>
+      <li>Services add: <b>People, Process, Physical evidence</b></li>
+    </ul>
+
+    <h3>Inbound &amp; content marketing</h3>
+    <p><b>Outbound</b> pushes the message out (ads, cold outreach). <b>Inbound</b> pulls people in by being useful — SEO, content, webinars — earning attention and generating <b>MQLs</b> (marketing-qualified leads) that convert to <b>SQLs</b> (sales-qualified leads) down the funnel.</p>
+
+    <div class="note key"><span class="lbl">Sales enablement</span>A huge, under-appreciated PMM job: arm the sales team with battlecards, demos, objection handling, ROI stories and competitive positioning. A great product with a confused sales team doesn't sell.</div>
+    <div class="note do"><span class="lbl">Do</span>Own your product's story. If you can't explain in one sentence who it's for and why it's better, your customers and your own sales team certainly can't.</div>
+  `,
+  quiz:[
+    {q:"The clearest split between PM and PMM is:",opts:["PM sells; PMM builds","PM builds the right product; PMM takes it to market","They're identical","PMM owns the roadmap"],a:1,ex:"PM = build the right thing; PMM = position, message, launch and enable sales."},
+    {q:"'Positioning' is best defined as:",opts:["The price of the product","The place your product holds in the customer's mind vs alternatives","The launch date","The number of features"],a:1,ex:"Positioning is the mental space you occupy relative to competitors."},
+    {q:"Inbound marketing works by:",opts:["Cold-calling prospects","Pulling people in with useful content (SEO, webinars)","Buying billboards only","Discounting heavily"],a:1,ex:"Inbound earns attention by being useful, generating qualified leads."},
+    {q:"The classic marketing mix '4 Ps' are:",opts:["People, Process, Product, Price","Product, Price, Place, Promotion","Plan, Pitch, Promote, Profit","Problem, Persona, Product, Price"],a:1,ex:"Product, Price, Place, Promotion — extended to 7 Ps for services."}
+  ]
+},
+{
+  id:"leading", num:16, icon:"🤝", title:"Leading & Stakeholders",
+  tagline:"Influence without authority",
+  blurb:"Stakeholder management, RACI, communication, saying no, and leading the team.",
+  html:`
+    <p class="lead">A PM has huge responsibility and almost no direct authority. Your entire job runs on <b>influence</b>: aligning engineers, designers, sales, marketing, support, finance and execs around a shared direction — none of whom report to you.</p>
+
+    <h3>Map your stakeholders</h3>
+    <p>Use a <b>Power/Interest grid</b> to decide how much attention each stakeholder needs:</p>
+    <table>
+      <tr><th>Power ↓ / Interest →</th><th>Low interest</th><th>High interest</th></tr>
+      <tr><td><b>High power</b></td><td>Keep satisfied</td><td>Manage closely (key players)</td></tr>
+      <tr><td><b>Low power</b></td><td>Monitor</td><td>Keep informed</td></tr>
+    </table>
+    <p>Pair with <b>RACI</b> for any initiative — who is <b>R</b>esponsible (does it), <b>A</b>ccountable (owns the outcome, one person), <b>C</b>onsulted (input), <b>I</b>nformed (kept in the loop).</p>
+
+    <h3>Communicate to align</h3>
+    <ul>
+      <li>Tailor the message: execs want outcomes &amp; trade-offs; engineers want clarity &amp; the why; sales want what's coming &amp; when.</li>
+      <li>Write crisp <b>one-pagers</b> — a single clear artifact that gets ten people rowing together beats a dozen meetings.</li>
+      <li>Over-communicate the <b>why</b>. People execute better and forgive change when they understand the reasoning.</li>
+    </ul>
+
+    <h3>The art of saying no</h3>
+    <div class="note key"><span class="lbl">Say no to the request, not the person</span>Acknowledge the underlying need, explain the trade-off ("yes, and here's what we'd drop"), tie the decision to the strategy, and leave the door open. A reasoned no builds more trust than an over-promised yes.</div>
+
+    <h3>Leading the team</h3>
+    <ul>
+      <li><b>Servant leadership</b> — remove blockers, provide context, then get out of the way.</li>
+      <li>Give the team the <b>problem and the why</b>, not just a spec — you'll get better solutions and more ownership.</li>
+      <li>Build <b>trust</b> with engineering &amp; design by respecting their craft and involving them early in discovery.</li>
+      <li>Manage up: keep leadership informed with no surprises; bring problems <em>with</em> a recommendation.</li>
+    </ul>
+
+    <h3>Handling conflict &amp; disagreement</h3>
+    <p>Use <b>"disagree and commit"</b> — argue hard on the evidence, then once a call is made, everyone rows together. Escalate cleanly when truly stuck, framing the decision and the options rather than the drama.</p>
+    <div class="note do"><span class="lbl">Do</span>Make decisions transparent: capture the decision, the why, and who was consulted. Trust compounds when people can see how and why calls are made.</div>
+    <div class="note dont"><span class="lbl">Don't</span>Try to please everyone — you'll build an incoherent product. And don't rely on your (non-existent) authority; you lead by clarity, evidence and relationships.</div>
+  `,
+  quiz:[
+    {q:"In RACI, the single person who owns the outcome is:",opts:["Responsible","Accountable","Consulted","Informed"],a:1,ex:"Accountable = one owner of the outcome; Responsible = those who do the work."},
+    {q:"A Power/Interest grid helps you decide:",opts:["Story points","How much attention each stakeholder needs","The price","Sprint length"],a:1,ex:"It sorts stakeholders into manage-closely, keep-satisfied, keep-informed, monitor."},
+    {q:"The best way to say 'no' to a stakeholder is to:",opts:["Ignore the request","Acknowledge the need, explain the trade-off, tie to strategy","Blame engineering","Say yes to keep the peace"],a:1,ex:"Say no to the request, not the person — with a reason rooted in strategy."},
+    {q:"'Disagree and commit' means:",opts:["Never argue","Debate hard, then fully support the decision once made","Always defer to the loudest voice","Avoid all conflict"],a:1,ex:"Argue on evidence, then align and execute together once a decision is made."},
+    {q:"A PM's authority over engineers is:",opts:["Total","Mostly influence, not command","Financial","Set by HR"],a:1,ex:"PMs lead through influence — clarity, evidence and trust — not direct authority."}
+  ]
+}
+];
+const GLOSSARY = [
+{t:"Product/Market Fit (PMF)",c:"Strategy",d:"The point where a product satisfies a strong market demand — customers pull it from you and retention is healthy. The first goal of any new product."},
+{t:"North Star Metric",c:"Metrics",d:"The single metric that best captures the core value your product delivers to customers (e.g. nights booked, messages sent)."},
+{t:"OKR",c:"Strategy",d:"Objectives & Key Results. One ambitious qualitative Objective + 2–4 measurable Key Results. Aligns teams on outcomes."},
+{t:"KPI",c:"Metrics",d:"Key Performance Indicator — a metric you actively track to gauge health or progress toward a goal."},
+{t:"MVP",c:"Discovery",d:"Minimum Viable Product — the smallest release that delivers real value and lets you learn from real users."},
+{t:"MLP",c:"Discovery",d:"Minimum Lovable Product — an MVP with enough polish/delight that users actually love it, not just tolerate it."},
+{t:"Jobs To Be Done (JTBD)",c:"Discovery",d:"The idea that customers 'hire' a product to make progress in a situation. Focuses on outcomes, not features."},
+{t:"Value Proposition",c:"Strategy",d:"The compelling reason a customer should choose you over alternatives (or over doing nothing)."},
+{t:"Persona",c:"Discovery",d:"An evidence-based archetype of a target user, with goals, pains and context, so teams design for a real human."},
+{t:"Total Addressable Market (TAM)",c:"Business",d:"The total revenue opportunity if you captured 100% of a market. Narrowed to SAM then SOM."},
+{t:"Product Discovery",c:"Discovery",d:"The work of deciding what to build — validating that a solution is valuable, usable, feasible and viable before building."},
+{t:"Continuous Discovery",c:"Discovery",d:"Teresa Torres' practice of small, weekly research touchpoints with customers, running in parallel with delivery."},
+{t:"Dual-track Agile",c:"Agile",d:"Running a discovery track (validate what to build) alongside a delivery track (build validated work)."},
+{t:"Product Backlog",c:"Agile",d:"The ordered master list of everything that might be built, owned and prioritised by the PM/PO."},
+{t:"Sprint",c:"Agile",d:"A fixed-length iteration (1–4 weeks) in Scrum, ending in a potentially shippable increment."},
+{t:"Velocity",c:"Agile",d:"Story points a team completes per sprint. A planning aid for forecasting — not a productivity target."},
+{t:"Story Point",c:"Agile",d:"A relative estimate of effort/complexity/uncertainty for a work item, deliberately not measured in hours."},
+{t:"User Story",c:"Agile",d:"'As a [user], I want [goal], so that [benefit].' A lightweight requirement centred on user value."},
+{t:"Acceptance Criteria",c:"Agile",d:"The conditions that must be true for a story to be 'done', often written as Given/When/Then."},
+{t:"Definition of Done (DoD)",c:"Agile",d:"The team's shared checklist for truly-finished work (tested, documented, deployed)."},
+{t:"Epic",c:"Agile",d:"A large body of work that can be broken down into many user stories."},
+{t:"Technical Debt",c:"Agile",d:"The future cost of shortcuts taken today. Like financial debt, it accrues 'interest' (slower future work)."},
+{t:"Roadmap",c:"Strategy",d:"A living, high-level view of where the product is heading and why — direction, ideally not dated promises."},
+{t:"Now/Next/Later",c:"Strategy",d:"A roadmap format that groups work by confidence horizon instead of fixed dates."},
+{t:"Product Strategy",c:"Strategy",d:"The reasoned choice of where to play and how to win, plus what you deliberately won't do."},
+{t:"Positioning",c:"GTM",d:"The distinct place your product occupies in the customer's mind relative to alternatives."},
+{t:"Go-to-Market (GTM)",c:"GTM",d:"The plan for how you'll reach, sell to, and support a target market: who, message, channels, pricing, onboarding."},
+{t:"Product-Led Growth (PLG)",c:"GTM",d:"A GTM motion where the product itself drives acquisition, conversion and expansion (free tier, trials, self-serve)."},
+{t:"Churn",c:"Metrics",d:"The rate at which customers (logo churn) or revenue (revenue churn) are lost over a period."},
+{t:"Retention",c:"Metrics",d:"The proportion of users who keep coming back over time — the clearest signal of delivered value."},
+{t:"Cohort Analysis",c:"Metrics",d:"Grouping users by a shared start point (e.g. signup month) and tracking their behaviour over time."},
+{t:"Funnel",c:"Metrics",d:"The step-by-step path users take toward a goal (e.g. visit → signup → activate → pay); you find drop-offs at each step."},
+{t:"Activation",c:"Metrics",d:"A new user reaching first real value quickly — the 'aha moment'."},
+{t:"Vanity Metric",c:"Metrics",d:"A number that looks good but doesn't inform a decision (e.g. cumulative signups)."},
+{t:"Leading Indicator",c:"Metrics",d:"A metric that predicts future results (e.g. trials started), as opposed to a lagging one that confirms the past."},
+{t:"Guardrail Metric",c:"Metrics",d:"A metric that must not degrade while you optimise a primary goal (e.g. latency, support load)."},
+{t:"A/B Test",c:"Metrics",d:"A controlled experiment splitting traffic between variants to measure the causal effect of a change."},
+{t:"Lifetime Value (LTV)",c:"Business",d:"The total revenue (or margin) expected from a customer over the whole relationship."},
+{t:"Customer Acquisition Cost (CAC)",c:"Business",d:"The average cost to acquire one paying customer, across sales and marketing."},
+{t:"Net Revenue Retention (NRR)",c:"Business",d:"Revenue retained + expansion from existing customers, minus churn. Above 100% means you grow without new logos."},
+{t:"Gross Margin",c:"Business",d:"Revenue minus cost of goods sold, as a %. How much each sale actually contributes."},
+{t:"NPV",c:"Business",d:"Net Present Value — future cash flows discounted to today's money. Positive NPV means value creation."},
+{t:"Payback Period",c:"Business",d:"How long it takes for an investment (or a customer) to recoup its cost."},
+{t:"Business Case",c:"Business",d:"The costs/benefits/risk argument, in numbers and narrative, that an investment is worth making."},
+{t:"RICE",c:"Strategy",d:"A prioritisation score: (Reach × Impact × Confidence) ÷ Effort."},
+{t:"MoSCoW",c:"Strategy",d:"Prioritisation by Must / Should / Could / Won't-have-this-time."},
+{t:"Kano Model",c:"Discovery",d:"Classifies features as Basic (must-be), Performance (linear), or Delighters (excitement)."},
+{t:"Opportunity Cost",c:"Strategy",d:"The value of the best alternative you give up when you choose to do one thing over another."},
+{t:"Stakeholder",c:"Leadership",d:"Anyone affected by or invested in your product — sales, support, execs, engineering, customers, legal."},
+{t:"RACI",c:"Leadership",d:"A responsibility map: Responsible, Accountable, Consulted, Informed — clarifying who does what on an initiative."},
+{t:"Disagree and Commit",c:"Leadership",d:"Argue hard on the evidence, then fully support the decision once it's made."},
+{t:"Crossing the Chasm",c:"Strategy",d:"Geoffrey Moore's challenge of moving from visionary early adopters to the pragmatic mainstream majority."},
+{t:"Early Adopter",c:"GTM",d:"A customer who embraces new products early, tolerates rough edges, and gives rich feedback."},
+{t:"PRD",c:"Discovery",d:"Product Requirements Document — describes what the product should do to meet a market need."},
+{t:"MRD",c:"Discovery",d:"Market Requirements Document — captures what the market needs and why (problems, segments, size)."},
+{t:"Wireframe / Prototype",c:"Design",d:"Low- to high-fidelity mockups used to test a solution's usability and value before building it."},
+{t:"Usability",c:"Design",d:"How easily and efficiently people can accomplish their goals with the product."},
+{t:"Design Sprint",c:"Design",d:"A time-boxed (often 5-day) process to prototype and test a big idea with users quickly."},
+{t:"Feature Flag",c:"Agile",d:"A switch that turns functionality on/off in production without a new deploy — enables gradual rollout and testing."},
+{t:"Dogfooding",c:"Discovery",d:"Using your own product internally to catch issues and build empathy ('eating your own dog food')."},
+{t:"Sunset",c:"GTM",d:"The planned retirement of a product or feature that no longer earns its keep."},
+{t:"Value Metric",c:"Business",d:"The unit you charge by (per seat, per GB, per transaction) — ideally one that scales with customer value."},
+{t:"Freemium",c:"GTM",d:"A model offering a free tier to drive adoption, with paid upgrades for advanced value."},
+{t:"Blue Ocean",c:"Strategy",d:"Competing by creating uncontested market space rather than fighting rivals in a bloody 'red ocean'."},
+{t:"Segmentation",c:"Discovery",d:"Dividing a market into groups with similar needs/behaviour, then choosing which to serve first."},
+{t:"Beachhead",c:"Strategy",d:"The initial narrow segment you win first before expanding to adjacent markets."},
+{t:"Feature Creep",c:"Agile",d:"Uncontrolled expansion of scope that bloats a product and dilutes its value."},
+{t:"Sales Enablement",c:"GTM",d:"Equipping the sales team to sell: battlecards, demos, objection handling, ROI stories, competitive positioning."}
+];
+const ACRONYMS = [
+{a:"PM",f:"Product Manager",d:"Owns the why & what — value, strategy, market."},
+{a:"PO",f:"Product Owner",d:"Scrum role focused on a clear, prioritised backlog."},
+{a:"PMM",f:"Product Marketing Manager",d:"Positioning, messaging, launch, sales enablement."},
+{a:"MVP",f:"Minimum Viable Product",d:"Smallest release that delivers value & learning."},
+{a:"MLP",f:"Minimum Lovable Product",d:"An MVP polished enough that users love it."},
+{a:"PMF",f:"Product/Market Fit",d:"Strong demand meets your product."},
+{a:"JTBD",f:"Jobs To Be Done",d:"The progress a customer 'hires' a product for."},
+{a:"OKR",f:"Objectives & Key Results",d:"Ambitious objective + measurable key results."},
+{a:"KPI",f:"Key Performance Indicator",d:"A metric you track for health/progress."},
+{a:"NSM",f:"North Star Metric",d:"Single metric capturing core customer value."},
+{a:"PRD",f:"Product Requirements Document",d:"What the product should do."},
+{a:"MRD",f:"Market Requirements Document",d:"What the market needs and why."},
+{a:"BRD",f:"Business Requirements Document",d:"The business needs a project must satisfy."},
+{a:"UX",f:"User Experience",d:"The overall experience of using the product."},
+{a:"UI",f:"User Interface",d:"The visual/interactive surface users touch."},
+{a:"DoR",f:"Definition of Ready",d:"A story is clear enough to start."},
+{a:"DoD",f:"Definition of Done",d:"Shared bar for truly-finished work."},
+{a:"WIP",f:"Work In Progress",d:"Items in flight; Kanban limits it."},
+{a:"SAFe",f:"Scaled Agile Framework",d:"A way to run Agile across many teams."},
+{a:"WSJF",f:"Weighted Shortest Job First",d:"Cost of delay ÷ job size (SAFe prioritisation)."},
+{a:"RICE",f:"Reach, Impact, Confidence, Effort",d:"A prioritisation scoring model."},
+{a:"AARRR",f:"Acquisition, Activation, Retention, Revenue, Referral",d:"'Pirate' growth funnel."},
+{a:"HEART",f:"Happiness, Engagement, Adoption, Retention, Task-success",d:"Google's UX metrics framework."},
+{a:"TAM",f:"Total Addressable Market",d:"The whole possible market."},
+{a:"SAM",f:"Serviceable Available Market",d:"The slice you can serve."},
+{a:"SOM",f:"Serviceable Obtainable Market",d:"What you can realistically win."},
+{a:"GTM",f:"Go-To-Market",d:"Plan to reach, sell & support a market."},
+{a:"PLG",f:"Product-Led Growth",d:"The product drives its own adoption."},
+{a:"SLG",f:"Sales-Led Growth",d:"Reps drive acquisition for higher-value deals."},
+{a:"GA",f:"General Availability",d:"The full public release."},
+{a:"EAP",f:"Early Access Program",d:"Limited early release to selected users."},
+{a:"CAC",f:"Customer Acquisition Cost",d:"Cost to win one paying customer."},
+{a:"LTV",f:"Lifetime Value",d:"Total value expected from a customer."},
+{a:"ARPU",f:"Average Revenue Per User",d:"Revenue divided by users."},
+{a:"MRR",f:"Monthly Recurring Revenue",d:"Predictable monthly subscription revenue."},
+{a:"ARR",f:"Annual Recurring Revenue",d:"MRR × 12; annualised subscription revenue."},
+{a:"NRR",f:"Net Revenue Retention",d:"Retained + expansion − churn from existing customers."},
+{a:"ACV",f:"Annual Contract Value",d:"Average yearly value of a contract."},
+{a:"TCV",f:"Total Contract Value",d:"Full value over a contract's life."},
+{a:"NPS",f:"Net Promoter Score",d:"Likelihood customers recommend you (−100 to +100)."},
+{a:"CSAT",f:"Customer Satisfaction",d:"Short-term satisfaction score after an interaction."},
+{a:"CES",f:"Customer Effort Score",d:"How easy it was to get something done."},
+{a:"DAU/MAU",f:"Daily / Monthly Active Users",d:"Engagement; the ratio is a 'stickiness' proxy."},
+{a:"ROI",f:"Return On Investment",d:"(Gain − cost) ÷ cost, as a %."},
+{a:"NPV",f:"Net Present Value",d:"Future cash discounted to today's money."},
+{a:"IRR",f:"Internal Rate of Return",d:"Discount rate where NPV = 0."},
+{a:"CapEx",f:"Capital Expenditure",d:"One-off spend on long-lived assets."},
+{a:"OpEx",f:"Operating Expenditure",d:"Ongoing running costs."},
+{a:"COGS",f:"Cost Of Goods Sold",d:"Direct cost of delivering the product."},
+{a:"SaaS",f:"Software as a Service",d:"Software delivered by subscription over the web."},
+{a:"B2B / B2C",f:"Business-to-Business / -Consumer",d:"Selling to companies vs individuals."},
+{a:"MQL / SQL",f:"Marketing / Sales Qualified Lead",d:"Lead stages down the funnel."},
+{a:"SLA",f:"Service Level Agreement",d:"Committed level of service (e.g. uptime)."},
+{a:"API",f:"Application Programming Interface",d:"How software systems talk to each other."},
+{a:"QA",f:"Quality Assurance",d:"Testing to ensure the product meets its bar."},
+{a:"CRO",f:"Conversion Rate Optimisation",d:"Improving % who take a desired action."},
+{a:"SEO / SEM",f:"Search Engine Optimisation / Marketing",d:"Organic vs paid search visibility."},
+{a:"FAB",f:"Features, Advantages, Benefits",d:"Translate what it is into why they care."},
+{a:"PESTLE",f:"Political, Economic, Social, Technological, Legal, Environmental",d:"Macro-environment scan."},
+{a:"SWOT",f:"Strengths, Weaknesses, Opportunities, Threats",d:"Position analysis."},
+{a:"RACI",f:"Responsible, Accountable, Consulted, Informed",d:"Responsibility mapping."}
+];
+const INTERVIEW = [
+{cat:"Product Design",q:"Design a product for X (e.g. an alarm clock for the blind).",approach:`<p><b>Structure it, don't jump to features.</b> Interviewers test your thinking process, not your idea.</p>
+  <h5>A reliable framework (CIRCLES-lite)</h5>
+  <ol><li><b>Clarify</b> — ask about goal, platform, constraints. "Who is this for and what's the business goal?"</li>
+  <li><b>Who</b> — pick 1–2 user segments/personas.</li>
+  <li><b>Needs / pain points</b> — list their jobs-to-be-done; pick the most important.</li>
+  <li><b>Solutions</b> — brainstorm 3+, then narrow.</li>
+  <li><b>Prioritise</b> — use value vs effort or impact; state your reasoning.</li>
+  <li><b>Measure</b> — how would you know it worked? (a success metric)</li>
+  <li><b>Summarise</b> the recommendation and trade-offs.</li></ol>`,
+  points:["Always clarify before solving","Anchor on a specific user + their top need","Voice the trade-offs out loud","End with a success metric"]},
+
+{cat:"Analytical / Metrics",q:"A key metric dropped 20% overnight. What do you do?",approach:`<p><b>Be a calm detective. Structure the diagnosis.</b></p>
+  <h5>Steps</h5>
+  <ol><li><b>Clarify the metric</b> — exact definition, timeframe, which metric.</li>
+  <li><b>Is it real?</b> — rule out a tracking/logging bug or a data pipeline break first (most 'overnight' drops are instrumentation).</li>
+  <li><b>Segment</b> — slice by platform, geography, new vs returning, browser, app version, marketing channel. Where is the drop concentrated?</li>
+  <li><b>Internal vs external</b> — did we ship a release? Change pricing? Or was it a holiday, outage, competitor, seasonality, PR event?</li>
+  <li><b>Form a hypothesis</b>, verify with data, then decide the fix and how to prevent recurrence.</li></ol>`,
+  points:["Check for a tracking bug FIRST","Segment to localise the drop","Separate internal changes from external events","State a hypothesis, then verify"]},
+
+{cat:"Behavioral",q:"Tell me about a time you influenced without authority.",approach:`<p><b>Use STAR:</b> Situation, Task, Action, Result. Keep it specific and quantified.</p>
+  <ul><li><b>Situation</b> — set the context briefly.</li>
+  <li><b>Task</b> — what you were responsible for.</li>
+  <li><b>Action</b> — what <em>you</em> did (use 'I', not 'we'): the data you gathered, how you aligned stakeholders, the trade-offs you framed.</li>
+  <li><b>Result</b> — the measurable outcome, and what you learned.</li></ul>
+  <p>For influence specifically, show you led with <b>evidence and shared goals</b>, not politics.</p>`,
+  points:["Use STAR and say 'I' not 'we'","Quantify the result","Show evidence-based persuasion","End with a reflection/learning"]},
+
+{cat:"Strategy",q:"Should Company X build/enter market Y?",approach:`<p><b>A structured go/no-go, not a gut answer.</b></p>
+  <ol><li><b>Clarify the goal</b> — why are they considering it? (growth, defence, new segment)</li>
+  <li><b>Market</b> — size (TAM/SAM/SOM), growth, trends (PESTLE).</li>
+  <li><b>Fit</b> — does it match the company's strategy, strengths and brand? ('Where to play / how to win'.)</li>
+  <li><b>Competition</b> — who's there, how defensible (Five Forces)? What's our differentiation?</li>
+  <li><b>Feasibility & cost</b> vs the opportunity; risks.</li>
+  <li><b>Recommendation</b> — a clear yes/no with the top 2 reasons and how you'd de-risk (e.g. an experiment first).</li></ol>`,
+  points:["Anchor on the strategic goal","Assess market, fit, competition, feasibility","Give a clear recommendation","Propose a way to de-risk before full commitment"]},
+
+{cat:"Estimation",q:"How many X are there / sold per year? (market sizing)",approach:`<p><b>They want structured reasoning, not the exact number.</b></p>
+  <ol><li><b>State assumptions out loud</b> — population, penetration, frequency.</li>
+  <li><b>Pick top-down or bottom-up</b> and build with round numbers.</li>
+  <li>Example: coffees/day in a city = population × % who drink coffee × cups/day.</li>
+  <li><b>Sanity-check</b> the result against something you know.</li>
+  <li>Note what would most change the answer.</li></ol>`,
+  points:["Think aloud; show the structure","Use round, defensible numbers","Sanity-check the final figure","It's about the method, not the answer"]},
+
+{cat:"Prioritization",q:"You have 5 features and one quarter. How do you decide?",approach:`<p><b>Show a repeatable method tied to strategy.</b></p>
+  <ol><li><b>Clarify the goal/metric</b> this quarter is meant to move.</li>
+  <li>Score each feature with <b>RICE</b> (or value vs effort) — say your Reach/Impact/Confidence/Effort estimates.</li>
+  <li>Sanity-check against <b>strategy</b> and dependencies (some things unblock others).</li>
+  <li>Balance the mix: strategic bets, customer requests, keep-the-lights-on.</li>
+  <li>Communicate the <b>reasoning and what you're saying no to</b>, and why.</li></ol>`,
+  points:["Tie priority to the goal metric","Make estimates explicit (RICE)","Consider dependencies & mix","Explain the no, not just the yes"]},
+
+{cat:"Product Design",q:"What's your favourite product and how would you improve it?",approach:`<p><b>Tests product sense + structured critique.</b></p>
+  <ol><li>Name it and state <b>who it's for and the job it does</b>.</li>
+  <li>Why it's great — tie to user value, not just 'I like it'.</li>
+  <li>Pick <b>a specific user segment with an unmet need</b>.</li>
+  <li>Propose 1–2 concrete improvements, with the <b>problem each solves</b> and how you'd measure success.</li>
+  <li>Acknowledge trade-offs / why the team may not have done it yet.</li></ol>`,
+  points:["Lead with user value, not taste","Choose a real unmet need","Attach a metric to each improvement","Show awareness of trade-offs"]},
+
+{cat:"Behavioral",q:"Tell me about a product/feature that failed. What happened?",approach:`<p><b>They're testing ownership and learning, not perfection.</b></p>
+  <ul><li>Pick a real failure; describe it honestly with STAR.</li>
+  <li>Take <b>ownership</b> — what you'd have done differently (don't blame others).</li>
+  <li>Show the <b>data/insight</b> that revealed it failed.</li>
+  <li>End with the <b>concrete lesson</b> and how you applied it later.</li></ul>`,
+  points:["Be honest; take ownership","Show how you measured the failure","Focus on the learning applied since","Avoid blaming the team"]},
+
+{cat:"Analytical / Metrics",q:"How would you measure the success of feature Z?",approach:`<p><b>Connect the feature to value, then pick metrics.</b></p>
+  <ol><li>State the <b>goal</b> of the feature (the user/business outcome).</li>
+  <li>Pick a <b>primary metric</b> that reflects that outcome.</li>
+  <li>Add <b>secondary metrics</b> (adoption, engagement) and <b>guardrails</b> (things that must not worsen).</li>
+  <li>Note leading vs lagging, and how you'd read it (cohorts, A/B test).</li></ol>`,
+  points:["Start from the intended outcome","One primary metric + guardrails","Distinguish leading vs lagging","Say how you'd validate causally"]},
+
+{cat:"Strategy",q:"What would you do in your first 30/60/90 days as PM here?",approach:`<p><b>Show a learn-then-lead plan.</b></p>
+  <ul><li><b>30 days — Learn:</b> the product, users, data, team, stakeholders and current strategy. Talk to customers and read the metrics.</li>
+  <li><b>60 days — Plan:</b> identify the biggest opportunities/problems, align on goals, propose priorities.</li>
+  <li><b>90 days — Deliver:</b> ship an early win, establish your operating rhythm and metrics.</li></ul>`,
+  points:["Listen before changing things","Meet customers and stakeholders early","Find an early, credible win","Establish a metrics rhythm"]},
+
+{cat:"Technical",q:"Explain an API / how a feature works to a non-technical stakeholder.",approach:`<p><b>Tests communication & technical fluency.</b> Use an analogy, avoid jargon.</p>
+  <ul><li>An API is like a <b>restaurant menu + waiter</b>: you order from a defined list, the kitchen (system) prepares it, you don't need to know how.</li>
+  <li>Explain <b>why it matters</b> to the business (enables integrations/partners/faster building).</li>
+  <li>Check understanding; adjust depth to the audience.</li></ul>`,
+  points:["Use a concrete analogy","Drop the jargon","Tie it to business value","Match depth to the audience"]},
+
+{cat:"Prioritization",q:"A big customer demands a feature that's off-strategy. What do you do?",approach:`<p><b>Balance the relationship with product coherence.</b></p>
+  <ol><li><b>Understand the real need</b> behind the request (JTBD) — the ask may not be the best solution.</li>
+  <li>Assess <b>impact</b>: revenue at risk, is the need shared by many customers or just one?</li>
+  <li>Weigh against <b>strategy & opportunity cost</b>.</li>
+  <li>Options: solve the underlying need differently, a workaround, a roadmap commitment, or a reasoned no.</li>
+  <li>Communicate the decision honestly with the trade-off.</li></ol>`,
+  points:["Dig for the underlying need","Check if it's one voice or many","Weigh revenue vs strategy & opportunity cost","Offer alternatives; say no with a reason"]}
+];
+/* __APP_LOGIC__ */
+
+/* ---------- state / persistence ---------- */
+const LS_KEY = "pmStudioProgress_v1";
+let state = load();
+function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {done:{},scores:{}}; }catch(e){ return {done:{},scores:{}}; } }
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ---------- DOM refs ---------- */
+const $ = s=>document.querySelector(s);
+const content=$("#content"), nav=$("#nav"), sidebar=$("#sidebar"), scrim=$("#scrim");
+const progFill=$("#progFill"), progPct=$("#progPct"), progLabel=$("#progLabel"), toastEl=$("#toast");
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>toastEl.classList.remove("show"),2200); }
+
+/* ---------- progress ---------- */
+function completedCount(){ return MODULES.filter(m=>state.done[m.id]).length; }
+function updateProgress(){
+  const pct = Math.round(completedCount()/MODULES.length*100);
+  progFill.style.width=pct+"%"; progPct.textContent=pct+"%";
+  progLabel.textContent = completedCount()+" of "+MODULES.length+" modules complete";
+}
+function markDone(id){ if(!state.done[id]){ state.done[id]=true; save(); buildNav(); updateProgress(); toast("Module complete ✓ "+pct()+"% overall"); } }
+function pct(){ return Math.round(completedCount()/MODULES.length*100); }
+
+/* ---------- navigation ---------- */
+const TOOLS=[
+  {id:"interview",icon:"🎤",title:"Interview Prep"},
+  {id:"flashcards",icon:"🃏",title:"Flashcards"},
+  {id:"glossary",icon:"📖",title:"Glossary"},
+  {id:"acronyms",icon:"🔤",title:"Acronym Sheet"},
+  {id:"rice",icon:"🧮",title:"RICE Calculator"}
+];
+function buildNav(){
+  let h = `<button class="nav-item" data-route="home"><span class="ic">🏠</span> Dashboard</button>`;
+  h += `<div class="nav-group-label">Learning Path</div>`;
+  MODULES.forEach(m=>{
+    h += `<button class="nav-item ${state.done[m.id]?"done":""}" data-route="${m.id}">
+      <span class="nav-num">${String(m.num).padStart(2,"0")}</span>
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.title)}</span>
+      <span class="dot"></span></button>`;
+  });
+  h += `<div class="nav-group-label">Practice &amp; Reference</div>`;
+  TOOLS.forEach(t=>{ h += `<button class="nav-item" data-route="${t.id}"><span class="ic">${t.icon}</span> ${esc(t.title)}</button>`; });
+  nav.innerHTML=h;
+}
+function setActiveNav(route){
+  nav.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active", b.dataset.route===route));
+}
+
+/* ---------- router ---------- */
+function navigate(route){
+  route = route||"home";
+  const m = MODULES.find(x=>x.id===route);
+  if(route==="home") renderDashboard();
+  else if(m) renderModule(m);
+  else if(route==="interview") renderInterview();
+  else if(route==="flashcards") renderFlashcards();
+  else if(route==="glossary") renderGlossary();
+  else if(route==="acronyms") renderAcronyms();
+  else if(route==="rice") renderRice();
+  else { renderDashboard(); route="home"; }
+  setActiveNav(route);
+  if(location.hash.slice(1)!==route) history.replaceState(null,"","#"+route);
+  content.scrollTo?.(0,0); window.scrollTo(0,0);
+  closeSidebar();
+}
+window.addEventListener("hashchange",()=>navigate(location.hash.slice(1)));
+
+/* ---------- dashboard ---------- */
+function renderDashboard(){
+  const done=completedCount();
+  let cards="";
+  MODULES.forEach(m=>{
+    cards += `<div class="mod-card ${state.done[m.id]?"done":""}" data-go="${m.id}">
+      <span class="mc-num">${String(m.num).padStart(2,"0")}</span>
+      <div class="mc-ic">${m.icon}</div>
+      <h3>${esc(m.title)}</h3>
+      <p>${esc(m.blurb)}</p>
+      <div class="mc-foot"><span class="mc-check">✓</span><span>${state.done[m.id]?"Completed":"Not started"}</span></div>
+    </div>`;
+  });
+  content.innerHTML = `
+  <div class="view active">
+    <div class="hero-dash">
+      <div class="eyebrow" style="color:var(--signal)">Self-paced · Interactive · Interview-ready</div>
+      <h1>Become a <em>Product Manager</em>.<br>Learn it, speak it, and crack the interview.</h1>
+      <p>A hands-on studio covering the entire PM role — from discovery and strategy to metrics, pricing, Agile and go-to-market. Read a module, test yourself with a quiz, drill the vocabulary with flashcards, and rehearse real interview questions. Your progress saves automatically in this browser.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="n">${MODULES.length}</div><div class="l">Modules</div></div>
+        <div class="stat"><div class="n">${MODULES.reduce((a,m)=>a+m.quiz.length,0)}</div><div class="l">Quiz questions</div></div>
+        <div class="stat"><div class="n">${GLOSSARY.length+ACRONYMS.length}</div><div class="l">Terms &amp; acronyms</div></div>
+        <div class="stat"><div class="n">${INTERVIEW.length}</div><div class="l">Interview drills</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn primary" data-go="${done<MODULES.length?(MODULES.find(m=>!state.done[m.id])||MODULES[0]).id:'role'}">${done===0?"Start learning →":done<MODULES.length?"Resume where you left off →":"Review from the top →"}</button>
+        <a class="btn" href="PM-Crash-Course-Video.html">🎬 Watch the narrated video course</a>
+        <button class="btn" data-go="interview">Practice interviews</button>
+        <button class="btn" data-go="flashcards">Drill flashcards</button>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="eyebrow">How to use this studio</div>
+      <h2>Four ways to learn</h2>
+      <div class="grid g4" style="margin-top:8px">
+        <div class="card"><span class="tag">1 · Read</span><h4>Work the modules</h4><p>Go top to bottom or jump around. Each is short, plain-English, and grounded in real PM practice.</p></div>
+        <div class="card"><span class="tag">2 · Test</span><h4>Take the quiz</h4><p>Every module ends in a quiz with instant feedback and explanations. Passing marks it complete.</p></div>
+        <div class="card"><span class="tag">3 · Drill</span><h4>Flashcards &amp; glossary</h4><p>Master the language and acronyms so you speak fluent product.</p></div>
+        <div class="card"><span class="tag">4 · Rehearse</span><h4>Interview prep</h4><p>Structured approaches to the question types interviewers actually use.</p></div>
+      </div>
+      <div class="note key"><span class="lbl">For trainers</span>Use modules as a syllabus, run the quizzes live as knowledge checks, and use the interview bank for mock sessions. Everything is self-contained in one file you can share.</div>
+    </div>
+    <h2 style="color:var(--paper);margin:8px 0 16px">The learning path</h2>
+    <div class="module-grid">${cards}</div>
+    <p class="footer-note">Content distilled from the Product Focus “Product Management Journal” series and widely-used PM frameworks. Built for self-study and team training.</p>
+  </div>`;
+}
+
+/* ---------- module view ---------- */
+function renderModule(m){
+  const idx=MODULES.indexOf(m);
+  const prev=MODULES[idx-1], next=MODULES[idx+1];
+  content.innerHTML = `
+  <div class="view active">
+    <div class="sheet">
+      <div class="eyebrow">Module ${String(m.num).padStart(2,"0")} · ${esc(m.tagline)}</div>
+      <h2>${m.icon} ${esc(m.title)}</h2>
+      ${m.html}
+      <div class="mark-done">
+        <span class="mc-ic" style="font-size:22px">${state.done[m.id]?"✅":"📘"}</span>
+        <span class="txt">${state.done[m.id]?"You've completed this module.":"Finished reading? Take the quiz below or mark it complete."}</span>
+        <button class="btn ${state.done[m.id]?"":"primary"}" id="mdBtn" style="margin-left:auto">${state.done[m.id]?"Mark not complete":"Mark complete"}</button>
+      </div>
+    </div>
+    ${renderQuiz(m)}
+    <div class="next-prev">
+      ${prev?`<button class="btn" data-go="${prev.id}">← ${esc(prev.title)}</button>`:`<button class="btn" data-go="home">← Dashboard</button>`}
+      ${next?`<button class="btn primary" data-go="${next.id}">${esc(next.title)} →</button>`:`<button class="btn primary" data-go="interview">Interview Prep →</button>`}
+    </div>
+  </div>`;
+  const mdBtn=$("#mdBtn");
+  mdBtn.onclick=()=>{ if(state.done[m.id]){ delete state.done[m.id]; save(); buildNav(); updateProgress(); renderModule(m); } else { markDone(m.id); renderModule(m); } };
+  wireQuiz(m);
+}
+
+/* ---------- quiz ---------- */
+function renderQuiz(m){
+  let qs="";
+  m.quiz.forEach((q,i)=>{
+    let opts="";
+    q.opts.forEach((o,j)=>{ opts += `<button class="quiz-opt" data-q="${i}" data-o="${j}">${esc(o)}<span class="mk"></span></button>`; });
+    qs += `<div class="quiz-q" data-qi="${i}">
+      <div class="qtext"><span class="chip">${i+1}</span><span>${esc(q.q)}</span></div>
+      ${opts}
+      <div class="quiz-explain" id="ex-${m.id}-${i}"></div>
+    </div>`;
+  });
+  return `<div class="quiz-box" id="quiz-${m.id}">
+    <div class="eyebrow" style="color:var(--signal)">Knowledge check</div>
+    <h3>Quiz — ${esc(m.title)}</h3>
+    <p style="color:rgba(241,236,224,.75);font-size:.95rem">Pick an answer to see instant feedback. Answer all ${m.quiz.length} to complete the module.</p>
+    ${qs}
+    <div class="quiz-result" id="res-${m.id}"></div>
+  </div>`;
+}
+function wireQuiz(m){
+  const answered={};
+  const box=$("#quiz-"+m.id);
+  box.querySelectorAll(".quiz-opt").forEach(btn=>{
+    btn.onclick=()=>{
+      const i=+btn.dataset.q, j=+btn.dataset.o;
+      if(answered[i]!==undefined) return;
+      answered[i]=j;
+      const q=m.quiz[i];
+      const group=box.querySelectorAll(`.quiz-opt[data-q="${i}"]`);
+      group.forEach(b=>{
+        b.classList.add("disabled");
+        const oj=+b.dataset.o;
+        if(oj===q.a){ b.classList.add("correct"); b.querySelector(".mk").textContent="✓"; }
+        if(oj===j && j!==q.a){ b.classList.add("wrong"); b.querySelector(".mk").textContent="✗"; }
+      });
+      const ex=$("#ex-"+m.id+"-"+i);
+      ex.innerHTML=(j===q.a?"<b>Correct.</b> ":"<b>Not quite.</b> ")+esc(q.ex);
+      ex.classList.add("show");
+      if(Object.keys(answered).length===m.quiz.length) finishQuiz(m,answered);
+    };
+  });
+}
+function finishQuiz(m,answered){
+  let correct=0; m.quiz.forEach((q,i)=>{ if(answered[i]===q.a) correct++; });
+  const score=Math.round(correct/m.quiz.length*100);
+  state.scores[m.id]=score; 
+  const res=$("#res-"+m.id);
+  const pass=score>=60;
+  res.innerHTML=`<div class="score">${score}%</div>
+    <p style="margin:.2em 0 0"><b>${correct}/${m.quiz.length} correct.</b> ${pass?"Nicely done — you've got this module.":"Review the explanations above and try again."}</p>`;
+  res.classList.add("show");
+  if(pass) markDone(m.id); else save();
+}
+
+/* ---------- interview ---------- */
+function renderInterview(){
+  const cats=["All",...Array.from(new Set(INTERVIEW.map(i=>i.cat)))];
+  content.innerHTML=`<div class="view active"><div class="sheet">
+    <div class="eyebrow">Interview Prep</div>
+    <h2>🎤 Crack the PM interview</h2>
+    <p class="lead">PM interviews test <b>how you think</b>, not trivia. Learn the question types and a repeatable structure for each. Click a question to reveal a model approach and the traits interviewers score.</p>
+    <div class="note key"><span class="lbl">The universal move</span>Whatever the question — <b>clarify first, structure your answer out loud, anchor on a user & a goal, state trade-offs, and end with a success metric.</b> Thinking process beats a clever answer.</div>
+    <div class="note do"><span class="lbl">Behavioural? Use STAR</span><b>S</b>ituation · <b>T</b>ask · <b>A</b>ction (say “I”) · <b>R</b>esult (quantified) — then a one-line learning.</div>
+    <div class="filter-tags" id="ivTags">${cats.map((c,i)=>`<span class="ftag ${i===0?"active":""}" data-cat="${esc(c)}">${esc(c)}</span>`).join("")}</div>
+    <div id="ivList"></div>
+  </div></div>`;
+  const list=$("#ivList");
+  function draw(cat){
+    const items=INTERVIEW.filter(i=>cat==="All"||i.cat===cat);
+    list.innerHTML=items.map((it,i)=>`<div class="iv-item" data-i="${i}">
+      <div class="iv-q"><span class="chip">Q</span><span>${esc(it.q)}</span><span class="pill sig cat">${esc(it.cat)}</span></div>
+      <div class="iv-a">${it.approach}<div class="note do" style="margin-top:14px"><span class="lbl">Interviewers are scoring</span>${it.points.map(p=>esc(p)).join(" &nbsp;·&nbsp; ")}</div></div>
+    </div>`).join("");
+    list.querySelectorAll(".iv-item").forEach(el=>{ el.querySelector(".iv-q").onclick=()=>el.classList.toggle("open"); });
+  }
+  draw("All");
+  $("#ivTags").querySelectorAll(".ftag").forEach(t=>{ t.onclick=()=>{ $("#ivTags").querySelectorAll(".ftag").forEach(x=>x.classList.remove("active")); t.classList.add("active"); draw(t.dataset.cat); }; });
+}
+
+/* ---------- flashcards ---------- */
+let fcDeck=[], fcIdx=0, fcFilter="all";
+function buildDeck(){
+  const terms=GLOSSARY.map(g=>({kind:"Term",cat:g.c,front:g.t,back:g.d,deck:"terms"}));
+  const acr=ACRONYMS.map(a=>({kind:"Acronym",cat:"Acronym",front:a.a,back:"<b>"+esc(a.f)+"</b><br>"+esc(a.d),deck:"acronyms"}));
+  let d=[...terms,...acr];
+  if(fcFilter==="terms") d=terms; else if(fcFilter==="acronyms") d=acr;
+  return d;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function renderFlashcards(){
+  content.innerHTML=`<div class="view active"><div class="sheet">
+    <div class="eyebrow">Flashcards</div>
+    <h2>🃏 Speak fluent product</h2>
+    <p class="lead">Flip through key terms and acronyms until the language is second nature. Click the card to flip · use the arrows or your keyboard (← → to move, space to flip).</p>
+    <div class="filter-tags" id="fcTabs">
+      <span class="ftag ${fcFilter==="all"?"active":""}" data-f="all">All</span>
+      <span class="ftag ${fcFilter==="terms"?"active":""}" data-f="terms">Terms</span>
+      <span class="ftag ${fcFilter==="acronyms"?"active":""}" data-f="acronyms">Acronyms</span>
+    </div>
+    <div class="fc-stage"><div class="fc" id="fc">
+      <div class="fc-face fc-front"><div class="kind" id="fcKind"></div><div class="term" id="fcFront"></div><div class="hint">click to flip</div></div>
+      <div class="fc-face fc-back"><div class="kind">Definition</div><div class="def" id="fcBack"></div><div class="hint">click to flip back</div></div>
+    </div></div>
+    <div class="fc-controls">
+      <button class="btn" id="fcPrev">← Prev</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn" id="fcNext">Next →</button>
+      <button class="btn" id="fcShuffle">🔀 Shuffle</button>
+    </div>
+  </div></div>`;
+  fcDeck=buildDeck(); fcIdx=0; drawCard();
+  $("#fcTabs").querySelectorAll(".ftag").forEach(t=>{ t.onclick=()=>{ fcFilter=t.dataset.f; renderFlashcards(); }; });
+  $("#fc").onclick=()=>$("#fc").classList.toggle("flip");
+  $("#fcPrev").onclick=()=>move(-1); $("#fcNext").onclick=()=>move(1);
+  $("#fcShuffle").onclick=()=>{ fcDeck=shuffle(fcDeck.slice()); fcIdx=0; drawCard(); toast("Shuffled "+fcDeck.length+" cards"); };
+}
+function drawCard(){
+  const c=fcDeck[fcIdx]; if(!c) return;
+  $("#fc").classList.remove("flip");
+  $("#fcKind").textContent=c.kind+(c.cat&&c.kind==="Term"?" · "+c.cat:"");
+  $("#fcFront").innerHTML=esc(c.front);
+  $("#fcBack").innerHTML=c.back;
+  $("#fcCount").textContent=(fcIdx+1)+" / "+fcDeck.length;
+}
+function move(d){ fcIdx=(fcIdx+d+fcDeck.length)%fcDeck.length; drawCard(); }
+document.addEventListener("keydown",e=>{
+  if(!$("#fc")) return;
+  if(e.key==="ArrowRight") move(1);
+  else if(e.key==="ArrowLeft") move(-1);
+  else if(e.key===" "){ e.preventDefault(); $("#fc").classList.toggle("flip"); }
+});
+
+/* ---------- glossary ---------- */
+function renderGlossary(){
+  const cats=["All",...Array.from(new Set(GLOSSARY.map(g=>g.c))).sort()];
+  content.innerHTML=`<div class="view active"><div class="sheet">
+    <div class="eyebrow">Glossary</div>
+    <h2>📖 The product manager's dictionary</h2>
+    <p class="lead">${GLOSSARY.length} terms in plain English. Search or filter by area.</p>
+    <div class="searchbar"><input type="text" id="glSearch" placeholder="Search terms and definitions…"></div>
+    <div class="filter-tags" id="glTags">${cats.map((c,i)=>`<span class="ftag ${i===0?"active":""}" data-cat="${esc(c)}">${esc(c)}</span>`).join("")}</div>
+    <dl id="glList"></dl>
+  </div></div>`;
+  let cat="All";
+  function draw(){
+    const q=($("#glSearch").value||"").toLowerCase();
+    const items=GLOSSARY.filter(g=>(cat==="All"||g.c===cat)&&(!q||g.t.toLowerCase().includes(q)||g.d.toLowerCase().includes(q)))
+      .sort((a,b)=>a.t.localeCompare(b.t));
+    $("#glList").innerHTML=items.length?items.map(g=>`<div class="term-row"><dt>${esc(g.t)}<span class="cat">${esc(g.c)}</span></dt><dd>${esc(g.d)}</dd></div>`).join(""):`<div class="empty">No matches. Try another word.</div>`;
+  }
+  $("#glSearch").oninput=draw;
+  $("#glTags").querySelectorAll(".ftag").forEach(t=>{ t.onclick=()=>{ $("#glTags").querySelectorAll(".ftag").forEach(x=>x.classList.remove("active")); t.classList.add("active"); cat=t.dataset.cat; draw(); }; });
+  draw();
+}
+
+/* ---------- acronyms ---------- */
+function renderAcronyms(){
+  content.innerHTML=`<div class="view active"><div class="sheet">
+    <div class="eyebrow">Acronym Sheet</div>
+    <h2>🔤 Decode the alphabet soup</h2>
+    <p class="lead">${ACRONYMS.length} acronyms every PM hears. Search to find one fast.</p>
+    <div class="searchbar"><input type="text" id="acSearch" placeholder="Search e.g. RICE, CAC, GTM…"></div>
+    <dl id="acList"></dl>
+  </div></div>`;
+  function draw(){
+    const q=($("#acSearch").value||"").toLowerCase();
+    const items=ACRONYMS.filter(a=>!q||a.a.toLowerCase().includes(q)||a.f.toLowerCase().includes(q)||a.d.toLowerCase().includes(q))
+      .sort((a,b)=>a.a.localeCompare(b.a));
+    $("#acList").innerHTML=items.length?items.map(a=>`<div class="term-row"><dt>${esc(a.a)}<span class="cat">${esc(a.f)}</span></dt><dd>${esc(a.d)}</dd></div>`).join(""):`<div class="empty">No matches.</div>`;
+  }
+  $("#acSearch").oninput=draw; draw();
+}
+
+/* ---------- RICE calculator ---------- */
+function renderRice(){
+  content.innerHTML=`<div class="view active"><div class="sheet">
+    <div class="eyebrow">Interactive Tool</div>
+    <h2>🧮 RICE prioritisation calculator</h2>
+    <p class="lead">Score a feature to compare it objectively against others. <b>RICE = (Reach × Impact × Confidence) ÷ Effort.</b> Higher scores are higher priority.</p>
+    <div class="calc">
+      <div class="calc-row">
+        <div><label>Reach — people/events per time period</label><input type="number" id="rReach" value="1000" min="0"></div>
+        <div><label>Impact — per person</label>
+          <select id="rImpact">
+            <option value="3">Massive (3×)</option>
+            <option value="2">High (2×)</option>
+            <option value="1" selected>Medium (1×)</option>
+            <option value="0.5">Low (0.5×)</option>
+            <option value="0.25">Minimal (0.25×)</option>
+          </select></div>
+      </div>
+      <div class="calc-row">
+        <div><label>Confidence in your estimates</label>
+          <select id="rConf">
+            <option value="1">High — 100%</option>
+            <option value="0.8" selected>Medium — 80%</option>
+            <option value="0.5">Low — 50%</option>
+          </select></div>
+        <div><label>Effort — person-months</label><input type="number" id="rEffort" value="2" min="0.1" step="0.5"></div>
+      </div>
+      <div class="calc-out"><div class="l mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,236,224,.7)">RICE score</div><div class="rscore" id="rScore">—</div><div id="rHint" style="font-size:.9rem;color:rgba(241,236,224,.8)"></div></div>
+    </div>
+    <div class="note"><span class="lbl">Read it right</span>The number is only meaningful <b>relative to other features scored the same way</b>. Score your whole list, then sort. Treat it as structured debate, not gospel — garbage estimates give confident-looking garbage.</div>
+    <div class="note do"><span class="lbl">Tip</span>Keep <b>Reach</b> on a consistent time window (e.g. per quarter) across all features so scores are comparable.</div>
+  </div></div>`;
+  function calc(){
+    const reach=+$("#rReach").value||0, impact=+$("#rImpact").value, conf=+$("#rConf").value, effort=+$("#rEffort").value||0;
+    if(effort<=0){ $("#rScore").textContent="—"; $("#rHint").textContent="Enter an effort greater than 0."; return; }
+    const score=(reach*impact*conf)/effort;
+    $("#rScore").textContent=score.toLocaleString(undefined,{maximumFractionDigits:0});
+    $("#rHint").textContent=`(${reach.toLocaleString()} × ${impact} × ${conf}) ÷ ${effort} person-months`;
+  }
+  ["rReach","rImpact","rConf","rEffort"].forEach(id=>{ $("#"+id).oninput=calc; $("#"+id).onchange=calc; });
+  calc();
+}
+
+/* ---------- global click delegation for data-go ---------- */
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]"); if(g){ navigate(g.dataset.go); return; }
+  const n=e.target.closest(".nav-item"); if(n){ navigate(n.dataset.route); return; }
+  const card=e.target.closest("[data-go]"); if(card){ navigate(card.dataset.go); }
+});
+
+/* ---------- sidebar (mobile) ---------- */
+function closeSidebar(){ sidebar.classList.remove("open"); scrim.classList.remove("show"); }
+$("#hamburger").onclick=()=>{ sidebar.classList.toggle("open"); scrim.classList.toggle("show"); };
+scrim.onclick=closeSidebar;
+
+/* ---------- reset ---------- */
+$("#resetBtn").onclick=()=>{ if(confirm("Reset all progress and quiz scores? This can't be undone.")){ state={done:{},scores:{}}; save(); buildNav(); updateProgress(); navigate("home"); toast("Progress reset"); } };
+
+/* ---------- boot ---------- */
+buildNav();
+updateProgress();
+navigate(location.hash.slice(1)||"home");
+</script>
+</body>
+</html>

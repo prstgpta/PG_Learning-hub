@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)file:///Users/t0183mx/Downloads/automotive_lifecycle_infographic_2.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 48-Month Automotive Development Journey</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: #f4f6f9;
+    color: #2e3c4e;
+    padding: 32px 36px 44px;
+    min-width: 1100px;
+  }
+
+  /* ── TITLE ── */
+  .header { text-align: center; margin-bottom: 10px; }
+  .main-title {
+    font-size: 24px; font-weight: 700; letter-spacing: 1.6px;
+    color: #2a3a50; text-transform: uppercase;
+  }
+  .main-sub {
+    font-size: 12px; letter-spacing: 2.5px; color: #7a96ae;
+    text-transform: uppercase; margin-top: 6px;
+  }
+
+  /* ── TIMELINE RULER ── */
+  .ruler-wrap { margin: 22px 0 6px; }
+  .ruler-title {
+    font-size: 11px; font-weight: 600; color: #8a9fb5;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .ruler {
+    position: relative; height: 22px;
+    background: linear-gradient(90deg, #d6e2ee 0%, #c8d8e8 35%, #b8cede 65%, #aac4d8 100%);
+    border-radius: 5px; border: 1px solid #b8ccd8;
+  }
+  .ruler-ticks {
+    display: flex; justify-content: space-between;
+    position: absolute; width: 100%; top: 0; bottom: 0;
+    align-items: center; padding: 0 2px;
+  }
+  .tick { width: 1px; height: 55%; background: rgba(80,110,140,0.25); position: relative; }
+  .tick span {
+    position: absolute; top: 125%; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 600; color: #7a96ae; white-space: nowrap;
+  }
+  .tick:first-child span, .tick:last-child span { color: #4a7a9a; font-weight: 700; }
+
+  /* proportional phase span underline bars */
+  .span-bars { display: flex; gap: 7px; margin-top: 20px; }
+  .span-bar { height: 5px; border-radius: 3px; opacity: 0.5; }
+  .sb1 { flex: 1;    background: #7090b0; }
+  .sb2 { flex: 1.65; background: #5a8898; }
+  .sb3 { flex: 1;    background: #608a8a; }
+  .sb4 { flex: 1;    background: #6878a0; }
+  .sb5 { flex: 1;    background: #6a8aaa; }
+
+  /* ── PHASES ROW ── */
+  .phases { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+
+  /* ── CHEVRON CONNECTORS ── */
+  .arrow-connector {
+    display: flex; align-items: center; flex-shrink: 0;
+    color: #9ab4c8; font-size: 18px;
+  }
+
+  /* ── PHASE CARDS ── */
+  .phase {
+    border-radius: 12px; padding: 16px 13px 14px;
+    display: flex; flex-direction: column; flex: 1;
+  }
+  .ph1 { background: #eaf0f8; border: 1px solid #c8d8e8; }
+  .ph2 { background: #e8f2f4; border: 1px solid #c0d8dc; flex: 1.65; }
+  .ph3 { background: #e8f4f2; border: 1px solid #bcd4d0; }
+  .ph4 { background: #eef0f8; border: 1px solid #c4cce0; }
+  .ph5 { background: #eaf2f6; border: 1px solid #bed0da; }
+
+  /* phase header */
+  .phase-hdr { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 13px; }
+  .phase-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  }
+  .ph1 .phase-num { background: #c0d4e8; color: #3a5878; }
+  .ph2 .phase-num { background: #aed0d8; color: #2e5a68; }
+  .ph3 .phase-num { background: #a8cec8; color: #2e5858; }
+  .ph4 .phase-num { background: #b8c8e0; color: #3a4870; }
+  .ph5 .phase-num { background: #b0ccd8; color: #345470; }
+
+  .phase-name {
+    font-size: 11px; font-weight: 700; color: #3a5068;
+    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.45;
+    margin-top: 5px;
+  }
+
+  /* ── STAGE CARDS ── */
+  .stage {
+    background: #ffffff;
+    border-radius: 8px; padding: 10px 11px;
+    margin-bottom: 8px; border-left: 3px solid #9ab8cc;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(60,90,120,0.07);
+  }
+  .stage:last-of-type { margin-bottom: 0; }
+  .stage-tag {
+    font-size: 10px; font-weight: 700; color: #7a9eb8;
+    text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px;
+  }
+  .stage-title {
+    font-size: 12px; font-weight: 700; color: #2e4460; line-height: 1.4; margin-bottom: 4px;
+  }
+  .stage-body { font-size: 11px; color: #6a8098; line-height: 1.6; }
+
+  /* ── PARALLEL SPLIT ── */
+  .split-row { display: flex; gap: 7px; margin-bottom: 8px; }
+  .split-half {
+    flex: 1; background: #ffffff;
+    border-radius: 8px; padding: 9px 10px; border-left: 3px solid #a8c4d8;
+    box-shadow: 0 1px 3px rgba(60,90,120,0.06);
+  }
+  .split-tag   { font-size: 9.5px; font-weight: 700; color: #7a9eb8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+  .split-title { font-size: 11.5px; font-weight: 700; color: #2e4460; line-height: 1.35; margin-bottom: 3px; }
+  .split-body  { font-size: 10.5px; color: #7088a0; line-height: 1.5; }
+
+  /* ── META TRACKS ── */
+  .meta-tracks { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+  .mtrack {
+    display: flex; align-items: center; gap: 8px;
+    background: #f2f6fa; border-radius: 6px;
+    padding: 6px 9px; border-left: 2px solid #9abccc;
+  }
+  .mdot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .mname { font-size: 11px; font-weight: 700; color: #3a5878; }
+  .msub  { font-size: 10px; color: #7a98aa; margin-left: auto; }
+
+  /* ── LOOP BOXES ── */
+  .loop-box { margin-top: 8px; padding: 9px 10px; border-radius: 8px; border: 1px dashed; }
+  .loop-slate { background: #edf4f8; border-color: #98bece; }
+  .loop-sand  { background: #f6f2ea; border-color: #c8b888; }
+  .loop-tag   { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+  .lt-slate   { color: #5a8eaa; }
+  .lt-sand    { color: #9a8450; }
+  .loop-body  { font-size: 10.5px; color: #6a8898; line-height: 1.55; }
+  .loop-body strong { color: #3a5878; }
+
+  /* ── BADGES ── */
+  .badges { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .badge {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.3px; padding: 3px 9px; border-radius: 5px;
+  }
+  .b-slate { background: #deeaf2; color: #4a7a98; border: 1px solid #aacad8; }
+  .b-steel { background: #dde4f0; color: #4a6080; border: 1px solid #a8b8d0; }
+  .b-sage  { background: #daeee8; color: #3a7868; border: 1px solid #98ccc0; }
+  .b-sand  { background: #f0e8d8; color: #7a6030; border: 1px solid #c8b080; }
+  .b-rose  { background: #f0e0e0; color: #885050; border: 1px solid #d0a8a8; }
+  .b-mauve { background: #ece0f0; color: #6a4880; border: 1px solid #c0a0d0; }
+
+  /* ── WARNING STRIPE ── */
+  .warn-stripe {
+    margin-top: 7px; padding: 6px 10px; border-radius: 5px;
+    background: #faeaea; border-left: 3px solid #d0a0a0;
+    font-size: 10.5px; color: #885858; font-weight: 600; line-height: 1.45;
+  }
+
+  /* ── BOTTOM FLOW ── */
+  .bottom-section { margin-top: 22px; }
+  .bottom-title {
+    font-size: 10px; font-weight: 600; color: #8aA4b8;
+    text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 9px;
+  }
+  .flow-row {
+    display: flex; align-items: center;
+    background: #ffffff; border-radius: 10px;
+    padding: 10px 14px; border: 1px solid #ccdde8;
+    box-shadow: 0 1px 4px rgba(60,90,120,0.07);
+  }
+  .fn      { flex: 1; text-align: center; font-size: 10px; font-weight: 600; color: #7a9aae; padding: 0 5px; line-height: 1.5; }
+  .fn.hi   { color: #4a7a98; }
+  .fn.warn { color: #9a6868; }
+  .fn.go   { color: #4a8878; }
+  .fa      { color: #a8c0cc; font-size: 14px; flex-shrink: 0; }
+  .fa.rev  { color: #c0a868; }
+
+  /* ── ARC LABEL ── */
+  .arc-row { display: flex; align-items: center; justify-content: center; margin-top: 9px; }
+  .arc-label {
+    font-size: 10px; color: #9a8450;
+    background: #f8f2e4; border: 1px dashed #c8b070;
+    border-radius: 5px; padding: 5px 16px; letter-spacing: 0.3px;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    justify-content: center; margin-top: 18px;
+    padding-top: 14px; border-top: 1px solid #ccd8e4;
+  }
+  .li    { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #7a98aa; }
+  .ldot  { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="main-title">The 48-Month Automotive Development Journey</div>
+  <div class="main-sub">End-to-End Product Lifecycle &nbsp;·&nbsp; Market Intelligence to Start of Sales &nbsp;·&nbsp; 36–48 Month Programme</div>
+</div>
+
+<!-- ══ TIMELINE RULER ══ -->
+<div class="ruler-wrap">
+  <div class="ruler-title">Programme Timeline — Month 0 through Month 48</div>
+  <div class="ruler">
+    <div class="ruler-ticks">
+      <div class="tick"><span>M0</span></div>
+      <div class="tick"><span>M6</span></div>
+      <div class="tick"><span>M12</span></div>
+      <div class="tick"><span>M18</span></div>
+      <div class="tick"><span>M24</span></div>
+      <div class="tick"><span>M30</span></div>
+      <div class="tick"><span>M36</span></div>
+      <div class="tick"><span>M42</span></div>
+      <div class="tick"><span>M48</span></div>
+    </div>
+  </div>
+  <div class="span-bars">
+    <div class="span-bar sb1"></div>
+    <div class="span-bar sb2"></div>
+    <div class="span-bar sb3"></div>
+    <div class="span-bar sb4"></div>
+    <div class="span-bar sb5"></div>
+  </div>
+</div>
+
+<!-- ══ PHASES ══ -->
+<div class="phases">
+
+  <!-- ─ PHASE 1 ─ -->
+  <div class="phase ph1">
+    <div class="phase-hdr">
+      <div class="phase-num">1</div>
+      <div class="phase-name">Strategy &amp;<br>Insights</div>
+    </div>
+
+    <div class="split-row">
+      <div class="split-half">
+        <div class="split-tag">Stage 1A · Parallel</div>
+        <div class="split-title">Market &amp; Competitor Intelligence</div>
+        <div class="split-body">Benchmarking, trend mapping, segment analysis</div>
+      </div>
+      <div class="split-half">
+        <div class="split-tag">Stage 1B · Parallel</div>
+        <div class="split-title">Customer Insights</div>
+        <div class="split-body">VOC research, ethnographic studies, persona profiling</div>
+      </div>
+    </div>
+
+    <div class="stage" style="border-left-color:#90b8cc;">
+      <div class="stage-tag">Stage 2</div>
+      <div class="stage-title">Product Planning Digest</div>
+      <div class="stage-body">Identifying the <strong style="color:#3a6080">Product DNA</strong> — core attributes, value proposition &amp; strategic differentiation</div>
+    </div>
+
+    <div class="stage" style="border-left-color:#9ab8cc;">
+      <div class="stage-tag">Stage 3</div>
+      <div class="stage-title">Strategy Definition &amp; Business Case</div>
+      <div class="stage-body">Finalising project viability, investment thresholds &amp; programme go/no-go decision gate</div>
+      <div class="badges">
+        <span class="badge b-sand">⚑ Go / No-Go Gate</span>
+        <span class="badge b-steel">Business Case</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">▶</div>
+
+  <!-- ─ PHASE 2 ─ -->
+  <div class="phase ph2">
+    <div class="phase-hdr">
+      <div class="phase-num">2</div>
+      <div class="phase-name">Technical Design &amp;<br>Engineering</div>
+    </div>
+
+    <div class="stage" style="border-left-color:#88bcc8; margin-bottom:8px;">
+      <div class="stage-tag">Stage 4 — Metafunction Collaboration</div>
+      <div class="stage-title">Cross-Functional Engineering Tracks</div>
+      <div class="meta-tracks">
+        <div class="mtrack">
+          <div class="mdot" style="background:#7aaac8;"></div>
+          <span class="mname">PRS</span>
+          <span class="msub">Powertrain Solutions</span>
+        </div>
+        <div class="mtrack">
+          <div class="mdot" style="background:#68b0a0;"></div>
+          <span class="mname">VEHE</span>
+          <span class="msub">Vehicle Engineering</span>
+        </div>
+        <div class="mtrack">
+          <div class="mdot" style="background:#a890c8;"></div>
+          <span class="mname">SWE</span>
+          <span class="msub">Software Engineering</span>
+        </div>
+        <div class="mtrack">
+          <div class="mdot" style="background:#c0a86a;"></div>
+          <span class="mname">EHE</span>
+          <span class="msub">Electrical / Hardware Engineering</span>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge b-steel">📐 Design Album</span>
+        <span class="badge b-mauve">Concurrent Engineering</span>
+      </div>
+    </div>
+
+    <div class="loop-box loop-slate">
+      <div class="loop-tag lt-slate">⟳ 6-Month Iteration Loop</div>
+      <div class="loop-body">
+        <strong>Styling Team</strong> (Interiors &amp; Exteriors) &nbsp;↔&nbsp; <strong>VEHE</strong> (Vehicle Engineering)<br>
+        Continuous design-feasibility feedback · Surfacing targets vs. chassis hard points · Iterative sign-off per design theme
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">▶</div>
+
+  <!-- ─ PHASE 3 ─ -->
+  <div class="phase ph3">
+    <div class="phase-hdr">
+      <div class="phase-num">3</div>
+      <div class="phase-name">Integration &amp;<br>Prototyping</div>
+    </div>
+
+    <div class="stage" style="border-left-color:#80c0b8;">
+      <div class="stage-tag">Stage 5</div>
+      <div class="stage-title">System Integration</div>
+      <div class="stage-body">Hardware-in-the-Loop (HIL) testing · Subsystem interface verification · Integration bench validation · Software-hardware co-verification</div>
+      <div class="badges">
+        <span class="badge b-slate">HIL Testing</span>
+        <span class="badge b-steel">SIL</span>
+        <span class="badge b-steel">MIL</span>
+      </div>
+    </div>
+
+    <div class="stage" style="border-left-color:#80beb8;">
+      <div class="stage-tag">Stage 6</div>
+      <div class="stage-title">Prototypes &amp; Modeling</div>
+      <div class="stage-body">
+        🪵 <strong style="color:#3a7060">Plywood / Wooden Bucks</strong> — Physical ergonomic &amp; packaging mock-ups<br>
+        🚗 <strong style="color:#3a7060">Car on a Table</strong> — All ECUs connected &amp; powered; full network bus simulation for software testing
+      </div>
+      <div class="badges">
+        <span class="badge b-sage">Wooden Bucks</span>
+        <span class="badge b-steel">ECU Rig</span>
+        <span class="badge b-slate">CAN / LIN Bus</span>
+      </div>
+    </div>
+
+    <div class="loop-box loop-sand">
+      <div class="loop-tag lt-sand">↩ Feasibility Iterations</div>
+      <div class="loop-body">Integration findings feed back to <strong style="color:#7a6030">Stage 4</strong> (Metafunction) for design revisions &amp; re-engineering cycles</div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">▶</div>
+
+  <!-- ─ PHASE 4 ─ -->
+  <div class="phase ph4">
+    <div class="phase-hdr">
+      <div class="phase-num">4</div>
+      <div class="phase-name">Validation &amp;<br>Compliance</div>
+    </div>
+
+    <div class="stage" style="border-left-color:#9ab0cc;">
+      <div class="stage-tag">Stage 7</div>
+      <div class="stage-title">Worldwide Testing &amp; Validation Cycles</div>
+      <div class="stage-body">Climatic extremes (Arctic / Desert) · Durability tracks · NVH · Crash &amp; NCAP · ADAS &amp; autonomous validation · Ride &amp; handling</div>
+      <div class="badges">
+        <span class="badge b-steel">Climate</span>
+        <span class="badge b-steel">Durability</span>
+        <span class="badge b-steel">NVH</span>
+        <span class="badge b-rose">Crash / NCAP</span>
+      </div>
+    </div>
+
+    <div class="stage" style="border-left-color:#d0a8a8;">
+      <div class="stage-tag">Stage 8</div>
+      <div class="stage-title">Homologation &amp; Certification</div>
+      <div class="stage-body">
+        <strong style="color:#4a7858">Legislative:</strong> WLTP, UNECE, EPA, GB · Type-approval per market<br>
+        <strong style="color:#4a7858">Electrical:</strong> ISO 26262 (Functional Safety), ASPICE, EMC / EMI
+      </div>
+      <div class="badges">
+        <span class="badge b-rose">🔒 Production Gate</span>
+        <span class="badge b-sand">Type Approval</span>
+        <span class="badge b-mauve">ISO 26262</span>
+      </div>
+      <div class="warn-stripe">⚠ Production cannot commence until Homologation &amp; Certification is fully locked</div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">▶</div>
+
+  <!-- ─ PHASE 5 ─ -->
+  <div class="phase ph5">
+    <div class="phase-hdr">
+      <div class="phase-num">5</div>
+      <div class="phase-name">Manufacturing &amp;<br>Launch</div>
+    </div>
+
+    <div class="stage" style="border-left-color:#90b8cc;">
+      <div class="stage-tag">Stage 9</div>
+      <div class="stage-title">Manufacturing Readiness</div>
+      <div class="stage-body">
+        <strong style="color:#3a5e80">DFM</strong> — Design for Manufacturing: geometry, tolerances &amp; materials optimised for production<br>
+        <strong style="color:#3a5e80">DFA</strong> — Design for Assembly: minimise steps, reduce tooling complexity &amp; errors
+      </div>
+      <div class="badges">
+        <span class="badge b-steel">DFM</span>
+        <span class="badge b-steel">DFA</span>
+        <span class="badge b-sage">Line Trials</span>
+        <span class="badge b-slate">PPAP</span>
+      </div>
+    </div>
+
+    <div class="stage" style="border-left-color:#80bcc8;">
+      <div class="stage-tag">Stage 10 — Programme Milestone</div>
+      <div class="stage-title">SOP / SOS</div>
+      <div class="stage-body">
+        <strong style="color:#3a7868">SOP</strong> — Start of Production: first saleable vehicle off the production line<br>
+        <strong style="color:#3a7868">SOS</strong> — Start of Sales: commercial launch &amp; dealer / channel activation
+      </div>
+      <div class="badges">
+        <span class="badge b-sage">🚀 SOP</span>
+        <span class="badge b-slate">🏁 SOS</span>
+        <span class="badge b-sand">Market Launch</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ BOTTOM PROCESS FLOW ══ -->
+<div class="bottom-section">
+  <div class="bottom-title">End-to-End Sequential &amp; Iterative Flow</div>
+  <div class="flow-row">
+    <div class="fn">Market Intel &amp;<br>Customer VOC</div>
+    <div class="fa">→</div>
+    <div class="fn">Product DNA &amp;<br>Business Case</div>
+    <div class="fa">→</div>
+    <div class="fn hi">4-Track Eng.<br>+ Styling Loop ⟳</div>
+    <div class="fa">→</div>
+    <div class="fn hi">HIL Integration<br>+ Prototyping</div>
+    <div class="fa rev">↩</div>
+    <div class="fn" style="color:#9a8450; font-size:9.5px;">Feasibility<br>Iterations<br>→ Stage 4</div>
+    <div class="fa rev">↩</div>
+    <div class="fa">→</div>
+    <div class="fn hi">Worldwide<br>Validation</div>
+    <div class="fa">→</div>
+    <div class="fn warn">Homologation<br>Lock 🔒</div>
+    <div class="fa">→</div>
+    <div class="fn">DFM / DFA<br>Readiness</div>
+    <div class="fa">→</div>
+    <div class="fn go">SOP → SOS<br>🚀 Launch</div>
+  </div>
+  <div class="arc-row">
+    <div class="arc-label">↩ &nbsp; Feasibility Iteration Loop: Stage 5 (System Integration) feeds back to Stage 4 (Metafunction Engineering) &nbsp; ↩</div>
+  </div>
+</div>
+
+<!-- ══ LEGEND ══ -->
+<div class="legend">
+  <div class="li"><div class="ldot" style="background:#c0d4e8;"></div>Phase 1 — Strategy</div>
+  <div class="li"><div class="ldot" style="background:#aed0d8;"></div>Phase 2 — Engineering</div>
+  <div class="li"><div class="ldot" style="background:#a8cec8;"></div>Phase 3 — Integration</div>
+  <div class="li"><div class="ldot" style="background:#b8c8e0;"></div>Phase 4 — Validation</div>
+  <div class="li"><div class="ldot" style="background:#b0ccd8;"></div>Phase 5 — Launch</div>
+  <div class="li"><div class="ldot" style="background:#c8e2ee; border:1px dashed #98bece;"></div>Iteration Loop</div>
+  <div class="li"><div class="ldot" style="background:#f0e8d0; border:1px dashed #c8b888;"></div>Feasibility Feedback</div>
+  <div class="li"><div class="ldot" style="background:#f0dede; border:1px solid #d0a8a8;"></div>Critical Gate / Lock</div>
+</div>
+
+
+
+</body></html>

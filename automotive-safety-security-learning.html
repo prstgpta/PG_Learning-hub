@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automotive Functional Safety & Cybersecurity – Learning Module</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#1d2433;--muted:#5b6478;--primary:#1f5eff;--primary-soft:#e8efff;--safety:#0f9d58;--safety-soft:#e6f6ee;--cyber:#7b3fe4;--cyber-soft:#f1eafd;--border:#e2e6ef;--ok:#12a150;--bad:#d93025;--radius:14px;--shadow:0 4px 18px rgba(20,30,60,.08)}
+body.dark{--bg:#0f1420;--card:#182032;--text:#e8ecf5;--muted:#9aa4bb;--primary:#6f9bff;--primary-soft:#1e2a48;--safety-soft:#123326;--cyber-soft:#2a1d45;--border:#2a3550;--shadow:0 4px 18px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:background .3s,color .3s}
+header{background:linear-gradient(120deg,#0f9d58 0%,#1f5eff 50%,#7b3fe4 100%);color:#fff;padding:28px 24px 70px}
+header .wrap{max-width:1150px;margin:0 auto;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+header h1{margin:0 0 6px;font-size:1.9rem}
+header p{margin:0;opacity:.92}
+.theme-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;padding:8px 14px;border-radius:999px;cursor:pointer;font-size:.9rem}
+.tabs{max-width:1150px;margin:-46px auto 0;display:flex;gap:10px;padding:0 24px}
+.tab{flex:1;background:var(--card);border:2px solid transparent;border-radius:var(--radius) var(--radius) 0 0;padding:16px;cursor:pointer;font-size:1.05rem;font-weight:600;color:var(--muted);box-shadow:var(--shadow);transition:.2s}
+.tab small{display:block;font-weight:400;font-size:.82rem}
+.tab.active{color:var(--primary);border-color:var(--primary);border-bottom-color:var(--card)}
+main{max-width:1150px;margin:0 auto;padding:0 24px 60px}
+.panel{display:none;background:var(--card);border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow);padding:28px}
+.panel.active{display:block;animation:fade .35s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2{margin-top:0;font-size:1.45rem}
+h3{font-size:1.15rem;margin:26px 0 10px}
+.lead{font-size:1.1rem;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:14px 0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:600}
+.pill.safety{background:var(--safety-soft);color:var(--safety)}
+.pill.cyber{background:var(--cyber-soft);color:var(--cyber)}
+.hint{font-size:.88rem;color:var(--muted)}
+.callout{border-left:4px solid var(--primary);background:var(--primary-soft);padding:12px 16px;border-radius:8px;margin:14px 0}
+.callout.safety{border-color:var(--safety);background:var(--safety-soft)}
+.callout.cyber{border-color:var(--cyber);background:var(--cyber-soft)}
+button.btn{background:var(--primary);color:#fff;border:none;padding:9px 16px;border-radius:9px;cursor:pointer;font-weight:600;font-size:.92rem}
+button.btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+button.btn:disabled{opacity:.45;cursor:not-allowed}
+select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:.92rem;width:100%}
+label{font-weight:600;font-size:.9rem;display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--primary-soft)}
+/* flip cards */
+.flip{perspective:1000px;height:230px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;justify-content:center;box-shadow:var(--shadow)}
+.flip-front{color:#fff;text-align:center}
+.flip-front .big{font-size:2.2rem}
+.flip-back{background:var(--card);border:1px solid var(--border);transform:rotateY(180deg);font-size:.92rem}
+.bg-safety{background:linear-gradient(135deg,#0f9d58,#34c27a)}
+.bg-cyber{background:linear-gradient(135deg,#7b3fe4,#a275f5)}
+.bg-hara{background:linear-gradient(135deg,#0b7a43,#1f5eff)}
+.bg-tara{background:linear-gradient(135deg,#5a25b8,#1f5eff)}
+/* game */
+.game-item{font-size:1.1rem;font-weight:600;text-align:center;padding:22px;border:2px dashed var(--border);border-radius:var(--radius);margin:12px 0}
+.game-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.game-btns button{min-width:170px;padding:12px;font-size:1rem}
+.btn-safety{background:var(--safety)!important}
+.btn-cyber{background:var(--cyber)!important}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;display:none}
+.feedback.show{display:block}
+.feedback.good{background:#e3f7ea;color:#0b6b33}
+.feedback.badf{background:#fde7e6;color:#a1231b}
+/* timeline */
+.timeline{position:relative;margin:16px 0;padding-left:26px;border-left:3px solid var(--border)}
+.tl-item{position:relative;margin-bottom:12px;cursor:pointer;padding:8px 12px;border-radius:8px;transition:.2s}
+.tl-item:hover{background:var(--primary-soft)}
+.tl-item::before{content:"";position:absolute;left:-35px;top:14px;width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--card)}
+.tl-item .tl-detail{display:none;color:var(--muted);font-size:.9rem;margin-top:4px}
+.tl-item.open .tl-detail{display:block}
+/* detailed layout */
+.layout{display:grid;grid-template-columns:240px 1fr;gap:26px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.sidenav{position:static!important}}
+.sidenav{position:sticky;top:14px;align-self:start}
+.sidenav a{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:9px;color:var(--text);text-decoration:none;font-size:.92rem;margin-bottom:3px}
+.sidenav a:hover,.sidenav a.current{background:var(--primary-soft);color:var(--primary)}
+.sidenav a .chk{font-size:.85rem;color:var(--ok);visibility:hidden}
+.sidenav a.done .chk{visibility:visible}
+.progress{height:10px;background:var(--border);border-radius:999px;overflow:hidden;margin:8px 0 4px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--safety),var(--primary),var(--cyber));transition:width .4s}
+.module{display:none}
+.module.active{display:block;animation:fade .3s}
+.mod-footer{display:flex;justify-content:space-between;gap:10px;margin-top:30px;border-top:1px solid var(--border);padding-top:16px;flex-wrap:wrap}
+/* accordion */
+details{border:1px solid var(--border);border-radius:10px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;padding:12px 14px;font-weight:600;list-style:none}
+summary::after{content:"+";float:right;font-size:1.2rem;color:var(--primary)}
+details[open] summary::after{content:"–"}
+details>div{padding:0 14px 14px}
+/* clickable chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--border);background:var(--card);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;transition:.15s}
+.chip:hover{border-color:var(--primary)}
+.chip.sel{background:var(--primary);color:#fff;border-color:var(--primary)}
+.info-box{margin-top:12px;padding:14px;border-radius:10px;background:var(--primary-soft);min-height:52px}
+/* stepper */
+.stepper-head{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.step-dot{flex:1;min-width:90px;padding:8px;text-align:center;font-size:.78rem;border-radius:8px;background:var(--border);color:var(--muted);cursor:pointer}
+.step-dot.on{background:var(--primary);color:#fff}
+.step-dot.past{background:var(--primary-soft);color:var(--primary)}
+.step-body{min-height:150px}
+.step-nav{display:flex;justify-content:space-between;margin-top:12px}
+/* results */
+.result{font-size:1.5rem;font-weight:800;text-align:center;padding:16px;border-radius:12px;margin-top:12px;color:#fff;transition:.3s}
+.asil-QM{background:#8a94a8}.asil-A{background:#2e9e5b}.asil-B{background:#c9a400}.asil-C{background:#e8710a}.asil-D{background:#d93025}
+.risk-1{background:#2e9e5b}.risk-2{background:#8bbf3c}.risk-3{background:#c9a400}.risk-4{background:#e8710a}.risk-5{background:#d93025}
+.feas-High{background:#d93025}.feas-Medium{background:#e8710a}.feas-Low{background:#c9a400}.feas-VeryLow{background:#2e9e5b}
+.matrix td{text-align:center;font-weight:700;color:#fff;cursor:pointer;transition:.15s}
+.matrix td.lbl,.matrix th{color:var(--text);cursor:default;font-weight:600}
+.matrix td.hl{outline:4px solid var(--text);outline-offset:-4px;transform:scale(1.04)}
+.asil-table td{text-align:center;font-weight:700;color:#fff;padding:5px}
+.asil-table td.lbl{color:var(--text);background:transparent}
+/* quiz */
+.q{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:12px 0}
+.q-title{font-weight:600;margin-bottom:8px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.93rem}
+.opt:hover:not(:disabled){border-color:var(--primary)}
+.opt.correct{border-color:var(--ok);background:#e3f7ea;color:#0b6b33}
+.opt.wrong{border-color:var(--bad);background:#fde7e6;color:#a1231b}
+.explain{display:none;font-size:.88rem;color:var(--muted);margin-top:6px}
+.explain.show{display:block}
+.score{font-size:1.1rem;font-weight:700;padding:12px;border-radius:10px;background:var(--primary-soft);text-align:center}
+.reveal{cursor:pointer}
+.reveal .ans{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);color:var(--muted)}
+.reveal.open .ans{display:block}
+.reveal .tap{font-size:.8rem;color:var(--primary)}
+input[type=search]{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:.95rem}
+.gl-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.gl-item b{color:var(--primary)}
+.stat{font-size:1.9rem;font-weight:800;color:var(--primary)}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div>
+      <h1>🚗 Safe & Secure Vehicles</h1>
+      <p>Functional Safety (FuSa), Cybersecurity, HARA and TARA, explained simply</p>
+    </div>
+    <button class="theme-btn" id="themeBtn">🌙 Dark mode</button>
+  </div>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="exec" role="tab">📊 Executive View<small>15-minute overview for leaders</small></button>
+  <button class="tab" data-tab="detail" role="tab">🔬 Detailed View<small>Step-by-step learning with tools</small></button>
+</div>
+
+<main>
+<section class="panel active" id="exec">
+  <h2>The big picture in one sentence</h2>
+  <p class="lead">A modern car can hurt people in two ways: <b>something inside it breaks</b>, or <b>someone breaks into it</b>. Functional Safety handles the first. Cybersecurity handles the second.</p>
+
+  <div class="grid g2">
+    <div class="callout safety"><b>🛡️ Functional Safety (FuSa)</b><br>"What if the electronics or software <b>fail</b>?"<br><span class="hint">Accidental. No bad intent. Example: a sensor wire breaks.</span></div>
+    <div class="callout cyber"><b>🔐 Cybersecurity</b><br>"What if someone <b>attacks</b> the car?"<br><span class="hint">Deliberate. A clever attacker. Example: a hacker sends fake brake commands.</span></div>
+  </div>
+
+  <h3>🃏 Four key terms <span class="hint">(click a card to flip it)</span></h3>
+  <div class="grid g4">
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front bg-safety"><div class="big">🛡️</div><b>Functional Safety</b><span>ISO 26262</span></div>
+      <div class="flip-face flip-back"><b>What:</b> Making sure car electronics don't cause harm when they fail.<br><br><b>Like:</b> A smoke detector and fuse box in your house. They don't stop all faults, they keep faults from hurting you.</div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front bg-cyber"><div class="big">🔐</div><b>Cybersecurity</b><span>ISO/SAE 21434 · UN R155</span></div>
+      <div class="flip-face flip-back"><b>What:</b> Protecting the car, its data and its cloud services from hackers.<br><br><b>Like:</b> Locks, alarm and CCTV on your house. They exist because someone might <i>try</i> to get in.</div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front bg-hara"><div class="big">⚠️</div><b>HARA</b><span>Hazard Analysis & Risk Assessment</span></div>
+      <div class="flip-face flip-back"><b>What:</b> The safety "risk check". List what could go wrong if a function fails, and how bad it would be.<br><br><b>Output:</b> A safety level (<b>ASIL</b> A to D) and <b>safety goals</b>.</div>
+    </div></div>
+    <div class="flip"><div class="flip-inner">
+      <div class="flip-face flip-front bg-tara"><div class="big">🕵️</div><b>TARA</b><span>Threat Analysis & Risk Assessment</span></div>
+      <div class="flip-face flip-back"><b>What:</b> The security "risk check". List what attackers could target, how much damage it causes, and how easy the attack is.<br><br><b>Output:</b> A <b>risk value</b> (1 to 5) and <b>cybersecurity goals</b>.</div>
+    </div></div>
+  </div>
+
+  <h3>🎮 Quick game: Is it a Safety or a Security problem?</h3>
+  <div class="card">
+    <div class="hint" id="gameProgress">Scenario 1 of 8</div>
+    <div class="game-item" id="gameItem">…</div>
+    <div class="game-btns">
+      <button class="btn btn-safety" data-ans="fusa">🛡️ Functional Safety</button>
+      <button class="btn btn-cyber" data-ans="cyber">🔐 Cybersecurity</button>
+    </div>
+    <div class="feedback" id="gameFeedback"></div>
+    <div style="text-align:center;margin-top:10px"><button class="btn ghost" id="gameNext" style="display:none">Next scenario →</button></div>
+  </div>
+
+  <h3>💼 Why leaders should care</h3>
+  <div class="grid g3">
+    <div class="card"><div class="stat">July 2024</div>From this date, <b>every new car</b> registered in the EU must meet <b>UN R155</b> (cybersecurity) and <b>R156</b> (software updates). No certificate means no sales.</div>
+    <div class="card"><div class="stat">1.4 million</div>Vehicles recalled in 2015 after researchers <b>remotely hacked a Jeep</b> and controlled its steering and brakes over the mobile network.</div>
+    <div class="card"><div class="stat">ASIL D</div>The highest safety level (e.g., steering, braking). It drives major <b>cost, time and supplier choices</b>, so getting HARA right early saves money.</div>
+  </div>
+
+  <h3>📅 Key standards & regulations <span class="hint">(click to expand)</span></h3>
+  <div class="timeline">
+    <div class="tl-item"><b>2011 / 2018: ISO 26262</b>: Functional Safety for road vehicles<div class="tl-detail">The main safety standard. 12 parts covering the full life of a product, from idea to scrapping. 2nd edition in 2018 added trucks, buses, motorcycles and semiconductors.</div></div>
+    <div class="tl-item"><b>2021: ISO/SAE 21434</b>: Cybersecurity engineering<div class="tl-detail">Defines how to build security into vehicles across their whole life. Clause 15 describes the TARA method.</div></div>
+    <div class="tl-item"><b>2021 to 2024: UNECE R155 & R156</b>: Legal requirements<div class="tl-detail">R155 requires a certified Cyber Security Management System (CSMS). R156 requires a Software Update Management System (SUMS). Mandatory in the EU for new vehicle types from July 2022 and all new vehicles from July 2024. Also adopted by Japan, Korea and others.</div></div>
+    <div class="tl-item"><b>2022: ISO 21448 (SOTIF)</b>: Safety without failure<div class="tl-detail">Covers hazards where nothing is broken but the system still behaves unsafely. Example: a camera blinded by the sun. Very important for driver-assist and self-driving features.</div></div>
+    <div class="tl-item"><b>2024: ISO/PAS 8800</b>: Safety of AI in vehicles<div class="tl-detail">Guidance on making AI/machine-learning components safe enough for road vehicles.</div></div>
+  </div>
+
+  <h3>⚖️ HARA vs TARA at a glance</h3>
+  <table>
+    <tr><th></th><th><span class="pill safety">HARA</span></th><th><span class="pill cyber">TARA</span></th></tr>
+    <tr><td><b>Belongs to</b></td><td>Functional Safety (ISO 26262)</td><td>Cybersecurity (ISO/SAE 21434)</td></tr>
+    <tr><td><b>Worried about</b></td><td>Accidental failures</td><td>Deliberate attacks</td></tr>
+    <tr><td><b>Who gets hurt?</b></td><td>People (injuries)</td><td>People, money, operations, privacy</td></tr>
+    <tr><td><b>Result</b></td><td>ASIL (QM, A, B, C, D) + safety goals</td><td>Risk value (1 to 5) + cybersecurity goals</td></tr>
+    <tr><td><b>When done?</b></td><td>Early design; updated on change</td><td>Early design, and <b>continuously</b> through the car's life (new threats appear)</td></tr>
+    <tr><td><b>Legally required?</b></td><td>Best practice / industry expectation</td><td>Yes, for type approval (UN R155)</td></tr>
+  </table>
+
+  <h3>✅ Key takeaways</h3>
+  <div class="grid g2">
+    <div class="card">1️⃣ <b>Safety and security are partners.</b> A hack on the brakes is a safety problem too.</div>
+    <div class="card">2️⃣ <b>Start early.</b> HARA and TARA belong in the concept phase. Fixing late is expensive.</div>
+    <div class="card">3️⃣ <b>Security never ends.</b> Cars need monitoring and updates for 15+ years.</div>
+    <div class="card">4️⃣ <b>It's a market-access issue.</b> Without R155/R156 compliance, vehicles cannot be sold in many markets.</div>
+  </div>
+
+  <h3>📝 Check your understanding</h3>
+  <div id="execQuiz"></div>
+</section>
+<section class="panel" id="detail">
+ <div class="layout">
+  <nav class="sidenav">
+    <b>Your progress</b>
+    <div class="progress"><div id="progBar"></div></div>
+    <div class="hint" id="progText">0 of 7 modules complete</div>
+    <div style="margin-top:12px" id="sideLinks">
+      <a href="#" data-mod="m1">1. Functional Safety<span class="chk">✔</span></a>
+      <a href="#" data-mod="m2">2. Cybersecurity<span class="chk">✔</span></a>
+      <a href="#" data-mod="m3">3. HARA in depth<span class="chk">✔</span></a>
+      <a href="#" data-mod="m4">4. TARA in depth<span class="chk">✔</span></a>
+      <a href="#" data-mod="m5">5. Working together<span class="chk">✔</span></a>
+      <a href="#" data-mod="m6">6. Glossary<span class="chk">✔</span></a>
+      <a href="#" data-mod="m7">7. Final quiz<span class="chk">✔</span></a>
+    </div>
+  </nav>
+  <div>
+
+  <!-- MODULE 1 -->
+  <div class="module active" id="m1">
+    <span class="pill safety">Module 1</span>
+    <h2>Functional Safety (FuSa): ISO 26262</h2>
+    <div class="callout safety"><b>Official meaning:</b> "Absence of unreasonable risk due to hazards caused by malfunctioning behaviour of E/E systems."<br><b>In plain words:</b> If a car's electronics or software go wrong, nobody should get hurt.</div>
+
+    <h3>Two kinds of failure</h3>
+    <div class="grid g2">
+      <div class="card"><b>🐞 Systematic faults</b> (design mistakes)<br>A bug or wrong requirement. It happens <i>every time</i> the same conditions occur.<br><span class="hint">Fixed by good process: clear requirements, reviews, coding rules (e.g., MISRA), testing.</span></div>
+      <div class="card"><b>🎲 Random hardware faults</b> (parts wear out)<br>A chip, sensor or wire fails at a random time.<br><span class="hint">Handled by safety mechanisms: watchdogs, error-correcting memory (ECC), duplicate "lockstep" processors, plausibility checks.</span></div>
+    </div>
+
+    <h3>The ISO 26262 map <span class="hint">(click a part)</span></h3>
+    <div class="chips" id="partChips"></div>
+    <div class="info-box" id="partInfo">👆 Select a part to see what it covers.</div>
+
+    <h3>ASIL: the safety "intensity dial"</h3>
+    <p>Every safety goal gets an <b>ASIL</b> (Automotive Safety Integrity Level). The higher the level, the more effort and proof are required.</p>
+    <div class="grid g4" style="grid-template-columns:repeat(5,1fr)">
+      <div class="result asil-QM" style="font-size:1rem">QM<br><small style="font-weight:400">Normal quality, no special safety needs</small></div>
+      <div class="result asil-A" style="font-size:1rem">A<br><small style="font-weight:400">Low</small></div>
+      <div class="result asil-B" style="font-size:1rem">B<br><small style="font-weight:400">e.g., brake lights</small></div>
+      <div class="result asil-C" style="font-size:1rem">C<br><small style="font-weight:400">e.g., cruise control</small></div>
+      <div class="result asil-D" style="font-size:1rem">D<br><small style="font-weight:400">e.g., steering, braking</small></div>
+    </div>
+
+    <details><summary>📐 Hardware targets per ASIL (for the curious)</summary><div>
+      <table>
+        <tr><th>Metric</th><th>Plain meaning</th><th>ASIL B</th><th>ASIL C</th><th>ASIL D</th></tr>
+        <tr><td>SPFM</td><td>% of single faults that are caught by a safety mechanism</td><td>≥ 90%</td><td>≥ 97%</td><td>≥ 99%</td></tr>
+        <tr><td>LFM</td><td>% of "hidden" (latent) faults that are detected</td><td>≥ 60%</td><td>≥ 80%</td><td>≥ 90%</td></tr>
+        <tr><td>PMHF</td><td>Allowed rate of dangerous failures</td><td>&lt; 100 FIT</td><td>&lt; 100 FIT</td><td>&lt; 10 FIT</td></tr>
+      </table>
+      <p class="hint">1 FIT = 1 failure per billion hours of operation.</p>
+    </div></details>
+    <details><summary>🔗 Related standards: SOTIF and AI</summary><div>
+      <p><b>ISO 21448 (SOTIF)</b>: "Safety Of The Intended Functionality". Covers danger when <i>nothing is broken</i> but the system's design isn't good enough for a situation, e.g., a radar confused by a metal bridge or a camera blinded by glare.</p>
+      <p><b>ISO/PAS 8800</b>: Safety for AI/machine-learning parts, e.g., how to prove a pedestrian-detection network is good enough.</p>
+    </div></details>
+    <details><summary>🔁 The safety lifecycle (V-model)</summary><div>
+      <p>Left side goes <b>down</b>: Item definition → HARA → Functional safety concept → Technical safety concept → Hardware/Software design.<br>Right side goes <b>up</b>: Unit tests → Integration tests → Vehicle validation → <b>Safety case</b> (the argument + evidence that the car is safe) → Release.</p>
+    </div></details>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module" id="m2">
+    <span class="pill cyber">Module 2</span>
+    <h2>Automotive Cybersecurity: ISO/SAE 21434 & UN R155/R156</h2>
+    <div class="callout cyber"><b>In plain words:</b> Protecting the car's electronics, software, data and connected cloud services from <b>people who want to misuse them</b>: thieves, hackers, or even curious owners "tuning" their car.</div>
+
+    <h3>Where can an attacker get in? <span class="hint">(click an entry point)</span></h3>
+    <div class="chips" id="surfaceChips"></div>
+    <div class="info-box" id="surfaceInfo">👆 Select an entry point to see example attacks and protections.</div>
+
+    <h3>The rulebook</h3>
+    <table>
+      <tr><th>Document</th><th>Type</th><th>What it asks for (simply)</th></tr>
+      <tr><td><b>ISO/SAE 21434</b></td><td>Standard</td><td>A full engineering process for security: plan, analyse (TARA), design, test, produce, monitor, respond, retire.</td></tr>
+      <tr><td><b>UN R155</b></td><td>Law (type approval)</td><td>The carmaker must have a certified <b>CSMS</b> (Cyber Security Management System) and prove each vehicle type was risk-assessed and protected.</td></tr>
+      <tr><td><b>UN R156</b></td><td>Law (type approval)</td><td>A certified <b>SUMS</b> (Software Update Management System) so updates (including over-the-air) are safe, secure and traceable.</td></tr>
+      <tr><td><b>ISO 24089</b></td><td>Standard</td><td>How to engineer software updates; supports R156.</td></tr>
+      <tr><td><b>China GB 44495</b></td><td>Law (China)</td><td>China's equivalent of R155.</td></tr>
+    </table>
+
+    <h3>The cybersecurity lifecycle</h3>
+    <div class="grid g3">
+      <div class="card">📋 <b>Concept</b><br>Item definition → TARA → cybersecurity goals → cybersecurity concept</div>
+      <div class="card">🛠️ <b>Development</b><br>Secure design, secure coding, penetration testing, fuzz testing</div>
+      <div class="card">🏭 <b>Production</b><br>Secure key injection, locked debug ports</div>
+      <div class="card">📡 <b>Operations</b><br>Monitor new threats (Vehicle Security Operations Centre), fix vulnerabilities, send updates</div>
+      <div class="card">🚨 <b>Incident response</b><br>Analyse, contain, fix, report</div>
+      <div class="card">♻️ <b>End of support</b><br>Plan and communicate when updates stop; protect data at scrapping</div>
+    </div>
+    <div class="callout">💡 <b>Key difference from safety:</b> A hazard doesn't get smarter over time, but attackers do. That's why TARA is revisited throughout the car's life.</div>
+  </div>
+  <!-- MODULE 3 -->
+  <div class="module" id="m3">
+    <span class="pill safety">Module 3</span>
+    <h2>HARA: Hazard Analysis & Risk Assessment</h2>
+    <p class="lead">HARA answers: <i>"If this function misbehaves, how could someone get hurt, and how seriously must we protect against it?"</i></p>
+
+    <h3>Walk through the 7 steps</h3>
+    <div class="card" id="haraStepper"></div>
+
+    <h3>The three dials: S, E and C</h3>
+    <div class="grid g3">
+      <div class="card"><b>S: Severity</b> <span class="hint">How badly could people be hurt?</span><br>S0 No injuries<br>S1 Light/moderate injuries<br>S2 Severe, survival likely<br>S3 Life-threatening or fatal</div>
+      <div class="card"><b>E: Exposure</b> <span class="hint">How often is the car in that situation?</span><br>E0 Practically never<br>E1 Very rare<br>E2 Rare (&lt;1% of driving time)<br>E3 Sometimes (1–10%)<br>E4 Often (&gt;10%)</div>
+      <div class="card"><b>C: Controllability</b> <span class="hint">Can a normal driver avoid harm?</span><br>C0 Always controllable<br>C1 Simply (≥99% of drivers)<br>C2 Normally (≥90%)<br>C3 Hard or impossible (&lt;90%)</div>
+    </div>
+
+    <h3>🧮 ASIL calculator</h3>
+    <div class="card">
+      <div class="grid g3">
+        <div><label for="selS">Severity</label><select id="selS"><option value="0">S0: No injuries</option><option value="1">S1: Light/moderate</option><option value="2">S2: Severe</option><option value="3" selected>S3: Life-threatening</option></select></div>
+        <div><label for="selE">Exposure</label><select id="selE"><option value="0">E0: Incredible</option><option value="1">E1: Very low</option><option value="2">E2: Low</option><option value="3">E3: Medium</option><option value="4" selected>E4: High</option></select></div>
+        <div><label for="selC">Controllability</label><select id="selC"><option value="0">C0: Controllable</option><option value="1">C1: Simply</option><option value="2">C2: Normally</option><option value="3" selected>C3: Difficult</option></select></div>
+      </div>
+      <div class="result" id="asilResult"></div>
+      <p class="hint" id="asilWhy"></p>
+      <details><summary>📊 See the full ASIL table (your choice is highlighted)</summary><div><table class="asil-table" id="asilTable"></table></div></details>
+    </div>
+    <div class="callout">💡 <b>Memory trick:</b> Add the numbers S + E + C. <b>10 = D, 9 = C, 8 = B, 7 = A, 6 or less = QM.</b> If any of them is 0, it's QM.</div>
+
+    <h3>🎯 Practice: guess the ASIL</h3>
+    <div id="asilPractice"></div>
+
+    <details><summary>✂️ ASIL decomposition: splitting a tough requirement</summary><div>
+      <p>An ASIL D requirement can be shared between two <b>independent</b> parts (e.g., a main and a backup channel), each built to a lower level:</p>
+      <ul><li>D = C(D) + A(D)</li><li>D = B(D) + B(D)</li><li>D = D(D) + QM(D)</li></ul>
+      <p class="hint">The "(D)" means the parts still remember the original goal was D. Independence (no common cause of failure) must be proven.</p>
+    </div></details>
+    <details><summary>🎯 What makes a good safety goal?</summary><div>
+      <p>Written at vehicle level, technology-neutral, with an ASIL, a <b>safe state</b> and a <b>Fault Tolerant Time Interval (FTTI)</b>.</p>
+      <div class="callout safety">Example: "Avoid unintended steering torque above 3 Nm for longer than 50 ms. <b>ASIL D</b>. Safe state: steering assist switched off with driver warning."</div>
+    </div></details>
+  </div>
+
+  <!-- MODULE 4 -->
+  <div class="module" id="m4">
+    <span class="pill cyber">Module 4</span>
+    <h2>TARA: Threat Analysis & Risk Assessment</h2>
+    <p class="lead">TARA answers: <i>"What could an attacker go after, how bad would it be, how easy is it, and what do we do about it?"</i></p>
+
+    <h3>Walk through the 7 steps</h3>
+    <div class="card" id="taraStepper"></div>
+
+    <h3>🕵️ STRIDE: six ways to think like an attacker <span class="hint">(tap a card)</span></h3>
+    <div class="grid g3" id="strideCards"></div>
+
+    <h3>🧮 Attack feasibility calculator</h3>
+    <p class="hint">ISO/SAE 21434 rates how hard an attack is by adding points for five factors. <b>More points = harder attack = lower feasibility.</b></p>
+    <div class="card">
+      <div style="margin-bottom:10px"><b>Try a preset:</b> <span class="chips" id="feasPresets" style="display:inline-flex"></span></div>
+      <div class="grid g3" id="feasSelects"></div>
+      <div class="result" id="feasResult"></div>
+    </div>
+
+    <h3>🎚️ Risk matrix <span class="hint">(click any cell, or use the dropdowns)</span></h3>
+    <div class="card">
+      <div class="grid g2">
+        <div><label for="selImpact">Impact (how bad?)</label><select id="selImpact"><option>Severe</option><option>Major</option><option>Moderate</option><option>Negligible</option></select></div>
+        <div><label for="selFeas">Attack feasibility (how easy?)</label><select id="selFeas"><option value="High">High</option><option value="Medium">Medium</option><option value="Low" selected>Low</option><option value="VeryLow">Very Low</option></select></div>
+      </div>
+      <table class="matrix" id="riskMatrix" style="margin-top:14px"></table>
+      <div class="info-box" id="riskInfo"></div>
+      <p class="hint">This is the example matrix from ISO/SAE 21434 Annex H. Companies may define their own.</p>
+    </div>
+
+    <h3>🔧 Worked example: steering system</h3>
+    <table>
+      <tr><th>Step</th><th>Result</th></tr>
+      <tr><td>Asset</td><td>Steering request message on the vehicle network (CAN). Property at risk: <b>Integrity</b></td></tr>
+      <tr><td>Damage scenario</td><td>Car steers unexpectedly at speed → Safety impact: <b>Severe</b></td></tr>
+      <tr><td>Threat</td><td>Attacker <b>spoofs</b> steering messages from a hacked infotainment unit</td></tr>
+      <tr><td>Attack path</td><td>Mobile network → infotainment → gateway → chassis network → steering ECU</td></tr>
+      <tr><td>Feasibility</td><td>≤1 month (4) + Expert (6) + Restricted info (3) + Unlimited window (0) + Specialized tools (4) = <b>17 → Low</b></td></tr>
+      <tr><td>Risk value</td><td>Severe × Low = <b>3</b></td></tr>
+      <tr><td>Treatment</td><td><b>Reduce.</b> Goal: "Ensure steering requests are authentic and unaltered." Controls: message authentication (SecOC), gateway firewall, intrusion detection, secure boot.</td></tr>
+    </table>
+  </div>
+  <!-- MODULE 5 -->
+  <div class="module" id="m5">
+    <span class="pill safety">Module 5</span> <span class="pill cyber">Safety + Security</span>
+    <h2>Working together: safety & security co-engineering</h2>
+    <p class="lead">A hacker who takes over the brakes creates a <b>safety</b> hazard. So the two teams must talk to each other constantly.</p>
+
+    <h3>Side-by-side comparison</h3>
+    <table>
+      <tr><th>Aspect</th><th><span class="pill safety">HARA</span></th><th><span class="pill cyber">TARA</span></th></tr>
+      <tr><td>Standard</td><td>ISO 26262-3</td><td>ISO/SAE 21434 Clause 15 (+ UN R155)</td></tr>
+      <tr><td>Cause</td><td>Faults and failures (accidental)</td><td>Attacks (intentional)</td></tr>
+      <tr><td>Starts from</td><td>Functions and how they can misbehave</td><td>Assets and what must be protected (Confidentiality, Integrity, Availability)</td></tr>
+      <tr><td>"How bad?"</td><td>Severity: injuries only</td><td>Impact: Safety, Financial, Operational, Privacy</td></tr>
+      <tr><td>"How likely?"</td><td>Exposure × Controllability</td><td>Attack feasibility (a smart attacker)</td></tr>
+      <tr><td>Rating</td><td>ASIL QM / A–D</td><td>Risk value 1–5 (+ CAL 1–4)</td></tr>
+      <tr><td>Goals</td><td>Safety goals (safe state, FTTI)</td><td>Cybersecurity goals and claims</td></tr>
+      <tr><td>Lifetime</td><td>Mostly stable after design</td><td>Living document, updated as threats change</td></tr>
+    </table>
+
+    <h3>Where they connect</h3>
+    <div class="grid g3">
+      <div class="card">🔗 <b>Shared item definition</b><br>Both analyses start from the same description of the system.</div>
+      <div class="card">➡️ <b>TARA → HARA</b><br>Damage scenarios with "Safety" impact link to HARA hazards. An attack is just another way to cause the hazard.</div>
+      <div class="card">⬅️ <b>HARA → TARA</b><br>Safety mechanisms and safety-critical messages become important security assets.</div>
+    </div>
+
+    <h3>⚔️ When safety and security disagree <span class="hint">(tap to see the solution)</span></h3>
+    <div class="grid g2" id="conflicts"></div>
+
+    <h3>A typical joint workflow</h3>
+    <div class="chips">
+      <span class="chip">1. Item definition</span><span class="chip">→</span>
+      <span class="chip">2. HARA ∥ TARA</span><span class="chip">→</span>
+      <span class="chip">3. Cross-check results</span><span class="chip">→</span>
+      <span class="chip">4. Safety concept + Security concept</span><span class="chip">→</span>
+      <span class="chip">5. Joint technical design</span><span class="chip">→</span>
+      <span class="chip">6. Fault-injection + penetration tests</span>
+    </div>
+  </div>
+
+  <!-- MODULE 6 -->
+  <div class="module" id="m6">
+    <span class="pill safety">Module 6</span>
+    <h2>Glossary</h2>
+    <input type="search" id="glSearch" placeholder="🔍 Type to search, e.g. ASIL, FTTI, SecOC…">
+    <div id="glossary" style="margin-top:10px"></div>
+  </div>
+
+  <!-- MODULE 7 -->
+  <div class="module" id="m7">
+    <span class="pill cyber">Module 7</span>
+    <h2>Final quiz</h2>
+    <p class="lead">10 questions. You'll see an explanation after each answer.</p>
+    <div id="finalQuiz"></div>
+  </div>
+
+  <div class="mod-footer">
+    <button class="btn ghost" id="prevMod">← Previous</button>
+    <button class="btn" id="markDone">✔ Mark module complete</button>
+    <button class="btn ghost" id="nextMod">Next →</button>
+  </div>
+  </div>
+ </div>
+</section>
+</main>
+<footer>Based on ISO 26262:2018, ISO 21448:2022, ISO/SAE 21434:2021, UNECE R155/R156. Values are simplified for learning; always refer to the official standards for real projects.</footer>
+<script>
+const GAME = [
+  {t:"A memory chip in the brake controller suffers a random bit flip.",a:"fusa",e:"A random hardware fault. No attacker involved, so this is Functional Safety. ECC memory or a watchdog would catch it."},
+  {t:"Someone sends fake 'brake now' messages on the car's internal network.",a:"cyber",e:"Deliberate message spoofing is a cyberattack. Message authentication (SecOC) helps prevent it."},
+  {t:"A software bug makes the wipers stop working in heavy rain.",a:"fusa",e:"A systematic (design) fault. Better requirements, reviews and testing prevent it."},
+  {t:"A thief uses a 'relay box' to unlock and start a keyless car.",a:"cyber",e:"A relay attack extends the key's radio signal. Distance-bounding / UWB keys help defend against it."},
+  {t:"A fake over-the-air update installs malicious software.",a:"cyber",e:"Updates must be digitally signed and verified (UN R156 / secure boot)."},
+  {t:"A wheel-speed sensor wire breaks and the ABS gets wrong data.",a:"fusa",e:"A hardware failure. Plausibility checks between the four wheel sensors detect it."},
+  {t:"Personal contacts and location history are stolen from the infotainment.",a:"cyber",e:"A privacy / confidentiality breach, covered by cybersecurity (and data protection law)."},
+  {t:"The engine controller freezes, so the watchdog resets it.",a:"fusa",e:"A watchdog is a classic safety mechanism against software or hardware hangs."}
+];
+const EXEC_Q = [
+  {q:"Functional Safety mainly protects against…",o:["Hackers","Failures and malfunctions of electronics/software","Bad weather","Driver mistakes only"],a:1,e:"FuSa (ISO 26262) is about harm caused by malfunctioning electronic systems."},
+  {q:"Automotive cybersecurity mainly protects against…",o:["Random hardware failures","Wear and tear","Intentional attacks by people","Manufacturing defects"],a:2,e:"Security is about deliberate misuse by attackers."},
+  {q:"Which one is a legal requirement for vehicle type approval in the EU and other UNECE markets?",o:["ISO 26262","UN R155","ISO 9001","AUTOSAR"],a:1,e:"UN R155 requires a certified Cyber Security Management System for type approval."},
+  {q:"What is the main output of a HARA?",o:["Risk values 1–5","ASIL ratings and safety goals","A penetration test report","A software update plan"],a:1,e:"HARA gives each hazardous event an ASIL and produces safety goals."},
+  {q:"Why must TARA be updated during the car's life?",o:["Because cars get heavier","Because new attacks and vulnerabilities keep appearing","Because ASILs change yearly","It doesn't need updating"],a:1,e:"Attackers learn and adapt, so threat assessments must be kept current."}
+];
+const FINAL_Q = [
+  {q:"In HARA, what does the 'C' in S/E/C stand for?",o:["Cost","Controllability","Criticality","Confidentiality"],a:1,e:"Controllability = can a typical driver (or others) avoid the harm?"},
+  {q:"S3 + E4 + C3 gives which ASIL?",o:["ASIL B","ASIL C","ASIL D","QM"],a:2,e:"3+4+3 = 10 → ASIL D, the highest level."},
+  {q:"S2 + E3 + C2 gives which ASIL?",o:["QM","ASIL A","ASIL B","ASIL C"],a:1,e:"2+3+2 = 7 → ASIL A."},
+  {q:"Which four impact categories does ISO/SAE 21434 use in TARA?",o:["Safety, Financial, Operational, Privacy","Speed, Fuel, Oil, Pressure","Cost, Time, Quality, Scope","Confidentiality, Integrity, Availability, Authenticity"],a:0,e:"SFOP: Safety, Financial, Operational and Privacy."},
+  {q:"In the attack-potential method, a HIGHER total score means…",o:["The attack is easier","The attack is harder (lower feasibility)","The impact is bigger","The ASIL is higher"],a:1,e:"Points represent effort (time, expertise, equipment). More effort = less feasible."},
+  {q:"Which is NOT a valid risk treatment option in ISO/SAE 21434?",o:["Avoid","Reduce","Share","Ignore without documentation"],a:3,e:"Options are Avoid, Reduce, Share and Retain. Retaining a risk must be justified and documented."},
+  {q:"What does SOTIF (ISO 21448) cover?",o:["Hacker attacks","Hazards from random hardware faults","Hazards when nothing is broken but the function isn't good enough","Software updates"],a:2,e:"Example: a camera that misses a pedestrian in heavy glare, with no fault present."},
+  {q:"What is the FTTI?",o:["Fault Tolerant Time Interval: how long a fault can exist before it becomes dangerous","A type of CAN message","A security certificate","A testing tool"],a:0,e:"Safety mechanisms must detect and react within the FTTI."},
+  {q:"UN R156 is about…",o:["Crash testing","Software update management","Emission limits","Tyre pressure"],a:1,e:"R156 requires a Software Update Management System (SUMS)."},
+  {q:"A secure-boot check delays an ECU's start-up beyond its safety timing. This is an example of…",o:["A pure safety issue","A pure security issue","A safety–security conflict that needs co-engineering","Not a problem"],a:2,e:"Security mechanisms must still respect safety timing such as the FTTI, so both teams must agree on a design."}
+];
+const PARTS = [
+  ["Part 1","Vocabulary","The dictionary: definitions of all key terms like item, hazard, ASIL and safe state."],
+  ["Part 2","Safety management","Who is responsible, safety plans, safety culture, audits and assessments."],
+  ["Part 3","Concept phase","Item definition, <b>HARA</b>, safety goals and the functional safety concept."],
+  ["Part 4","System level","Technical safety concept, system architecture, integration and vehicle-level testing."],
+  ["Part 5","Hardware","Hardware design, failure analysis and the metrics SPFM, LFM and PMHF."],
+  ["Part 6","Software","Software requirements, architecture, coding guidelines, unit and integration testing."],
+  ["Part 7","Production & operation","Making, servicing and decommissioning the product safely."],
+  ["Part 8","Supporting processes","Configuration and change management, tool qualification, documentation, reuse of proven parts."],
+  ["Part 9","ASIL-oriented analyses","ASIL decomposition and analysis of dependent (common-cause) failures."],
+  ["Part 10","Guidelines","Explanations and examples to help apply the standard."],
+  ["Part 11","Semiconductors","How to apply ISO 26262 to chips and microcontrollers."],
+  ["Part 12","Motorcycles","Adaptations for motorcycles (uses MSIL to derive ASIL)."]
+];
+const SURFACES = [
+  ["📶 Telematics / mobile network","Remote attacks over the internet. The 2015 Jeep hack used this route.","Firewalls, network segmentation, intrusion detection, minimal open services."],
+  ["📱 Wi-Fi & Bluetooth","Exploiting bugs in wireless software stacks.","Patched stacks, pairing security, isolating infotainment from vehicle control."],
+  ["🔑 Keyless entry","Relay attacks that extend the key fob's signal to steal the car.","Ultra-wideband (UWB) distance measurement, motion-sensing key fobs."],
+  ["🔌 OBD-II diagnostic port","Physical access to the internal network; used for key programming theft.","Secure gateway, authenticated diagnostics (e.g., UDS security access with strong crypto)."],
+  ["💿 USB / infotainment","Malicious files or apps on media devices.","Input validation, sandboxing, signed apps."],
+  ["⚡ EV charging port","Attacks via charging communication (e.g., ISO 15118).","TLS certificates, input validation, isolation."],
+  ["☁️ Backend / cloud & apps","Compromised servers or phone apps that send commands to cars.","Strong authentication, monitoring, least privilege, secure APIs."],
+  ["🔄 Over-the-air updates","Installing fake or tampered software.","Code signing, secure boot, rollback protection (UN R156)."],
+  ["📡 V2X (vehicle-to-everything)","Fake traffic or hazard messages from other 'vehicles'.","Certificate-based message signing (PKI)."]
+];
+const HARA_STEPS = [
+  ["Item definition","Describe the system: what it does, its boundaries, interfaces and assumptions.<br><i>Example: Electric Power Steering (EPS) adds steering torque to help the driver.</i>"],
+  ["Situation analysis","List the driving situations and modes that matter.<br><i>Example: highway at 130 km/h, city traffic, parking, wet road, towing.</i>"],
+  ["Hazard identification","Ask 'what if the function…' using guide words: <b>loss of, unintended, too much, too little, too late, reversed</b>.<br><i>Example: 'Unintended steering torque'.</i>"],
+  ["Hazardous events","Combine each hazard with each situation.<br><i>Example: 'Unintended steering torque while driving on a highway at high speed'.</i>"],
+  ["Classify S, E, C","Rate Severity, Exposure and Controllability for each hazardous event.<br><i>Example: S3 (fatal crash possible), E4 (highways are common), C3 (hard to correct sudden steering).</i>"],
+  ["Determine ASIL","Use the ISO 26262 table (or the sum trick).<br><i>Example: 3 + 4 + 3 = 10 → <b>ASIL D</b>.</i>"],
+  ["Define safety goals","Write a top-level safety requirement with ASIL, safe state and FTTI.<br><i>Example: 'Avoid unintended steering torque &gt; 3 Nm for &gt; 50 ms. ASIL D.'</i>"]
+];
+const TARA_STEPS = [
+  ["Asset identification","Find what is valuable and which property could be harmed: <b>Confidentiality</b> (keep secret), <b>Integrity</b> (keep unaltered), <b>Availability</b> (keep working). Then describe the <b>damage scenario</b>.<br><i>Example: Steering message: Integrity. Damage: car steers on its own.</i>"],
+  ["Threat scenarios","Describe how an attacker could harm the asset. STRIDE and the UN R155 Annex 5 threat list are good checklists.<br><i>Example: spoofing steering messages.</i>"],
+  ["Impact rating","Rate the damage in four areas: <b>S</b>afety, <b>F</b>inancial, <b>O</b>perational, <b>P</b>rivacy. Levels: Severe, Major, Moderate, Negligible."],
+  ["Attack path analysis","Map the steps an attacker would take, often as an <b>attack tree</b>.<br><i>Example: Mobile network → infotainment → gateway → chassis CAN.</i>"],
+  ["Attack feasibility","Rate how easy the path is (High, Medium, Low, Very Low) using attack potential, CVSS or attack-vector methods."],
+  ["Risk value","Combine impact and feasibility in a risk matrix to get a value from <b>1 (low)</b> to <b>5 (high)</b>."],
+  ["Risk treatment","Decide: <b>Avoid</b> (remove the feature), <b>Reduce</b> (add protection), <b>Share</b> (e.g., insurance/contracts), or <b>Retain</b> (accept with justification). 'Reduce' creates <b>cybersecurity goals</b>; Share/Retain create <b>cybersecurity claims</b>."]
+];
+const STRIDE = [
+  ["S","Spoofing","Pretending to be someone/something else.","Fake key fob, fake ECU messages","Authentication"],
+  ["T","Tampering","Changing data or code.","Modified firmware, altered odometer","Integrity checks, signatures"],
+  ["R","Repudiation","Denying you did something.","Erasing logs after an attack","Secure logging"],
+  ["I","Information disclosure","Leaking secrets.","Stealing crypto keys or location data","Encryption, access control"],
+  ["D","Denial of service","Making something stop working.","Flooding the CAN bus","Rate limiting, filtering"],
+  ["E","Elevation of privilege","Gaining more rights than allowed.","Infotainment app gains control of brakes","Isolation, least privilege"]
+];
+const FEAS = [
+  {k:"Elapsed time",o:[["≤ 1 day",0],["≤ 1 week",1],["≤ 1 month",4],["≤ 6 months",17],["> 6 months",19]]},
+  {k:"Specialist expertise",o:[["Layman",0],["Proficient",3],["Expert",6],["Multiple experts",8]]},
+  {k:"Knowledge of the item",o:[["Public",0],["Restricted",3],["Confidential",7],["Strictly confidential",11]]},
+  {k:"Window of opportunity",o:[["Unlimited",0],["Easy",1],["Moderate",4],["Difficult",10]]},
+  {k:"Equipment",o:[["Standard",0],["Specialized",4],["Bespoke",7],["Multiple bespoke",9]]}
+];
+const PRESETS = [
+  ["🔌 OBD key-programming theft",[1,1,0,1,0]],
+  ["🔑 Keyless relay attack",[1,1,0,2,1]],
+  ["📶 Remote attack on steering",[2,2,1,0,1]],
+  ["🔬 Chip-level key extraction",[4,3,2,2,2]]
+];
+const IMPACTS = ["Severe","Major","Moderate","Negligible"];
+const FEAS_LEVELS = ["VeryLow","Low","Medium","High"];
+const RISK = {Severe:[2,3,4,5],Major:[1,2,3,4],Moderate:[1,2,2,3],Negligible:[1,1,1,1]};
+const RISK_TXT = {1:"Very low risk: usually <b>retain</b> (accept) with documentation.",2:"Low risk: often retained; consider simple measures.",3:"Medium risk: usually <b>reduce</b> with cybersecurity controls.",4:"High risk: <b>reduce</b> with strong controls; consider design changes.",5:"Very high risk: must <b>reduce</b> or <b>avoid</b> (e.g., remove or redesign the feature)."};
+const PRACTICE = [
+  {t:"Unintended steering torque at highway speed.",s:3,e:4,c:3,why:"Fatal crash possible (S3), highway driving is common (E4), sudden steering is very hard to correct (C3)."},
+  {t:"Brake lights fail to turn on when braking in city traffic.",s:2,e:4,c:2,why:"Rear-end collision with serious injuries (S2), braking in traffic is common (E4), following drivers can usually react (C2)."},
+  {t:"Loss of power-steering assist while parking slowly.",s:1,e:4,c:1,why:"Only minor bumps possible (S1), parking is common (E4), steering is just heavier, so easy to control (C1). 1+4+1 = 6."},
+  {t:"Loss of rear-wheel braking while braking at speed.",s:3,e:4,c:2,why:"Can lead to serious crash (S3), braking is very common (E4), front brakes still work so most drivers cope (C2)."},
+  {t:"The radio suddenly plays at maximum volume.",s:0,e:4,c:1,why:"Annoying, but no realistic injury (S0), so it's QM regardless of the other values."}
+];
+const CONFLICTS = [
+  ["🚪 Door locks after a crash","Safety: doors must unlock so rescuers can get in. Security: doors should stay locked against theft.","Use crash signals from the airbag controller (trusted, authenticated) to unlock; security policy allows this specific, verified event."],
+  ["⏱️ Secure boot vs start-up time","Security: check the software signature at every start. Safety: the brake controller must be ready within milliseconds.","Use hardware crypto accelerators, staged/parallel boot, or verify in the background while running a known-good image."],
+  ["🔧 Diagnostics access","Safety: workshops need easy access to fix faults. Security: the OBD port is an attack entry point.","Authenticated diagnostics with role-based certificates, and a gateway that blocks unauthorised commands."],
+  ["🔄 Fast security patches","Security: fix vulnerabilities quickly via OTA. Safety: every change needs impact analysis and testing.","Joint change-impact analysis; modular architecture so security fixes don't touch safety-critical code where possible."]
+];
+const GLOSSARY = [
+  ["ASIL","Automotive Safety Integrity Level (QM, A, B, C, D). How much safety rigor is needed. D is the highest."],
+  ["Attack path","The chain of steps an attacker uses to reach an asset."],
+  ["Attack potential","A points-based way to rate how hard an attack is (time, expertise, knowledge, window, equipment)."],
+  ["Asset","Something worth protecting, e.g., a key, a message, firmware or personal data."],
+  ["CAL","Cybersecurity Assurance Level (1–4). How much security rigor is needed for a goal, similar to ASIL."],
+  ["CAN","Controller Area Network, the common internal network connecting ECUs in a car."],
+  ["CIA","Confidentiality, Integrity, Availability: the three core security properties."],
+  ["CSMS","Cyber Security Management System, required by UN R155."],
+  ["Damage scenario","What bad outcome happens to people or the company if an asset is compromised."],
+  ["ECU","Electronic Control Unit, a small computer controlling a car function."],
+  ["E/E system","Electrical/electronic system: sensors, ECUs, actuators and software."],
+  ["FIT","Failures In Time: 1 failure per billion hours."],
+  ["FTTI","Fault Tolerant Time Interval: how long a fault can last before it can cause harm."],
+  ["FuSa","Functional Safety (ISO 26262)."],
+  ["HARA","Hazard Analysis and Risk Assessment: the safety risk analysis that produces ASILs and safety goals."],
+  ["Hazard","A potential source of harm caused by malfunctioning behaviour."],
+  ["Item","The system or function being analysed at vehicle level, e.g., power steering."],
+  ["LFM","Latent Fault Metric: how well hidden faults are detected."],
+  ["OTA","Over-The-Air software update."],
+  ["PMHF","Probabilistic Metric for random Hardware Failures: overall dangerous failure rate."],
+  ["QM","Quality Management: no special safety requirements beyond normal good quality."],
+  ["Safe state","A condition with acceptable risk the system moves to after a fault, e.g., assist switched off."],
+  ["Safety case","The structured argument and evidence that a system is safe enough."],
+  ["Safety goal","Top-level safety requirement from HARA, with an ASIL."],
+  ["SecOC","Secure Onboard Communication: an AUTOSAR feature that authenticates messages on in-vehicle networks."],
+  ["SOTIF","Safety Of The Intended Functionality (ISO 21448): hazards without faults."],
+  ["SPFM","Single-Point Fault Metric: how well single faults are covered by safety mechanisms."],
+  ["STRIDE","Threat checklist: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege."],
+  ["SUMS","Software Update Management System, required by UN R156."],
+  ["TARA","Threat Analysis and Risk Assessment: the security risk analysis that produces risk values and cybersecurity goals."],
+  ["VSOC","Vehicle Security Operations Centre: monitors the fleet for attacks."]
+];
+</script>
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const store = {get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+// Tabs & theme
+$$(".tab").forEach(t=>t.onclick=()=>{
+  $$(".tab").forEach(x=>x.classList.remove("active"));$$(".panel").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");$("#"+t.dataset.tab).classList.add("active");
+});
+function applyTheme(d){document.body.classList.toggle("dark",d);$("#themeBtn").textContent=d?"☀️ Light mode":"🌙 Dark mode"}
+applyTheme(store.get("fusaDark",false));
+$("#themeBtn").onclick=()=>{const d=!document.body.classList.contains("dark");applyTheme(d);store.set("fusaDark",d)};
+
+// Flip cards, timeline, reveal cards
+$$(".flip").forEach(f=>f.onclick=()=>f.classList.toggle("flipped"));
+$$(".tl-item").forEach(i=>i.onclick=()=>i.classList.toggle("open"));
+
+// Safety-or-security game
+let gi=0,gScore=0;
+function showGame(){
+  const fb=$("#gameFeedback");fb.className="feedback";$("#gameNext").style.display="none";
+  $$("[data-ans]").forEach(b=>b.disabled=false);
+  if(gi>=GAME.length){
+    $("#gameItem").innerHTML=`🏁 You scored <b>${gScore} / ${GAME.length}</b>!`;
+    $("#gameProgress").textContent="Finished";
+    $$("[data-ans]").forEach(b=>b.disabled=true);
+    const n=$("#gameNext");n.textContent="↻ Play again";n.style.display="inline-block";return;
+  }
+  $("#gameProgress").textContent=`Scenario ${gi+1} of ${GAME.length} · Score: ${gScore}`;
+  $("#gameItem").textContent=GAME[gi].t;
+}
+$$("[data-ans]").forEach(b=>b.onclick=()=>{
+  const it=GAME[gi],ok=b.dataset.ans===it.a;if(ok)gScore++;
+  const fb=$("#gameFeedback");fb.className="feedback show "+(ok?"good":"badf");
+  fb.innerHTML=(ok?"✅ Correct! ":"❌ Not quite. ")+it.e;
+  $$("[data-ans]").forEach(x=>x.disabled=true);
+  const n=$("#gameNext");n.textContent="Next scenario →";n.style.display="inline-block";
+});
+$("#gameNext").onclick=()=>{if(gi>=GAME.length){gi=0;gScore=0}else gi++;showGame()};
+showGame();
+
+// Generic quiz
+function quiz(el,qs){
+  let answered=0,score=0;
+  el.innerHTML=qs.map((q,i)=>`<div class="q"><div class="q-title">${i+1}. ${q.q}</div>${q.o.map((o,j)=>`<button class="opt" data-q="${i}" data-o="${j}">${o}</button>`).join("")}<div class="explain"></div></div>`).join("")+`<div class="score" style="display:none"></div><div style="text-align:center;margin-top:10px"><button class="btn ghost retry">↻ Retry quiz</button></div>`;
+  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const q=qs[b.dataset.q],box=b.parentElement;
+    box.querySelectorAll(".opt").forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add("correct")});
+    const ok=+b.dataset.o===q.a;if(ok)score++;else b.classList.add("wrong");
+    const ex=box.querySelector(".explain");ex.innerHTML=(ok?"✅ ":"❌ ")+q.e;ex.classList.add("show");
+    if(++answered===qs.length){const s=el.querySelector(".score");s.style.display="block";
+      const pct=Math.round(score/qs.length*100);
+      s.innerHTML=`Your score: ${score} / ${qs.length} (${pct}%) ${pct>=80?"🎉 Excellent!":pct>=50?"👍 Good, review the explanations.":"📚 Revisit the modules and try again."}`;}
+  });
+  el.querySelector(".retry").onclick=()=>quiz(el,qs);
+}
+quiz($("#execQuiz"),EXEC_Q);
+quiz($("#finalQuiz"),FINAL_Q);
+
+// Chip selectors (ISO 26262 parts, attack surfaces)
+function chipSet(wrap,info,items,render){
+  wrap.innerHTML=items.map((it,i)=>`<button class="chip" data-i="${i}">${it[0]}${it[1]&&wrap.id==="partChips"?": "+it[1]:""}</button>`).join("");
+  wrap.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+    wrap.querySelectorAll(".chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");
+    info.innerHTML=render(items[c.dataset.i]);
+  });
+}
+chipSet($("#partChips"),$("#partInfo"),PARTS,p=>`<b>${p[0]}: ${p[1]}</b><br>${p[2]}`);
+chipSet($("#surfaceChips"),$("#surfaceInfo"),SURFACES,s=>`<b>${s[0]}</b><br>⚠️ <b>Example attack:</b> ${s[1]}<br>🛡️ <b>Typical protection:</b> ${s[2]}`);
+
+// Steppers
+function stepper(el,steps,cls){
+  let cur=0;
+  function draw(){
+    el.innerHTML=`<div class="stepper-head">${steps.map((s,i)=>`<div class="step-dot ${i===cur?"on":i<cur?"past":""}" data-i="${i}">${i+1}. ${s[0]}</div>`).join("")}</div>
+    <div class="step-body"><h3 style="margin-top:4px">Step ${cur+1}: ${steps[cur][0]}</h3><p>${steps[cur][1]}</p></div>
+    <div class="step-nav"><button class="btn ghost" ${cur===0?"disabled":""} data-d="-1">← Back</button><button class="btn" ${cur===steps.length-1?"disabled":""} data-d="1">Next step →</button></div>`;
+    el.querySelectorAll(".step-dot").forEach(d=>d.onclick=()=>{cur=+d.dataset.i;draw()});
+    el.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{cur+=+b.dataset.d;draw()});
+  }
+  draw();
+}
+stepper($("#haraStepper"),HARA_STEPS);
+stepper($("#taraStepper"),TARA_STEPS);
+
+// ASIL logic
+function asil(s,e,c){if(!s||!e||!c)return"QM";const t=s+e+c;return t>=10?"D":t===9?"C":t===8?"B":t===7?"A":"QM"}
+const ASIL_DESC={QM:"No ISO 26262 safety requirements beyond normal quality management.",A:"Lowest safety level: basic safety measures and process.",B:"Moderate rigor, e.g., brake lights, headlights.",C:"High rigor, e.g., cruise control, rear brakes.",D:"Highest rigor: strongest safety mechanisms, independent reviews, formal methods recommended."};
+function buildAsilTable(){
+  let h="<tr><th>Severity</th><th>Exposure</th><th>C1</th><th>C2</th><th>C3</th></tr>";
+  for(let s=1;s<=3;s++)for(let e=1;e<=4;e++){
+    h+="<tr>"+(e===1?`<td class="lbl" rowspan="4"><b>S${s}</b></td>`:"")+`<td class="lbl">E${e}</td>`;
+    for(let c=1;c<=3;c++){const a=asil(s,e,c);h+=`<td class="asil-${a}" id="at-${s}${e}${c}">${a}</td>`}
+    h+="</tr>";
+  }
+  $("#asilTable").innerHTML=h;
+}
+function updAsil(){
+  const s=+$("#selS").value,e=+$("#selE").value,c=+$("#selC").value,a=asil(s,e,c);
+  const r=$("#asilResult");r.className="result asil-"+a;r.textContent=a==="QM"?"QM (no ASIL)":"ASIL "+a;
+  $("#asilWhy").innerHTML=(!s||!e||!c?"One of the values is 0, so the result is QM. ":`S${s} + E${e} + C${c} = ${s+e+c} → ${a}. `)+ASIL_DESC[a];
+  $$("#asilTable td").forEach(td=>td.classList.remove("hl"));
+  const cell=$(`#at-${s}${e}${c}`);if(cell)cell.classList.add("hl");
+}
+buildAsilTable();["#selS","#selE","#selC"].forEach(id=>$(id).onchange=updAsil);updAsil();
+
+// ASIL practice
+(function(){
+  const el=$("#asilPractice");
+  el.innerHTML=PRACTICE.map((p,i)=>`<div class="q"><div class="q-title">${i+1}. ${p.t}</div><div class="chips">${["QM","A","B","C","D"].map(a=>`<button class="chip" data-p="${i}" data-a="${a}">${a==="QM"?"QM":"ASIL "+a}</button>`).join("")}</div><div class="explain"></div></div>`).join("");
+  el.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{
+    const p=PRACTICE[b.dataset.p],ans=asil(p.s,p.e,p.c),box=b.closest(".q");
+    box.querySelectorAll(".chip").forEach(x=>{x.disabled=true;x.style.cursor="default";if(x.dataset.a===ans){x.classList.add("sel")}});
+    const ok=b.dataset.a===ans;if(!ok)b.style.borderColor="var(--bad)";
+    const ex=box.querySelector(".explain");ex.classList.add("show");
+    ex.innerHTML=`${ok?"✅ Correct!":"❌ Typical rating is <b>"+(ans==="QM"?"QM":"ASIL "+ans)+"</b>."} S${p.s} / E${p.e} / C${p.c}: ${p.why} <i>Real ratings depend on your assumptions and situation analysis.</i>`;
+  });
+})();
+
+// STRIDE cards
+$("#strideCards").innerHTML=STRIDE.map(s=>`<div class="card reveal"><b style="font-size:1.4rem;color:var(--cyber)">${s[0]}</b> <b>${s[1]}</b><br>${s[2]} <div class="tap">Tap for car example ▾</div><div class="ans">🚗 <b>Example:</b> ${s[3]}<br>🛡️ <b>Defence:</b> ${s[4]}</div></div>`).join("");
+
+// Conflicts
+$("#conflicts").innerHTML=CONFLICTS.map(c=>`<div class="card reveal"><b>${c[0]}</b><br>${c[1]}<div class="tap">Tap to see a solution ▾</div><div class="ans">💡 ${c[2]}</div></div>`).join("");
+$$(".reveal").forEach(r=>r.onclick=()=>r.classList.toggle("open"));
+
+// Feasibility calculator
+$("#feasSelects").innerHTML=FEAS.map((f,i)=>`<div><label for="fs${i}">${f.k}</label><select id="fs${i}">${f.o.map(o=>`<option value="${o[1]}">${o[0]} (${o[1]})</option>`).join("")}</select></div>`).join("");
+$("#feasPresets").innerHTML=PRESETS.map((p,i)=>`<button class="chip" data-pr="${i}">${p[0]}</button>`).join("");
+function feasLevel(t){return t<=9?"High":t<=13?"Medium":t<=19?"Low":"VeryLow"}
+function updFeas(){
+  const vals=FEAS.map((_,i)=>+$("#fs"+i).value),t=vals.reduce((a,b)=>a+b,0),lvl=feasLevel(t);
+  const r=$("#feasResult");r.className="result feas-"+lvl;
+  r.innerHTML=`Total points: ${t} → Feasibility: ${lvl==="VeryLow"?"Very Low":lvl}<br><small style="font-weight:400;font-size:.85rem">0–9 High · 10–13 Medium · 14–19 Low · 20+ Very Low</small>`;
+}
+FEAS.forEach((_,i)=>$("#fs"+i).onchange=()=>{$$("#feasPresets .chip").forEach(x=>x.classList.remove("sel"));updFeas()});
+$$("#feasPresets .chip").forEach(c=>c.onclick=()=>{
+  $$("#feasPresets .chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");
+  PRESETS[c.dataset.pr][1].forEach((idx,i)=>$("#fs"+i).selectedIndex=idx);updFeas();
+});
+updFeas();
+
+// Risk matrix
+function buildMatrix(){
+  let h="<tr><th>Impact ↓ / Feasibility →</th>"+FEAS_LEVELS.map(f=>`<th>${f==="VeryLow"?"Very Low":f}</th>`).join("")+"</tr>";
+  IMPACTS.forEach(im=>{h+=`<tr><td class="lbl"><b>${im}</b></td>`+RISK[im].map((v,j)=>`<td class="risk-${v}" data-im="${im}" data-fe="${FEAS_LEVELS[j]}">${v}</td>`).join("")+"</tr>"});
+  $("#riskMatrix").innerHTML=h;
+  $$("#riskMatrix td[data-im]").forEach(td=>td.onclick=()=>{$("#selImpact").value=td.dataset.im;$("#selFeas").value=td.dataset.fe;updRisk()});
+}
+function updRisk(){
+  const im=$("#selImpact").value,fe=$("#selFeas").value,v=RISK[im][FEAS_LEVELS.indexOf(fe)];
+  $$("#riskMatrix td").forEach(td=>td.classList.toggle("hl",td.dataset.im===im&&td.dataset.fe===fe));
+  $("#riskInfo").innerHTML=`<b>${im}</b> impact × <b>${fe==="VeryLow"?"Very Low":fe}</b> feasibility = <b>Risk ${v}</b>. ${RISK_TXT[v]}`;
+}
+buildMatrix();$("#selImpact").onchange=updRisk;$("#selFeas").onchange=updRisk;updRisk();
+
+// Glossary
+function drawGlossary(f=""){
+  const q=f.toLowerCase(),list=GLOSSARY.filter(g=>(g[0]+g[1]).toLowerCase().includes(q));
+  $("#glossary").innerHTML=list.length?list.map(g=>`<div class="gl-item"><b>${g[0]}</b>: ${g[1]}</div>`).join(""):"<p class='hint'>No matching terms.</p>";
+}
+$("#glSearch").oninput=e=>drawGlossary(e.target.value);drawGlossary();
+
+// Module navigation & progress
+const MODS=["m1","m2","m3","m4","m5","m6","m7"];
+let curMod=0,done=store.get("fusaDone",[]);
+function showMod(i){
+  curMod=i;$$(".module").forEach(m=>m.classList.remove("active"));$("#"+MODS[i]).classList.add("active");
+  $$("#sideLinks a").forEach(a=>a.classList.toggle("current",a.dataset.mod===MODS[i]));
+  $("#prevMod").disabled=i===0;$("#nextMod").disabled=i===MODS.length-1;
+  const d=done.includes(MODS[i]);$("#markDone").textContent=d?"✔ Completed (click to undo)":"✔ Mark module complete";
+  $("#detail").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function drawProgress(){
+  $$("#sideLinks a").forEach(a=>a.classList.toggle("done",done.includes(a.dataset.mod)));
+  $("#progBar").style.width=(done.length/MODS.length*100)+"%";
+  $("#progText").textContent=`${done.length} of ${MODS.length} modules complete`+(done.length===MODS.length?" 🎓":"");
+}
+$$("#sideLinks a").forEach(a=>a.onclick=e=>{e.preventDefault();showMod(MODS.indexOf(a.dataset.mod))});
+$("#prevMod").onclick=()=>showMod(curMod-1);
+$("#nextMod").onclick=()=>showMod(curMod+1);
+$("#markDone").onclick=()=>{
+  const m=MODS[curMod];
+  if(done.includes(m))done=done.filter(x=>x!==m);
+  else{done.push(m);if(curMod<MODS.length-1){store.set("fusaDone",done);drawProgress();showMod(curMod+1);return}}
+  store.set("fusaDone",done);drawProgress();showMod(curMod);
+};
+drawProgress();
+$$("#sideLinks a")[0].classList.add("current");$("#prevMod").disabled=true;
+</script>
+</body>
+</html>
